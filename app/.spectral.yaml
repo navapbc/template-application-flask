@@ -1,0 +1,24 @@
+# Spectral rule file to use in Makefile. See: https://meta.stoplight.io/docs/spectral/docs/getting-started/rulesets.md
+extends: spectral:oas
+
+rules:
+  operation-description: off
+  no-$ref-siblings: info
+  path-kebab-case:
+    description: Paths must be kebab-case.
+    message: "Path {{property}} must be kebab-case"
+    severity: warn
+    given: $.paths[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(\/([a-z0-9-]+|{[^}]+}))+$"
+  path-param-snake-case:
+    description: Parameters in paths must be snake_case.
+    message: "Parameter in path {{property}} must be snake_case"
+    severity: error
+    given: $.paths[*]~
+    then:
+      function: pattern
+      functionOptions:
+        match: "^(\/([^{^}]+|{[a-z0-9_]+}))+$"
