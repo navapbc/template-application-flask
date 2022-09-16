@@ -1,0 +1,250 @@
+openapi: 3.0.3
+info:
+  title: Template Application Flask
+  description: Template API for a Flask Application
+  version: "2022-06-21"
+  contact:
+    name: Template Application Flask
+    url: https://www.navapbc.com/
+    email: engineering@navapbc.com
+
+security:
+  - api_key: []
+  
+
+servers:
+  - url: /v1
+    description: Development server
+
+tags:
+  - name: Example
+  - name: Health
+    description: API Health and Integrity
+
+paths:
+  /healthcheck:
+    get:
+      security:
+        - {} # No authentication required
+      tags:
+        - Health
+      summary: Healthcheck for the API
+      operationId: api.route.healthcheck.healthcheck_get
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: boolean
+
+  /example-person:
+    post:
+      security:
+        - api_key: []
+      tags:
+        - Example
+      summary: Example post endpoint for creating a simple model in the DB
+      operationId: api.route.example_person_route.example_person_post
+      responses:
+        "201":
+          description: Example person was successfully submitted
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessfulResponse'
+                  - properties:
+                      data:
+                        $ref: "#/components/schemas/ExamplePersonResponse"
+        "400":
+          description: An unsuccessful request returns a 400 status code if one or more errors occurred.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExamplePersonRequest"
+
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Auth
+      in: header
+      x-apikeyInfoFunc: api.auth.api_key_auth.api_key_auth
+  schemas:
+    Date:
+      type: string
+      example: '1970-01-01'
+      format: date
+
+    ExamplePersonBase:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: Jane
+          description: The persons first name
+        middle_name:
+          type: string
+          example: Anne
+          nullable: true
+          description: The persons middle name
+        last_name:
+          type: string
+          example: Doe
+          description: The persons last name
+        phone_number:
+          type: string
+          example: "224-705-2345"
+          pattern: '^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$'
+        date_of_birth:
+          $ref: "#/components/schemas/Date"
+        is_real:
+          type: boolean
+          example: true
+          description: whether or not the person is real
+
+    ExamplePetBase:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Spot
+        species:
+          type: string
+          example: Dog
+          enum:
+            - Dog
+            - Cat
+            - Bird
+            - Fish
+
+    ExamplePetWithId:
+      type: object
+      properties:
+        example_pet_id:
+          type: string
+          example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
+          nullable: true
+      allOf:
+        - $ref: "#/components/schemas/ExamplePetBase"
+
+    ExamplePersonWithId:
+      type: object
+      properties:
+        pets:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/ExamplePetBase"
+      allOf:
+        - $ref: "#/components/schemas/ExamplePersonBase"
+
+    ExamplePersonRequest:
+      type: object
+      properties:
+        pets:
+          type: array
+          nullable: true
+          items:
+            $ref: "#/components/schemas/ExamplePetBase"
+      allOf:
+        - $ref: "#/components/schemas/ExamplePersonBase"
+
+    ExamplePersonResponse:
+      type: object
+      properties:
+        example_person_id:
+          type: string
+          format: uuid
+          example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
+        pets:
+            type: array
+            nullable: true
+            items:
+              $ref: "#/components/schemas/ExamplePetWithId"
+      allOf:
+        - $ref: "#/components/schemas/ExamplePersonWithId"
+
+    SuccessfulResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 201
+        message:
+          type: string
+          example: "success"
+        data:
+          oneOf:
+            - type: array
+            - type: object
+        warnings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationErrorDetail"
+      required: ["status_code"]
+      additionalProperties: false
+
+    ErrorResponse:
+      type: object
+      properties:
+        status_code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Unable to add record"
+        data:
+          oneOf:
+            - type: array
+            - type: object
+        warnings:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationErrorDetail"
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ValidationErrorDetail"
+      required: ["status_code", "errors"]
+      additionalProperties: false
+
+    ValidationErrorDetail:
+      type: object
+      properties:
+        type:
+          example: "required"
+          type: string
+        message:
+          example: "request.first_name is required."
+          description: "Somewhat user-friendly description of the error. May contain PII."
+          type: string
+        rule:
+          description: >
+            Usage varies depending on the source of the validation error. OpenAPI validation
+            errors will set this to the expected value behavior (i.e the max length, or pattern).
+          oneOf:
+            - type: string
+            - type: number
+            - type: integer
+            - type: boolean
+            - type: array
+            - type: object
+          nullable: true
+        field:
+          description: "Field path, when the error is associated with a specific field."
+          example: "request.first_name"
+          nullable: true
+          type: string
+      additionalProperties: false
+
+
+
+

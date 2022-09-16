@@ -1,0 +1,91 @@
+[tool.poetry]
+name = "template-application-flask"
+version = "0.1.0"
+description = "A template flask API for building ontop of"
+packages = [{ include = "api" }]
+authors = ["Nava Engineering <engineering@navapbc.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+connexion = {extras = ["swagger-ui"], version = "^2.13.1"}
+SQLAlchemy = {extras = ["mypy"], version = "^1.4.40"}
+alembic = "^1.8.1"
+psycopg2-binary = "^2.9.3"
+python-dotenv = "^0.20.0"
+pydantic = "^1.10.0"
+botocore = "^1.27.67"
+boto3 = "~1.24.67"
+smart-open = "^6.1.0"
+pytz = "^2022.2.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.0.0"
+black = "^22.6.0"
+flake8 = "^5.0.4"
+flake8-bugbear = "^22.8.23"
+flake8-alfred = "^1.1.1"
+isort = "^5.10.1"
+mypy = "^0.971"
+moto = {extras = ["s3"], version = "^4.0.2"}
+types-pytz = "^2022.2.1"
+coverage = "^6.4.4"
+Faker = "^14.2.0"
+factory-boy = "^3.2.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+db-migrate-up = "api.db.migrations.run:up"
+db-migrate-down = "api.db.migrations.run:down"
+db-migrate-down-all = "api.db.migrations.run:downall"
+generate-pet-csv = "api.scripts.generate_pet_csv:main"
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+line_length = 100
+
+[tool.mypy]
+# https://mypy.readthedocs.io/en/stable/config_file.html
+color_output = true
+error_summary = true
+pretty = true
+show_error_codes = true
+show_column_numbers = true
+show_error_context = true
+
+namespace_packages = true
+ignore_missing_imports = true
+warn_unused_configs = true
+
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+strict_equality = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+
+[[tool.mypy.overrides]]
+# Migrations are generated without "-> None"
+# for the returns. Rather than require manually
+# fixing this for every migration generated,
+# disable the check for that folder.
+module = "api.db.migrations.versions.*"
+disallow_untyped_defs = false
+
+[tool.coverage.run]
+omit = [
+  "api/db/migrations/*.py",
+]
