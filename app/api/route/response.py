@@ -7,9 +7,9 @@ from werkzeug.exceptions import HTTPException
 
 @dataclass
 class ValidationErrorDetail:
-    type: str  # In the Mass code this is an enum, but lets keep it basic here
+    type: str
     message: str = ""
-    rule: Optional[str] = None  # Also an enum in Mass
+    rule: Optional[str] = None
     field: Optional[str] = None
     value: Optional[str] = None  # Do not store PII data here, as it gets logged in some cases
 
