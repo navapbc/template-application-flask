@@ -23,7 +23,9 @@ def create_app(
 
     # Initialize the db
     if db_session_factory is None:
-        db_session_factory = db.init(check_migrations_current=check_migrations_current)
+        db_session_factory = db.init(
+            sync_lookups=True, check_migrations_current=check_migrations_current
+        )
 
     options = {"swagger_url": "/docs"}
     app = connexion.FlaskApp(__name__, specification_dir=get_project_root_dir(), options=options)

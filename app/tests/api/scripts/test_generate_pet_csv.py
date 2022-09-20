@@ -4,10 +4,10 @@ import os
 import pytest
 from smart_open import open as smart_open
 
-from api.db.models.factories import ExamplePetFactory
 from api.scripts.generate_pet_csv import PET_CSV_RECORD_HEADER, create_pet_csv
 from api.util.file_util import list_files
 from api.util.string_utils import blank_for_null
+from tests.api.db.models.factories import ExamplePetFactory
 
 
 @pytest.fixture
