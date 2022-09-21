@@ -92,7 +92,7 @@ def test_db(test_db_schema):
     engine = api.db.create_db_engine()
     Base.metadata.create_all(bind=engine)
 
-    db_session = api.db.init(sync_lookups=True)
+    db_session = api.db.init(sync_lookup_tables=True)
     db_session.close()
     db_session.remove()
 

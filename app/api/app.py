@@ -24,7 +24,7 @@ def create_app(
     # Initialize the db
     if db_session_factory is None:
         db_session_factory = db.init(
-            sync_lookups=True, check_migrations_current=check_migrations_current
+            sync_lookup_tables=True, check_migrations_current=check_migrations_current
         )
 
     options = {"swagger_url": "/docs"}

@@ -19,7 +19,7 @@ logger = api.logging.get_logger(__name__)
 
 def init(
     config: Optional[DbConfig] = None,
-    sync_lookups: bool = False,
+    sync_lookup_tables: bool = False,
     check_migrations_current: bool = False,
 ) -> scoped_session:
     logger.info("connecting to postgres db")
@@ -51,7 +51,7 @@ def init(
         sessionmaker(autocommit=False, expire_on_commit=False, bind=engine)
     )
 
-    if sync_lookups:
+    if sync_lookup_tables:
         init_lookup_tables(session_factory)
 
     if check_migrations_current:

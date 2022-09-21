@@ -31,7 +31,7 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # helps prevent so much boilerplate code.
 
     logger.info("Connecting to DB")
-    with db.session_scope(db.init(sync_lookups=True), close=True) as db_session:
+    with db.session_scope(db.init(sync_lookup_tables=True), close=True) as db_session:
         script_context = ScriptContext(db_session)
 
         yield script_context
