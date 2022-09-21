@@ -27,6 +27,7 @@ class LkRole(Base, TimestampMixin):
         self.role_id = role_id
         self.role_description = role_description
 
+
 class Role(LookupTable):
     model = LkRole
     column_names = ("role_id", "role_description")

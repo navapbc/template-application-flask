@@ -6,7 +6,7 @@ from smart_open import open as smart_open
 
 import api.db as db
 import api.logging
-from api.db.models.user_models import User, UserRole
+from api.db.models.user_models import User
 from api.scripts.util.script_util import script_context_manager
 from api.util.datetime_util import utcnow
 
@@ -21,9 +21,7 @@ class UserCsvRecord:
 
 
 USER_CSV_RECORD_HEADERS = UserCsvRecord(
-    user_name="User Name",
-    roles="Roles",
-    is_user_active="Is User Active?"
+    user_name="User Name", roles="Roles", is_user_active="Is User Active?"
 )
 
 

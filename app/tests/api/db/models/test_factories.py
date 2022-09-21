@@ -5,7 +5,6 @@ import pytest
 from api.db.models.user_models import Role, User
 from tests.api.db.models.factories import UserFactory
 
-
 user_params = {
     "first_name": "Alvin",
     "middle_name": "Bob",
@@ -13,7 +12,7 @@ user_params = {
     "phone_number": "999-999-9999",
     "date_of_birth": date(2022, 1, 1),
     "is_active": False,
-    "roles": [Role.USER, Role.ADMIN]
+    "roles": [Role.USER, Role.ADMIN],
 }
 
 
@@ -66,22 +65,14 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     user = UserFactory.create()
     validate_user_record(user)
 
-    db_record = (
-        test_db_session.query(User)
-        .filter(User.user_id == user.user_id)
-        .one_or_none()
-    )
+    db_record = test_db_session.query(User).filter(User.user_id == user.user_id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, user.for_json())
 
     user = UserFactory.create(**user_params)
     validate_user_record(user, user_params)
 
-    db_record = (
-        test_db_session.query(User)
-        .filter(User.user_id == user.user_id)
-        .one_or_none()
-    )
+    db_record = test_db_session.query(User).filter(User.user_id == user.user_id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, db_record.for_json())
 

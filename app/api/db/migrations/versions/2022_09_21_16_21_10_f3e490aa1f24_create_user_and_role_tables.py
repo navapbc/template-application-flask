@@ -1,7 +1,7 @@
 """Create user and role tables for first migration
 
 Revision ID: f3e490aa1f24
-Revises: 
+Revises:
 Create Date: 2022-09-21 16:21:10.283055
 
 """

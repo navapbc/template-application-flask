@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import Role, User, UserRole
+from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
 
@@ -39,7 +39,9 @@ def create_user(api_context: ApiContext) -> UserResponse:
     if request.roles is not None:
         roles = []
         for request_role in request.roles:
-            role = Role.get_instance(api_context.db_session, description=request_role.role_description)
+            role = Role.get_instance(
+                api_context.db_session, description=request_role.role_description
+            )
             roles.append(role)
 
     user = User(
@@ -50,10 +52,9 @@ def create_user(api_context: ApiContext) -> UserResponse:
         phone_number=request.phone_number,
         date_of_birth=request.date_of_birth,
         is_active=request.is_active,
-        roles=roles
+        roles=roles,
     )
     api_context.db_session.add(user)
-
 
     return UserResponse.from_orm(user)
 

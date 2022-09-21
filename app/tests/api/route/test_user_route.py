@@ -1,6 +1,6 @@
 from datetime import date
+
 import faker
-from api.db.models.base import Base
 
 from api.db.models.user_models import User
 
@@ -13,7 +13,7 @@ base_request = {
     "date_of_birth": "2022-01-01",
     "phone_number": "123-456-7890",
     "is_active": True,
-    "roles": [{"role_description":"Admin"}, {"role_description":"User"}]
+    "roles": [{"role_description": "Admin"}, {"role_description": "User"}],
 }
 
 
@@ -36,6 +36,7 @@ def validate_all_match(key, request, response, db_record):
     assert req_val == response_val
     assert req_val == db_val
 
+
 def test_post_user_201(client, api_auth_token, test_db_session):
     request = base_request | {}
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
@@ -54,12 +55,13 @@ def test_post_user_201(client, api_auth_token, test_db_session):
     validate_all_match("date_of_birth", request, response_record, db_record)
     validate_all_match("phone_number", request, response_record, db_record)
     validate_all_match("is_active", request, response_record, db_record)
-    
+
     request_roles = request["roles"]
     response_roles = response_record["roles"]
     db_roles = db_record.roles
     assert 2 == len(request_roles) == len(response_roles) == len(db_roles)
     validate_all_match("role_description", request_roles, response_roles, db_roles)
+
 
 def test_post_user_201_empty_array(client, api_auth_token, test_db_session):
     request = base_request | {"roles": []}
@@ -77,6 +79,7 @@ def test_post_user_201_empty_array(client, api_auth_token, test_db_session):
     response_roles = response_record["roles"]
     db_roles = db_record.roles
     assert 0 == len(request_roles) == len(response_roles) == len(db_roles)
+
 
 def test_post_user_400_missing_required_fields(client, api_auth_token, test_db_session):
     # Send an empty post - should fail validation
@@ -137,6 +140,7 @@ def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
     results = test_db_session.query(User).all()
     assert len(results) == 0
 
+
 def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     # Make the role a disallowed one
     request = base_request | {}
@@ -166,11 +170,10 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
         assert "is not one of" in message
         assert error_type == "enum"
 
+
 def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
     request = base_request | {}
-    response = client.post(
-        "/v1/user", json=request, headers={"X-Auth": "incorrect token"}
-    )
+    response = client.post("/v1/user", json=request, headers={"X-Auth": "incorrect token"})
     assert response.status_code == 401
 
     # Verify the error message

@@ -1,5 +1,4 @@
 import os
-import random
 import unittest.mock
 from datetime import datetime
 
@@ -91,4 +90,3 @@ class UserFactory(BaseFactory):
                 # as we aren't using the DB there will
                 # be no DB model conflict
                 self.roles = extracted
-

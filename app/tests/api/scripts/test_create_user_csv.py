@@ -3,8 +3,8 @@ import os
 
 import pytest
 from smart_open import open as smart_open
-from api.db.models.user_models import Role
 
+from api.db.models.user_models import Role
 from api.scripts.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from api.util.file_util import list_files
 from api.util.string_utils import blank_for_null
@@ -35,7 +35,9 @@ def validate_csv_records(db_records, csv_records):
             csv_record[USER_CSV_RECORD_HEADERS.user_name]
             == f"{db_record.first_name} {db_record.last_name}"
         )
-        assert csv_record[USER_CSV_RECORD_HEADERS.roles] == " ".join([role.role_description for role in db_record.roles])
+        assert csv_record[USER_CSV_RECORD_HEADERS.roles] == " ".join(
+            [role.role_description for role in db_record.roles]
+        )
         assert csv_record[USER_CSV_RECORD_HEADERS.is_user_active] == blank_for_null(
             db_record.is_active
         )
@@ -44,7 +46,10 @@ def validate_csv_records(db_records, csv_records):
 def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_s3_bucket):
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
     # To make validating these easier in the CSV, make the names consistent
-    db_records = [UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]), UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY])]
+    db_records = [
+        UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]),
+        UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY]),
+    ]
 
     create_user_csv(test_db_session, s3_filepath)
     csv_rows = read_csv_records(s3_filepath)
@@ -64,7 +69,10 @@ def test_create_user_csv_local(
 ):
     # Same as above test, but verifying the file logic
     # works locally in addition to S3.
-    db_records = [UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]), UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY])]
+    db_records = [
+        UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]),
+        UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY]),
+    ]
 
     create_user_csv(test_db_session, tmp_file_path)
     csv_rows = read_csv_records(tmp_file_path)
