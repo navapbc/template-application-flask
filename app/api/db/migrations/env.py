@@ -1,6 +1,6 @@
 import sys
 from typing import Any
-
+import api.db.migrations.enum_migrations
 import sqlalchemy
 from alembic import context
 

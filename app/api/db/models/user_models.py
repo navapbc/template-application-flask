@@ -1,8 +1,8 @@
 from datetime import date
 from typing import Optional
 from uuid import UUID
-
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, Text
+import enum
+from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID as postgresUUID
 from sqlalchemy.orm import Mapped, relationship, scoped_session
 
@@ -17,24 +17,12 @@ logger = api.logging.get_logger(__name__)
 # Lookup Tables
 #################################
 
+class RoleEnum(enum.Enum):
+    USER = 1
+    ADMIN = 2
+    THIRD_PARTY = 3
+    FOURTH_ONE = 4
 
-class LkRole(Base, TimestampMixin):
-    __tablename__ = "lk_role"
-    role_id: int = Column(Integer, primary_key=True, autoincrement=True)
-    role_description: str = Column(Text, nullable=False)
-
-    def __init__(self, role_id: int, role_description: str):
-        self.role_id = role_id
-        self.role_description = role_description
-
-
-class Role(LookupTable):
-    model = LkRole
-    column_names = ("role_id", "role_description")
-
-    USER = LkRole(1, "User")
-    ADMIN = LkRole(2, "Admin")
-    THIRD_PARTY = LkRole(3, "Third Party")
 
 
 #################################
@@ -54,7 +42,10 @@ class User(Base, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: Optional[list["Role"]] = relationship("LkRole", secondary="link_user_role", uselist=True)
+    roles: Optional[list[RoleEnum]] = relationship("LkRole", secondary="link_user_role", uselist=True)
+
+    primary_role: RoleEnum = Column(Enum(RoleEnum))
+    another: RoleEnum = Column(Enum(RoleEnum))
 
 
 class UserRole(Base, TimestampMixin):
@@ -62,10 +53,9 @@ class UserRole(Base, TimestampMixin):
     user_id: Mapped[UUID] = Column(
         postgresUUID(as_uuid=True), ForeignKey("user.user_id"), primary_key=True
     )
-    role_id: int = Column(Integer, ForeignKey("lk_role.role_id"), primary_key=True)
 
     user: User = relationship(User, overlaps="roles")
-    role: Role = relationship(LkRole, overlaps="roles")
+    role: RoleEnum = Column(Enum(RoleEnum))
 
 
 def sync_lookup_tables(db_session: scoped_session) -> None:
