@@ -40,7 +40,7 @@ build-backend = "poetry.core.masonry.api"
 db-migrate-up = "api.db.migrations.run:up"
 db-migrate-down = "api.db.migrations.run:down"
 db-migrate-down-all = "api.db.migrations.run:downall"
-generate-pet-csv = "api.scripts.generate_pet_csv:main"
+create-user-csv = "api.scripts.create_user_csv:main"
 
 [tool.black]
 line-length = 100

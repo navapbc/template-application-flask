@@ -2,7 +2,9 @@
 # Classes for handling database lookup tables.
 #
 
-from typing import Any, Dict
+from typing import Any, Dict, Iterable, Optional
+
+from sqlalchemy.orm import scoped_session
 
 import api.logging
 
@@ -85,7 +87,7 @@ class LookupTable:
             cls.insert_template_lookup_cache(key, value)
 
     @classmethod
-    def insert_template_lookup_cache(cls, key, template_instance):
+    def insert_template_lookup_cache(cls, key: str, template_instance: Any) -> None:
         row = tuple(map(template_instance.__getattribute__, cls.column_names))
         row_id, description = row[0], row[1]
 
@@ -97,7 +99,7 @@ class LookupTable:
         cls.description_to_template_instance[description] = template_instance
 
     @classmethod
-    def sync_to_database(cls, db_session):
+    def sync_to_database(cls, db_session: scoped_session) -> int:
         """Synchronize the lookup table to a database by adding or updating rows if needed.
 
         Should be called once during process initialization.
@@ -126,7 +128,9 @@ class LookupTable:
         return row_update_count
 
     @classmethod
-    def sync_row_to_database(cls, db_session, key, template_instance):
+    def sync_row_to_database(
+        cls, db_session: scoped_session, key: str, template_instance: Any
+    ) -> bool:
         """Synchronize a single row of the lookup table to a database by adding or updating it."""
         row = tuple(map(template_instance.__getattribute__, cls.column_names))
         row_id, description = row[0], row[1]
@@ -148,12 +152,17 @@ class LookupTable:
         return row_was_updated
 
     @classmethod
-    def get_all(cls):
+    def get_all(cls) -> Iterable[Any]:
         """Get all instances of a model."""
         return [p for p in vars(cls).values() if isinstance(p, cls.model)]
 
     @classmethod
-    def get_instance(cls, db_session, template=None, description=None):
+    def get_instance(
+        cls,
+        db_session: scoped_session,
+        template: Optional[Any] = None,
+        description: Optional[str] = None,
+    ) -> Any:
         """Get an ORM instance for the row by template instance or description.
 
         The instance is merged into the given db session.
@@ -170,7 +179,7 @@ class LookupTable:
             raise TypeError("either template or description must be passed")
 
     @classmethod
-    def get_id(cls, description):
+    def get_id(cls, description: str) -> int:
         """Get the id for the row by description."""
         if not hasattr(cls, "description_to_template_instance"):
             cls.populate_lookup_cache()
@@ -178,7 +187,7 @@ class LookupTable:
         return getattr(cls.description_to_template_instance[description], cls.column_names[0])
 
     @classmethod
-    def get_description(cls, row_id):
+    def get_description(cls, row_id: int) -> str:
         """Get the description for the row by id."""
         if not hasattr(cls, "id_to_template_instance"):
             cls.populate_lookup_cache()

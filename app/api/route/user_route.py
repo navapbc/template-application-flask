@@ -7,6 +7,7 @@ from api.route.api_context import api_context_manager
 
 logger = logging.get_logger(__name__)
 
+
 # Create user
 def user_post() -> flask.Response:
     """
@@ -28,10 +29,14 @@ def user_post() -> flask.Response:
 
 
 # Update user
-def user_patch() -> flask.Response:
-    pass
+def user_patch(user_id: str) -> flask.Response:
+    return response_util.success_response(
+        message="Success", data={}, status_code=200
+    ).to_api_response()
 
 
 # Get user
-def user_get() -> flask.Response:
-    pass
+def user_get(user_id: str) -> flask.Response:
+    return response_util.success_response(
+        message="Success", data={}, status_code=200
+    ).to_api_response()

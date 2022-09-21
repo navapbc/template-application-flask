@@ -27,7 +27,6 @@ class LkRole(Base, TimestampMixin):
         self.role_id = role_id
         self.role_description = role_description
 
-
 class Role(LookupTable):
     model = LkRole
     column_names = ("role_id", "role_description")
@@ -54,7 +53,9 @@ class User(Base, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: Optional[list["Role"]] = relationship("LkRole", secondary="link_user_role", uselist=True)
+    roles: Optional[list["LkRole"]] = relationship(
+        "LkRole", secondary="link_user_role", uselist=True
+    )
 
 
 class UserRole(Base, TimestampMixin):
@@ -65,7 +66,7 @@ class UserRole(Base, TimestampMixin):
     role_id: int = Column(Integer, ForeignKey("lk_role.role_id"), primary_key=True)
 
     user: User = relationship(User, overlaps="roles")
-    role: Role = relationship(LkRole, overlaps="roles")
+    role: LkRole = relationship(LkRole, overlaps="roles")
 
 
 def sync_lookup_tables(db_session: scoped_session) -> None:

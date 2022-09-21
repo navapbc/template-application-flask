@@ -17,7 +17,6 @@ servers:
     description: Development server
 
 tags:
-  - name: Example
   - name: User
   - name: Health
     description: API Health and Integrity
@@ -44,12 +43,12 @@ paths:
       security:
         - api_key: []
       tags:
-        - Example
-      summary: Example post endpoint for creating a simple model in the DB
+        - User
+      summary: Example post endpoint for creating a simple user in the DB
       operationId: api.route.user_route.user_post
       responses:
         "201":
-          description: Example person was successfully submitted
+          description: User was successfully submitted
           content:
             application/json:
               schema:
@@ -69,37 +68,6 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/UserBase"
-
-  /example-person:
-    post:
-      security:
-        - api_key: []
-      tags:
-        - Example
-      summary: Example post endpoint for creating a simple model in the DB
-      operationId: api.route.example_person_route.example_person_post
-      responses:
-        "201":
-          description: Example person was successfully submitted
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/SuccessfulResponse'
-                  - properties:
-                      data:
-                        $ref: "#/components/schemas/ExamplePersonResponse"
-        "400":
-          description: An unsuccessful request returns a 400 status code if one or more errors occurred.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ErrorResponse"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ExamplePersonRequest"
 
 
 components:
@@ -171,96 +139,6 @@ components:
           - User
           - Admin
           - Third Party
-
-
-    ExamplePersonBase:
-      type: object
-      properties:
-        first_name:
-          type: string
-          example: Jane
-          description: The persons first name
-        middle_name:
-          type: string
-          example: Anne
-          nullable: true
-          description: The persons middle name
-        last_name:
-          type: string
-          example: Doe
-          description: The persons last name
-        phone_number:
-          type: string
-          example: "224-705-2345"
-          pattern: '^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$'
-        date_of_birth:
-          $ref: "#/components/schemas/Date"
-        is_real:
-          type: boolean
-          example: true
-          description: whether or not the person is real
-
-    ExamplePetBase:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Spot
-        species:
-          type: string
-          example: Dog
-          enum:
-            - Dog
-            - Cat
-            - Bird
-            - Fish
-
-    ExamplePetWithId:
-      type: object
-      properties:
-        example_pet_id:
-          type: string
-          example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
-          nullable: true
-      allOf:
-        - $ref: "#/components/schemas/ExamplePetBase"
-
-    ExamplePersonWithId:
-      type: object
-      properties:
-        pets:
-          type: array
-          nullable: true
-          items:
-            $ref: "#/components/schemas/ExamplePetBase"
-      allOf:
-        - $ref: "#/components/schemas/ExamplePersonBase"
-
-    ExamplePersonRequest:
-      type: object
-      properties:
-        pets:
-          type: array
-          nullable: true
-          items:
-            $ref: "#/components/schemas/ExamplePetBase"
-      allOf:
-        - $ref: "#/components/schemas/ExamplePersonBase"
-
-    ExamplePersonResponse:
-      type: object
-      properties:
-        example_person_id:
-          type: string
-          format: uuid
-          example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
-        pets:
-            type: array
-            nullable: true
-            items:
-              $ref: "#/components/schemas/ExamplePetWithId"
-      allOf:
-        - $ref: "#/components/schemas/ExamplePersonWithId"
 
     SuccessfulResponse:
       type: object

@@ -35,6 +35,13 @@ class UserResponse(UserParams):
 def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
+    roles = None
+    if request.roles is not None:
+        roles = []
+        for request_role in request.roles:
+            role = Role.get_instance(api_context.db_session, description=request_role.role_description)
+            roles.append(role)
+
     user = User(
         user_id=uuid4(),
         first_name=request.first_name,
@@ -43,13 +50,13 @@ def create_user(api_context: ApiContext) -> UserResponse:
         phone_number=request.phone_number,
         date_of_birth=request.date_of_birth,
         is_active=request.is_active,
+        roles=roles
     )
     api_context.db_session.add(user)
 
-    if request.roles:
-        for role in request.roles:
-            role_id = Role.get_id(role.role_description)
-
-            api_context.db_session.add(UserRole(user_id=user.user_id, role_id=role_id))
 
     return UserResponse.from_orm(user)
+
+
+def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
+    pass
