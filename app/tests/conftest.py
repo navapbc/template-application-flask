@@ -137,7 +137,7 @@ def set_no_db_factories_alert():
 def initialize_factories_session(monkeypatch, test_db_session):
     monkeypatch.delenv("DB_FACTORIES_DISABLE_DB_ACCESS")
 
-    import api.db.models.factories as factories
+    import tests.api.db.models.factories as factories
 
     logger.info("set factories db_session to %s", test_db_session)
     factories.db_session = test_db_session

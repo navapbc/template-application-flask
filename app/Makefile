@@ -156,8 +156,8 @@ test-coverage-report: ## Open HTML test coverage report
 # Scripts
 ##################################################
 
-generate-pet-csv:
-	$(PY_RUN_CMD) generate-pet-csv
+create-user-csv:
+	$(PY_RUN_CMD) create-user-csv
 
 ##################################################
 # Miscellaneous Utilities

@@ -17,7 +17,7 @@ servers:
     description: Development server
 
 tags:
-  - name: Example
+  - name: User
   - name: Health
     description: API Health and Integrity
 
@@ -38,17 +38,17 @@ paths:
               schema:
                 type: boolean
 
-  /example-person:
+  /user:
     post:
       security:
         - api_key: []
       tags:
-        - Example
-      summary: Example post endpoint for creating a simple model in the DB
-      operationId: api.route.example_person_route.example_person_post
+        - User
+      summary: Example post endpoint for creating a simple user in the DB
+      operationId: api.route.user_route.user_post
       responses:
         "201":
-          description: Example person was successfully submitted
+          description: User was successfully submitted
           content:
             application/json:
               schema:
@@ -56,7 +56,7 @@ paths:
                   - $ref: '#/components/schemas/SuccessfulResponse'
                   - properties:
                       data:
-                        $ref: "#/components/schemas/ExamplePersonResponse"
+                        $ref: "#/components/schemas/UserResponse"
         "400":
           description: An unsuccessful request returns a 400 status code if one or more errors occurred.
           content:
@@ -67,7 +67,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ExamplePersonRequest"
+              $ref: "#/components/schemas/UserBase"
 
 
 components:
@@ -83,94 +83,62 @@ components:
       example: '1970-01-01'
       format: date
 
-    ExamplePersonBase:
+    UserBase:
       type: object
       properties:
         first_name:
           type: string
           example: Jane
-          description: The persons first name
+          description: The users first name
         middle_name:
           type: string
           example: Anne
           nullable: true
-          description: The persons middle name
+          description: The users middle name
         last_name:
           type: string
           example: Doe
-          description: The persons last name
+          description: The users last name
         phone_number:
           type: string
           example: "224-705-2345"
           pattern: '^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$'
         date_of_birth:
           $ref: "#/components/schemas/Date"
-        is_real:
+        is_active:
           type: boolean
           example: true
-          description: whether or not the person is real
-
-    ExamplePetBase:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Spot
-        species:
-          type: string
-          example: Dog
-          enum:
-            - Dog
-            - Cat
-            - Bird
-            - Fish
-
-    ExamplePetWithId:
-      type: object
-      properties:
-        example_pet_id:
-          type: string
-          example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
-          nullable: true
-      allOf:
-        - $ref: "#/components/schemas/ExamplePetBase"
-
-    ExamplePersonWithId:
-      type: object
-      properties:
-        pets:
+          description: whether or not the user is active
+        roles:
           type: array
           nullable: true
           items:
-            $ref: "#/components/schemas/ExamplePetBase"
-      allOf:
-        - $ref: "#/components/schemas/ExamplePersonBase"
+            $ref: "#/components/schemas/Role"
 
-    ExamplePersonRequest:
+    UserResponse:
       type: object
       properties:
-        pets:
-          type: array
-          nullable: true
-          items:
-            $ref: "#/components/schemas/ExamplePetBase"
-      allOf:
-        - $ref: "#/components/schemas/ExamplePersonBase"
-
-    ExamplePersonResponse:
-      type: object
-      properties:
-        example_person_id:
+        user_id:
           type: string
           format: uuid
           example: "2f0f58a0-fcad-465b-b474-ee6c961cd6e3"
-        pets:
-            type: array
-            nullable: true
-            items:
-              $ref: "#/components/schemas/ExamplePetWithId"
       allOf:
-        - $ref: "#/components/schemas/ExamplePersonWithId"
+        - $ref: "#/components/schemas/UserBase"
+
+    Role:
+      type: object
+      properties:
+        role_description:
+          type: string
+          example: User
+          enum:
+          - User
+          - Admin
+          - Third Party
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
 
     SuccessfulResponse:
       type: object

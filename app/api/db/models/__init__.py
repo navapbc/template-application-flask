@@ -1,3 +1,7 @@
-from . import example_person_models
+import api.logging
 
-__all__ = ["example_person_models"]
+from . import user_models
+
+logger = api.logging.get_logger(__name__)
+
+__all__ = ["user_models"]

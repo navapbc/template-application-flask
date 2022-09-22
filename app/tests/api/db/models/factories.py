@@ -1,13 +1,13 @@
 import os
-import random
 import unittest.mock
 from datetime import datetime
 
 import factory
+import factory.fuzzy
 import faker
 
 import api.db as db
-import api.db.models.example_person_models as example_person_models
+import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
 
 db_session = None
@@ -58,25 +58,25 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "commit"
 
 
-class ExamplePersonFactory(BaseFactory):
+class UserRoleFactory(BaseFactory):
     class Meta:
-        model = example_person_models.ExamplePerson
+        model = user_models.UserRole
 
-    example_person_id = Generators.UuidObj
+    user_id = factory.LazyAttribute(lambda u: u.user.user_id)
+    user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
+
+    role_description = factory.Iterator([r.value for r in user_models.RoleEnum])
+
+
+class UserFactory(BaseFactory):
+    class Meta:
+        model = user_models.User
+
+    user_id = Generators.UuidObj
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     phone_number = "123-456-7890"
     date_of_birth = factory.Faker("date_object")
-    is_real = factory.Faker("boolean")
+    is_active = factory.Faker("boolean")
 
-
-class ExamplePetFactory(BaseFactory):
-    class Meta:
-        model = example_person_models.ExamplePet
-
-    example_pet_id = Generators.UuidObj
-    name = factory.Faker("first_name")
-    species = random.choice(["Dog", "Cat", "Bird", "Fish"])
-
-    pet_owner = factory.SubFactory(ExamplePersonFactory)
-    pet_owner_id = factory.LazyAttribute(lambda p: p.pet_owner.example_person_id)
+    roles = factory.RelatedFactoryList(UserRoleFactory, size=2, factory_related_name="user")

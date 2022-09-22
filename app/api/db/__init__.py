@@ -17,7 +17,8 @@ logger = api.logging.get_logger(__name__)
 
 
 def init(
-    config: Optional[DbConfig] = None, check_migrations_current: bool = False
+    config: Optional[DbConfig] = None,
+    check_migrations_current: bool = False,
 ) -> scoped_session:
     logger.info("connecting to postgres db")
 
