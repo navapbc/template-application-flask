@@ -1,3 +1,4 @@
+import enum
 from datetime import date
 from typing import Optional
 from uuid import UUID
@@ -11,6 +12,12 @@ import api.logging
 from .base import Base, TimestampMixin, uuid_gen
 
 logger = api.logging.get_logger(__name__)
+
+
+class RoleEnum(str, enum.Enum):
+    USER = "User"
+    ADMIN = "Admin"
+    THIRD_PARTY = "Third Party"
 
 
 class User(Base, TimestampMixin):

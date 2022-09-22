@@ -1,4 +1,3 @@
-import enum
 from datetime import date
 from typing import Optional
 from uuid import uuid4
@@ -6,17 +5,11 @@ from uuid import uuid4
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import User, UserRole
+from api.db.models.user_models import RoleEnum, User, UserRole
 from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
 
 logger = api.logging.get_logger(__name__)
-
-
-class RoleEnum(str, enum.Enum):
-    USER = "User"
-    ADMIN = "Admin"
-    THIRD_PARTY = "Third Party"
 
 
 class RoleParams(BaseRequestModel):

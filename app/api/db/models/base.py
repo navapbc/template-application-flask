@@ -4,7 +4,7 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, Column, inspect
+from sqlalchemy import TIMESTAMP, Column, MetaData, inspect
 from sqlalchemy.ext.declarative import as_declarative
 from sqlalchemy.orm import declarative_mixin
 from sqlalchemy.sql.functions import now as sqlnow
@@ -16,7 +16,21 @@ def same_as_created_at(context: Any) -> Any:
     return context.get_current_parameters()["created_at"]
 
 
-@as_declarative()
+# Override the default naming of constraints
+# to use suffixes instead:
+# https://stackoverflow.com/questions/4107915/postgresql-default-constraint-names/4108266#4108266
+metadata = MetaData(
+    naming_convention={
+        "ix": "%(column_0_label)s_idx",
+        "uq": "%(table_name)s_%(column_0_name)s_uniq",
+        "ck": "%(table_name)s_`%(constraint_name)s_check`",
+        "fk": "%(table_name)s_%(column_0_name)s_%(referred_table_name)s_fkey",
+        "pk": "%(table_name)s_pkey",
+    }
+)
+
+
+@as_declarative(metadata=metadata)
 class Base:
     def _dict(self) -> dict:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

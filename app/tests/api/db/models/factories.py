@@ -9,7 +9,6 @@ import faker
 import api.db as db
 import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
-from api.route.handler.user_handler import RoleEnum
 
 db_session = None
 
@@ -66,7 +65,7 @@ class UserRoleFactory(BaseFactory):
     user_id = factory.LazyAttribute(lambda u: u.user.user_id)
     user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
 
-    role_description = factory.Iterator([r.value for r in RoleEnum])
+    role_description = factory.Iterator([r.value for r in user_models.RoleEnum])
 
 
 class UserFactory(BaseFactory):
