@@ -51,11 +51,17 @@ class HumanReadableFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         super(HumanReadableFormatter, self).format(record)
 
+        # In certain contexts (like during a request) we want to
+        # attach additional information (like a request ID) to all
+        # log messages for tracking purposes. Add that here.
+        additional_log_context = get_logging_context_attributes()
+        extra = record.__dict__ | additional_log_context
+
         return decodelog.format_line(
             datetime.utcfromtimestamp(record.created),
             record.name,
             record.funcName,
             record.levelname,
             record.message,
-            record.__dict__,
+            extra,
         )

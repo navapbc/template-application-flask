@@ -38,14 +38,72 @@ paths:
               schema:
                 type: boolean
 
+  /user/{user_id}:
+    get:
+      tags:
+        - User
+      summary: Get endpoint for a user in the DB
+      operationId: api.route.user_route.user_get
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: string
+            format: uuid
+          description: ID of User to get
+          required: true
+      responses:
+        "200":
+          description: A successful response returns a 200 status code and the user object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags:
+        - User
+      summary: Get endpoint for a user in the DB
+      operationId: api.route.user_route.user_patch
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: string
+            format: uuid
+          description: ID of User to get
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserBase"
+      responses:
+        "200":
+          description: A successful response returns a 200 status code and the user object.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /user:
     post:
-      security:
-        - api_key: []
       tags:
         - User
       summary: Example post endpoint for creating a simple user in the DB
       operationId: api.route.user_route.user_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserBase"
       responses:
         "201":
           description: User was successfully submitted
@@ -63,11 +121,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UserBase"
+
 
 
 components:
@@ -77,6 +131,7 @@ components:
       name: X-Auth
       in: header
       x-apikeyInfoFunc: api.auth.api_key_auth.api_key_auth
+
   schemas:
     Date:
       type: string
@@ -135,10 +190,6 @@ components:
           - User
           - Admin
           - Third Party
-        created_at:
-          type: string
-          format: date-time
-          nullable: true
 
     SuccessfulResponse:
       type: object
@@ -213,6 +264,16 @@ components:
           type: string
       additionalProperties: false
 
-
-
-
+  responses:
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    BadRequest:
+      description: There was a problem with your request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

@@ -1,3 +1,5 @@
+from typing import Any
+
 import flask
 
 import api.logging as logging
@@ -21,7 +23,7 @@ def user_post() -> flask.Response:
 
         logger.info(
             "Successfully inserted user",
-            extra={"user_id": response.user_id},
+            extra=get_user_log_params(response),
         )
         return response_util.success_response(
             message="Success", data=response.dict(), status_code=201
@@ -30,13 +32,43 @@ def user_post() -> flask.Response:
 
 # Update user
 def user_patch(user_id: str) -> flask.Response:
-    return response_util.success_response(
-        message="Success", data={}, status_code=200
-    ).to_api_response()
+    """
+    PATCH /v1/user/:user_id
+    """
+    logger.info("PATCH /v1/user/:user_id")
+
+    with api_context_manager() as api_context:
+        response = user_handler.patch_user(user_id, api_context)
+
+        logger.info(
+            "Successfully patched user",
+            extra=get_user_log_params(response),
+        )
+
+        return response_util.success_response(
+            message="Success", data=response.dict(), status_code=200
+        ).to_api_response()
 
 
 # Get user
 def user_get(user_id: str) -> flask.Response:
-    return response_util.success_response(
-        message="Success", data={}, status_code=200
-    ).to_api_response()
+    """
+    GET /v1/user/:user_id
+    """
+    logger.info("GET /v1/user/:user_id")
+
+    with api_context_manager() as api_context:
+        response = user_handler.get_user(user_id, api_context)
+
+        logger.info(
+            "Successfully fetched user",
+            extra=get_user_log_params(response),
+        )
+
+        return response_util.success_response(
+            message="Success", data=response.dict(), status_code=200
+        ).to_api_response()
+
+
+def get_user_log_params(user_response: user_handler.UserResponse) -> dict[str, Any]:
+    return {"user_id": user_response.user_id}
