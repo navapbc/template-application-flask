@@ -4,7 +4,6 @@ import os
 import pytest
 from smart_open import open as smart_open
 
-from api.db.models.user_models import Role
 from api.scripts.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from api.util.file_util import list_files
 from api.util.string_utils import blank_for_null
@@ -47,8 +46,8 @@ def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
     # To make validating these easier in the CSV, make the names consistent
     db_records = [
-        UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]),
-        UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY]),
+        UserFactory.create(first_name="A"),
+        UserFactory.create(first_name="B"),
     ]
 
     create_user_csv(test_db_session, s3_filepath)
@@ -56,7 +55,7 @@ def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_
     validate_csv_records(db_records, csv_rows)
 
     # If we add another DB record it'll go in the file as well
-    db_records.append(UserFactory.create(first_name="C", roles=[Role.USER]))
+    db_records.append(UserFactory.create(first_name="C"))
     create_user_csv(test_db_session, s3_filepath)
     csv_rows = read_csv_records(s3_filepath)
     validate_csv_records(db_records, csv_rows)
@@ -70,8 +69,8 @@ def test_create_user_csv_local(
     # Same as above test, but verifying the file logic
     # works locally in addition to S3.
     db_records = [
-        UserFactory.create(first_name="A", roles=[Role.USER, Role.ADMIN]),
-        UserFactory.create(first_name="B", roles=[Role.ADMIN, Role.THIRD_PARTY]),
+        UserFactory.create(first_name="A"),
+        UserFactory.create(first_name="B"),
     ]
 
     create_user_csv(test_db_session, tmp_file_path)

@@ -3,11 +3,13 @@ import unittest.mock
 from datetime import datetime
 
 import factory
+import factory.fuzzy
 import faker
 
 import api.db as db
 import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
+from api.route.handler.user_handler import RoleEnum
 
 db_session = None
 
@@ -57,6 +59,16 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "commit"
 
 
+class UserRoleFactory(BaseFactory):
+    class Meta:
+        model = user_models.UserRole
+
+    user_id = factory.LazyAttribute(lambda u: u.user.user_id)
+    user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
+
+    role_description = factory.Iterator([r.value for r in RoleEnum])
+
+
 class UserFactory(BaseFactory):
     class Meta:
         model = user_models.User
@@ -68,25 +80,4 @@ class UserFactory(BaseFactory):
     date_of_birth = factory.Faker("date_object")
     is_active = factory.Faker("boolean")
 
-    @factory.post_generation
-    def roles(self, create, extracted, **kwargs):
-        """
-        This function lets you do `UserFactory.create(roles=[Role.USER, Role.ADMIN])`
-        as it will otherwise complain that those roles already exist in the DB.
-        """
-
-        # extracted is a list of supplied params
-        # if anything was passed in we want to set them
-        if extracted:
-            # Create means we're using the DB and need
-            # to fetch the direct lookup models from the DB
-            # to avoid a conflict
-            if create:
-                for role in extracted:
-                    lk_role = user_models.Role.get_instance(db_session, template=role)
-                    self.roles.append(lk_role)
-            else:
-                # Otherwise just set directly
-                # as we aren't using the DB there will
-                # be no DB model conflict
-                self.roles = extracted
+    roles = factory.RelatedFactoryList(UserRoleFactory, size=2, factory_related_name="user")

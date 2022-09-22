@@ -12,14 +12,12 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
 from api.db.migrations.run import have_all_migrations_run
-from api.db.models import init_lookup_tables
 
 logger = api.logging.get_logger(__name__)
 
 
 def init(
     config: Optional[DbConfig] = None,
-    sync_lookup_tables: bool = False,
     check_migrations_current: bool = False,
 ) -> scoped_session:
     logger.info("connecting to postgres db")
@@ -50,9 +48,6 @@ def init(
     session_factory = scoped_session(
         sessionmaker(autocommit=False, expire_on_commit=False, bind=engine)
     )
-
-    if sync_lookup_tables:
-        init_lookup_tables(session_factory)
 
     if check_migrations_current:
         have_all_migrations_run(engine)

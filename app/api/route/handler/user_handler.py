@@ -1,3 +1,4 @@
+import enum
 from datetime import date
 from typing import Optional
 from uuid import uuid4
@@ -5,16 +6,22 @@ from uuid import uuid4
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import Role, User
+from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
 
 logger = api.logging.get_logger(__name__)
 
 
+class RoleEnum(str, enum.Enum):
+    USER = "User"
+    ADMIN = "Admin"
+    THIRD_PARTY = "Third Party"
+
+
 class RoleParams(BaseRequestModel):
-    role_id: Optional[int]
-    role_description: str
+    role_description: RoleEnum
+    created_at: Optional[date]
 
 
 class UserParams(BaseRequestModel):
@@ -35,15 +42,6 @@ class UserResponse(UserParams):
 def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
-    roles = None
-    if request.roles is not None:
-        roles = []
-        for request_role in request.roles:
-            role = Role.get_instance(
-                api_context.db_session, description=request_role.role_description
-            )
-            roles.append(role)
-
     user = User(
         user_id=uuid4(),
         first_name=request.first_name,
@@ -52,9 +50,17 @@ def create_user(api_context: ApiContext) -> UserResponse:
         phone_number=request.phone_number,
         date_of_birth=request.date_of_birth,
         is_active=request.is_active,
-        roles=roles,
     )
     api_context.db_session.add(user)
+
+    if request.roles is not None:
+        user_roles = []
+        for request_role in request.roles:
+            user_roles.append(
+                UserRole(user_id=user.user_id, role_description=request_role.role_description)
+            )
+
+        user.roles = user_roles
 
     return UserResponse.from_orm(user)
 

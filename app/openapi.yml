@@ -128,10 +128,6 @@ components:
     Role:
       type: object
       properties:
-        role_id:
-          type: integer
-          example: 1
-          nullable: true
         role_description:
           type: string
           example: User
@@ -139,6 +135,10 @@ components:
           - User
           - Admin
           - Third Party
+        created_at:
+          type: string
+          format: date-time
+          nullable: true
 
     SuccessfulResponse:
       type: object

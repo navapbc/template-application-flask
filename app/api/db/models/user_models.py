@@ -2,44 +2,15 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Integer, Text
+from sqlalchemy import Boolean, Column, Date, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID as postgresUUID
-from sqlalchemy.orm import Mapped, relationship, scoped_session
+from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
-from api.db.models.lookup import LookupTable
 
 from .base import Base, TimestampMixin, uuid_gen
 
 logger = api.logging.get_logger(__name__)
-
-#################################
-# Lookup Tables
-#################################
-
-
-class LkRole(Base, TimestampMixin):
-    __tablename__ = "lk_role"
-    role_id: int = Column(Integer, primary_key=True, autoincrement=True)
-    role_description: str = Column(Text, nullable=False)
-
-    def __init__(self, role_id: int, role_description: str):
-        self.role_id = role_id
-        self.role_description = role_description
-
-
-class Role(LookupTable):
-    model = LkRole
-    column_names = ("role_id", "role_description")
-
-    USER = LkRole(1, "User")
-    ADMIN = LkRole(2, "Admin")
-    THIRD_PARTY = LkRole(3, "Third Party")
-
-
-#################################
-# Model Tables
-#################################
 
 
 class User(Base, TimestampMixin):
@@ -54,22 +25,16 @@ class User(Base, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: Optional[list["LkRole"]] = relationship(
-        "LkRole", secondary="link_user_role", uselist=True
+    roles: Optional[list["UserRole"]] = relationship(
+        "UserRole", uselist=True, back_populates="user"
     )
 
 
 class UserRole(Base, TimestampMixin):
-    __tablename__ = "link_user_role"
+    __tablename__ = "user_role"
     user_id: Mapped[UUID] = Column(
         postgresUUID(as_uuid=True), ForeignKey("user.user_id"), primary_key=True
     )
-    role_id: int = Column(Integer, ForeignKey("lk_role.role_id"), primary_key=True)
+    role_description: str = Column(Text, primary_key=True, nullable=False, index=True)
 
-    user: User = relationship(User, overlaps="roles")
-    role: LkRole = relationship(LkRole, overlaps="roles")
-
-
-def sync_lookup_tables(db_session: scoped_session) -> None:
-    Role.sync_to_database(db_session)
-    db_session.commit()
+    user: User = relationship(User, back_populates="roles")

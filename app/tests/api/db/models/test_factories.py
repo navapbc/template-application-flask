@@ -2,8 +2,8 @@ from datetime import date, datetime
 
 import pytest
 
-from api.db.models.user_models import Role, User
-from tests.api.db.models.factories import UserFactory
+from api.db.models.user_models import User
+from tests.api.db.models.factories import UserFactory, UserRoleFactory
 
 user_params = {
     "first_name": "Alvin",
@@ -12,7 +12,6 @@ user_params = {
     "phone_number": "999-999-9999",
     "date_of_birth": date(2022, 1, 1),
     "is_active": False,
-    "roles": [Role.USER, Role.ADMIN],
 }
 
 
@@ -39,6 +38,7 @@ def validate_user_record(user: User, user_expected_values=None):
         assert user.phone_number is not None
         assert user.date_of_birth is not None
         assert user.is_active is not None
+        assert user.roles is not None
 
 
 def test_user_factory_build():
@@ -83,3 +83,11 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
 
     all_db_records = test_db_session.query(User).all()
     assert len(all_db_records) == 3
+
+
+def test_user_role_factory_create(test_db_session, initialize_factories_session):
+    # Verify if you build a UserRole directly, it gets
+    # a user attached to it with that single role
+    user_role = UserRoleFactory.create()
+    assert user_role.user is not None
+    assert len(user_role.user.roles) == 1
