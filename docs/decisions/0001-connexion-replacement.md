@@ -204,7 +204,7 @@ if __name__ == "__main__":
     app.run(port=8080)
 ```
 
-</summary>
+</details>
 
 * Good, because the API model definitions use Pydantic, which is a well-supported library we are already familiar with.
 * Good, because the API definitions are minimal and pretty intuitive to read.
