@@ -1,4 +1,4 @@
-# [short title of solved problem and solution]
+# Connexion Alternatives Decision Record
 
 * Status: Proposed
 * Deciders: TODO
