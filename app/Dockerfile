@@ -1,6 +1,6 @@
 # Use the official python3 image based on Debian 11 "Bullseye".
 # https://hub.docker.com/_/python
-FROM python:3-slim
+FROM python:3-slim AS release
 # Keep container packages up-to-date.
 RUN apt update \
     && apt upgrade --yes
