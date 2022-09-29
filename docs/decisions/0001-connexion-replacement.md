@@ -310,7 +310,7 @@ if __name__ == "__main__":
 * Good, because it is fairly straightforward and just seems to work as expected.
 * Bad, because the documentation is pretty minimal beyond getting openapi running. Seems like this is just an openapi wrapper with no other additional features.
 * Bad, because it is pretty barebones. It just sets up a swagger endpoint and does the object validation, but doesn't handle anything beyond that regarding authentication.
-* Bad, because even the maintainers recognize it needs a [bit more work](https://github.com/apiflask/apiflask/discussions/14#discussioncomment-571898) - and in the context of that discussion includes the main developer of APIFlask
+* Bad, because even the maintainers recognize it needs a [bit more work](https://github.com/apiflask/apiflask/discussions/14#discussioncomment-571898)
 
 ### APISpec
 
