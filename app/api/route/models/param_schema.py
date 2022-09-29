@@ -9,8 +9,6 @@ import api.logging
 
 logger = api.logging.get_logger(__name__)
 
-PARAM_UNSET_IN_REQUEST: str = "PARAM_UNSET_IN_REQUEST"
-
 
 @dataclass
 class ParamFieldConfig:
@@ -36,7 +34,7 @@ class ParamFieldConfig:
         ... = field(
             metadata = {
                 "validate": [
-                    RegExp("..."),
+                    Regexp("..."),
                     OneOf(["a", "b", "c"])
                     ], # See https://marshmallow.readthedocs.io/en/stable/marshmallow.validate.html#api-validators
 

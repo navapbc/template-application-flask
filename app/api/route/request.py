@@ -9,8 +9,6 @@ from api.route.models.base_api_model import BaseApiModel
 
 logger = api.logging.get_logger(__name__)
 
-PARAM_UNSET_IN_REQUEST: str = "PARAM_UNSET_IN_REQUEST"
-
 
 @marshmallow_dataclass
 class BaseRequestModel(BaseApiModel):
