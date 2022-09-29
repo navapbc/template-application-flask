@@ -1,14 +1,27 @@
 import flask
+from apiflask import APIBlueprint
+from marshmallow_dataclass import dataclass as marshmallow_dataclass
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.logging
 import api.route.response as response_util
 from api.route.api_context import api_context_manager
+from api.route.models.base_api_model import BaseApiModel
 
 logger = api.logging.get_logger(__name__)
 
 
+@marshmallow_dataclass
+class HealthOut(BaseApiModel):
+    message: str
+
+
+healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
+
+
+@healthcheck_blueprint.get("/healthcheck")
+@healthcheck_blueprint.output(HealthOut.Schema)
 def healthcheck_get() -> flask.Response:
     logger.info("GET /v1/healthcheck")
 

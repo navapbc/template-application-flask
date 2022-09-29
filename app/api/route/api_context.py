@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Generator, Optional
 
-import connexion
+from flask import request
 
 import api.app as app
 import api.db as db
@@ -40,8 +40,8 @@ def api_context_manager(is_user_expected: bool = True) -> Generator[ApiContext, 
     """
     with app.db_session() as db_session:
         # Attach the request body if present
-        if connexion.request.is_json:
-            body = connexion.request.json
+        if request.is_json:
+            body = request.json
         else:
             body = {}
 

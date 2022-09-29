@@ -12,7 +12,7 @@ This application should run as-is with minimal setup (see below).
 - Logging, with formatting in both human-readable and JSON formats
 - Backend script that generates a CSV locally or on S3 with proper credentials
 - Ability to run the various utility scripts inside or outside of Docker
-- Restructured and improved API request and response error handling which gives more details than the out-of-the-box approach for both Connexion and Pydantic
+- Restructured and improved API request and response error handling which gives more details than the out-of-the-box approach for APIFlask & marshmallow(+dataclasses)
 - Easy environment variable configuration for local development using a `local.env` file
 
 See [docs/README.md](/docs/README.md) for details on the API implementation.
