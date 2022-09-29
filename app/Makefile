@@ -119,6 +119,14 @@ db-migrate-heads: ## Show migrations marked as a head
 test:
 	$(PY_RUN_CMD) pytest $(args)
 
+test-coverage:
+	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest $(args)
+	$(PY_RUN_CMD) coverage report
+
+test-coverage-report: ## Open HTML test coverage report
+	$(PY_RUN_CMD) coverage html --directory .coverage_report
+	open .coverage_report/index.html
+
 ##################################################
 # Formatting and linting
 ##################################################
@@ -144,13 +152,9 @@ lint-spectral:
 	docker run --rm --tty --cap-drop=ALL --network=none --read-only --volume=$(PWD):/tmp:ro \
 		stoplight/spectral:6 lint /tmp/openapi.yml --ruleset /tmp/.spectral.yaml $(SPECTRAL_POSTPROC)
 
-test-coverage:
-	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest $(args)
-	$(PY_RUN_CMD) coverage report
+lint-security: # https://bandit.readthedocs.io/en/latest/index.html
+	$(PY_RUN_CMD) bandit -r . --number 3 --skip B101 -ll -x ./.venv
 
-test-coverage-report: ## Open HTML test coverage report
-	$(PY_RUN_CMD) coverage html --directory .coverage_report
-	open .coverage_report/index.html
 
 ##################################################
 # Scripts
