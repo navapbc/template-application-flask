@@ -135,6 +135,10 @@ format:
 	$(PY_RUN_CMD) isort --atomic api tests
 	$(PY_RUN_CMD) black api tests
 
+format-check:
+	$(PY_RUN_CMD) isort --atomic --check-only api tests
+	$(PY_RUN_CMD) black --check api tests
+
 lint: lint-spectral lint-py
 
 lint-py: lint-flake lint-mypy lint-poetry-version
