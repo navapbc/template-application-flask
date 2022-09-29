@@ -39,6 +39,7 @@ Chosen option: "APIFlask", because it appears to be a library that has taken sev
 ### Negative Consequences <!-- optional -->
 
 * If we use Marshmallow-dataclass, it's a bit cumbersome to define the validation rules as they all get passed via a metadata map. A utility for generating this so you can instead do `phone_number: str = field(metadata=get_metadata(required=True, regex="...", example="..."))` would go a long way in mitigating this annoyance.
+
 ## Pros and Cons of the Options
 
 ### APIFlask
