@@ -36,8 +36,6 @@ Chosen option: "APIFlask", because it appears to be a library that has taken sev
 ### Positive Consequences <!-- optional -->
 
 * No more writing OpenAPI specs, instead writing models once in-code.
-* TODO - not sure if I actually need to fill this section out, or just say "see: the good things section below"
-
 ### Negative Consequences <!-- optional -->
 
 * If we use Marshmallow-dataclass, it's a bit cumbersome to define the validation rules as they all get passed via a metadata map. A utility for generating this so you can instead do `phone_number: str = field(metadata=get_metadata(required=True, regex="...", example="..."))` would go a long way in mitigating this annoyance.

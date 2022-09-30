@@ -24,7 +24,6 @@ root
 │   └── tests
 │   └── local.env           Environment variable configuration for local files
 │   └── Makefile            Frequently used CLI commands for docker and utilities
-│   └── openapi.yml         API specification
 │   └── pyproject.toml      Python project configuration file
 │   └── setup.cfg           Python config for tools that don't support pyproject.toml yet
 │   └── Dockerfile          Docker build file for project
@@ -66,4 +65,4 @@ Environment variables for local development are stored in the [local.env](./app/
 Any environment variables specified directly in the [docker-compose](./docker-compose.yml) file will take precedent over those specified in the [local.env](./app/local.env) file.
 
 ## Authentication
-This API uses a very simple [ApiKey authentication approach](https://connexion.readthedocs.io/en/latest/security.html#apikey-authentication) which requires the caller to provide a static key. This is specified with the `API_AUTH_TOKEN` environment variable.
+This API uses a very simple [ApiKey authentication approach](https://apiflask.com/authentication/#use-external-authentication-library) which requires the caller to provide a static key. This is specified with the `API_AUTH_TOKEN` environment variable.

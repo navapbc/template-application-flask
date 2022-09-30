@@ -24,8 +24,7 @@ def main() -> None:
 
     if app_config.environment == "local":
         # If python files are changed, the app will auto-reload
-        # Note this doesn't have the OpenAPI yaml file configured at the moment
-        app.run(port=8080, use_reloader=True, reloader_type="stat")
+        app.run(host="0.0.0.0", port=8080, use_reloader=True, reloader_type="stat")
     else:
         # Don't enable the reloader if non-local
         app.run(port=8080)

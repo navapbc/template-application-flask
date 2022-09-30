@@ -8,7 +8,7 @@ def test_get_api_context(app, test_db_session):
     # Verify that you can grab the API context
     # so long as the DB session & current user
     # are attached to the flask global
-    with app.app.test_request_context():
+    with app.test_request_context():
         g.db = test_db_session
         g.current_user = "current user"
 
@@ -21,7 +21,7 @@ def test_get_api_context(app, test_db_session):
 def test_get_api_context_no_current_request(app):
     # You can't get the DB session from the App if there
     # isn't a request ("g.db" gets set in a handler before the request starts)
-    with app.app.app_context():
+    with app.app_context():
         # The app exists inside this block, but no request has started
         with pytest.raises(Exception, match="No database session available in application context"):
             with api_context_manager():

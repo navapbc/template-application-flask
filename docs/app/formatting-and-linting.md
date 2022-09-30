@@ -26,5 +26,3 @@ We use two flake extensions:
 ### Mypy
 [mypy](https://mypy.readthedocs.io/en/stable/) is used to validate and enforce typechecking in python. Configuration options can be found in [pyproject.toml - tool.mypy](/app/pyproject.toml)
 
-### Spectral
-[spectral](https://stoplight.io/open-source/spectral) is used to validate the schema of our [openapi.yml](/app/openapi.yml) file. Configuration options can be found in [.spectral.yaml](/app/.spectral.yaml)

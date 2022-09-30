@@ -4,11 +4,21 @@ from dataclasses import dataclass
 from typing import Any
 
 import flask
-from werkzeug.exceptions import Unauthorized
+from apiflask import HTTPTokenAuth, abort
 
 import api.logging
 
 logger = api.logging.get_logger(__name__)
+
+# Initialize the authorization context
+# this needs to be attached to your
+# routes as `your_blueprint..auth_required(api_key_auth)`
+# in order to enable authorization
+api_key_auth = HTTPTokenAuth("ApiKey", header="X-Auth")
+
+
+def get_app_security_scheme() -> dict[str, Any]:
+    return {"ApiKeyAuth": {"type": "apiKey", "in": "header", "name": "X-Auth"}}
 
 
 @dataclass
@@ -36,10 +46,18 @@ class User:
 API_AUTH_USER = User(uuid.uuid4(), "sub_id_1234", "API auth user")
 
 
-def api_key_auth(token: str, required_scopes: Any) -> dict:
+@api_key_auth.verify_token
+def verify_token(token: str) -> dict:
     logger.info("Authenticating provided token")
 
     user = process_token(token)
+
+    # Note that the current user can also be found
+    # by doing api_key_auth.current_user once in
+    # the request context. This is here in case
+    # multiple authentication approaches exist
+    # in your API, you don't need to check each
+    # one in order to figure out which was actually used
     flask.g.current_user = user
     flask.g.current_user_log_attributes = user.get_user_log_attributes()
 
@@ -60,12 +78,12 @@ def process_token(token: str) -> User:
         logger.info(
             "Authentication is not setup, please add an API_AUTH_TOKEN environment variable."
         )
-        raise Unauthorized(
-            "Authentication is not setup properly and the user cannot be authenticated"
-        )
+        abort(401, "Authentication is not setup properly and the user cannot be authenticated")
 
     if token != expected_auth_token:
         logger.info("Authentication failed for provided auth token.")
-        raise Unauthorized
+        abort(
+            401, "The server could not verify that you are authorized to access the URL requested"
+        )
 
     return API_AUTH_USER
