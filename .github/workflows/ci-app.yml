@@ -16,18 +16,15 @@ defaults:
   run:
     working-directory: ./app
 
-env:
-  # Some commands in the Makefile check if this is set
-  # and add additional parameters to the commands called
-  CI: true
+
 
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: build container
+      - name: Build container
         run: make build
 
       - name: Run format check
@@ -35,21 +32,19 @@ jobs:
 
       - name: Run linting
         run: make lint
-  security:
+
+  lint-security:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - name: Security Check
+      - name: Run security linting
         run: make lint-security
+
   test:
-    needs: [lint, security]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: test for multi-headed migration situation
-        run: make test args="-x tests/api/db/test_migrations.py::test_only_single_head_revision_in_migrations" 
+      - uses: actions/checkout@v3
 
       - name: Start tests
         run: make test-coverage
