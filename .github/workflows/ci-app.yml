@@ -16,16 +16,11 @@ defaults:
   run:
     working-directory: ./app
 
-
-
 jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Build container
-        run: make build
 
       - name: Run format check
         run: make format-check
