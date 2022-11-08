@@ -1,33 +1,38 @@
 # Template Application Flask
 
-Template application for a basic Flask API.
+## Overview
 
-This application should run as-is with minimal setup (see below).
+This is a template application that can be used to quickly create an API using Python and the Flask framework. This template includes a number of already implemented features and modules, including:
 
-## Features
+* Python/Flask-based API that writes to a database using API key authentication with example endpoints
+* PostgreSQL database + Alembic migrations configured for updating the database when the SQLAlchemy database models are updated
+* Thorough formatting & linting tools
+* Logging, with formatting in both human-readable and JSON formats
+* Backend script that generates a CSV locally or on S3 with proper credentials
+* Ability to run the various utility scripts inside or outside of Docker
+* Restructured and improved API request and response error handling which gives more details than the out-of-the-box approach for both Connexion and Pydantic
+* Easy environment variable configuration for local development using a `local.env` file
 
-- Python/Flask-based API that writes to a database using API key authentication with example endpoints
-- PostgreSQL database + Alembic migrations configured for updating the database when the SQLAlchemy database models are updated
-- Thorough formatting & linting tools
-- Logging, with formatting in both human-readable and JSON formats
-- Backend script that generates a CSV locally or on S3 with proper credentials
-- Ability to run the various utility scripts inside or outside of Docker
-- Restructured and improved API request and response error handling which gives more details than the out-of-the-box approach for both Connexion and Pydantic
-- Easy environment variable configuration for local development using a `local.env` file
+The template application is intended to work with the infrastructure from [template-infra](https://github.com/navapbc/template-infra).
 
-See [docs/README.md](/docs/README.md) for details on the API implementation.
+## Installation
 
-## Getting started
+To get started using the template infrastructure on your project, install the template by cloning the template repository and copying the following folders/files to your repository:
 
-This application is dockerized. Take a look at [Dockerfile](./app/Dockerfile) to see how it works.
+```bash
+# fetch latest version of the template
+git clone --single-branch --branch main --depth 1 git@github.com:navapbc/template-application-flask.git
 
-A very simple [docker-compose.yml](./docker-compose.yml) has been included to support local development and deployment. Take a look at [docker-compose.yml](./docker-compose.yml) for more information.
+cp -r \
+  template-application-flask/.github \
+  template-application-flask/bin \
+  template-application-flask/docs \
+  template-application-flask/app \
+  template-application-flask/docker-compose.yml \
+  .
 
-**How to run:**
+# clean up the template folder
+rm -fr template-application-flask
+```
 
-1. In your terminal, `cd` to the app directory of this repo.
-2. Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed & running.
-3. Run `make init start` to build the image and start the container.
-4. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
-5. Run `make run-logs` to see the logs of the running API container
-6. Run `make stop` when you are done to delete the container.
+Now you're ready to [get started](./getting-started.md).
