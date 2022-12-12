@@ -5,13 +5,21 @@
 # needs to be called `release` in order to integrate with the repo's
 # top-level Makefile
 FROM python:3-slim AS release
-# Keep container packages up-to-date.
-RUN apt update \
-    && apt upgrade --yes
+
 # Install poetry, the package manager.
 # https://python-poetry.org
 RUN pip install poetry
 
+RUN apt-get update \
+    && apt-get install --no-install-recommends --yes \
+    bsdmainutils \
+    build-essential \
+    curl \
+    git \
+    libffi-dev \
+    libpq-dev \
+    make \
+    postgresql
 
 # Set the application working directory.
 WORKDIR /srv
