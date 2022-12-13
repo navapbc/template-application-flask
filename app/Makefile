@@ -174,3 +174,10 @@ create-user-csv:
 # Pauses for 5 seconds
 sleep-5:
 	sleep 5
+
+setup-local:
+	# Configure poetry to use virtualenvs in the project directory
+	poetry config virtualenvs.in-project true
+
+	# Install dependencies
+	poetry install --no-root
