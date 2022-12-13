@@ -12,13 +12,8 @@ RUN pip install poetry
 
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes \
-    bsdmainutils \
     build-essential \
-    curl \
-    git \
-    libffi-dev \
     libpq-dev \
-    make \
     postgresql
 
 # Set the application working directory.
