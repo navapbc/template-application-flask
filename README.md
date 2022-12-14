@@ -35,4 +35,4 @@ cp -r \
 rm -fr template-application-flask
 ```
 
-Now you're ready to [get started](./getting-started.md).
+Now you're ready to [get started](./docs/app/getting-started.md).
