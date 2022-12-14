@@ -3,6 +3,17 @@ Database adapter for Postgres database.
 This module is an abstraction around the psycopg3 python postgres library. It
 has methods for connecting to the database, and abstracts away the loading of
 config and environment variables.
+
+Usage:
+    # During application initialization
+    from api.adapters import db
+    db.init()
+
+    # In a route handler
+    from api.adapters import db
+    with db.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT 1")
 """
 
 import atexit
@@ -68,6 +79,11 @@ def get_connection() -> psycopg.Connection:
     return pool.connection()
 
 
+# Global connection pool
+# The simplest way to use the psycopg pool is to create a single instance of it,
+# and to use this object in the rest of the program. The pool is threadsafe and
+# can be used by multiple threads at the same time.
+# https://www.psycopg.org/psycopg3/docs/advanced/pool.html
 pool: psycopg_pool.ConnectionPool | None = None
 
 __all__ = ["init", "get_connection", "Connection", "Cursor", "kwargs_row"]
