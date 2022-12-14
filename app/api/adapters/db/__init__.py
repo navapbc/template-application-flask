@@ -20,8 +20,8 @@ import atexit
 import os
 
 import psycopg
-from psycopg import rows
 import psycopg_pool
+from psycopg import rows
 
 from api import logging
 
