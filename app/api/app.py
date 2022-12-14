@@ -33,28 +33,6 @@ def create_app(
         validate_responses=True,
     )
 
-    @app.app.before_request
-    def push_db() -> None:
-        # Attach the DB session factory
-        # to the global Flask context
-        g.db = db.get_connection()
-
-    @app.app.teardown_request
-    def close_db(exception: Optional[Exception] = None) -> None:
-        if not do_close_db:
-            logger.debug("Not closing DB session")
-            return
-
-        try:
-            logger.debug("Closing DB session")
-            db = g.pop("db", None)
-
-            if db is not None:
-                db.close()
-        except Exception:
-            logger.exception("Exception while closing DB session")
-            pass
-
     return app
 
 
