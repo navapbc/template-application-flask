@@ -1,6 +1,5 @@
 import os
-from contextlib import contextmanager
-from typing import Generator, Optional
+from typing import Optional
 
 import connexion
 from flask import g
