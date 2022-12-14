@@ -6,8 +6,8 @@ import connexion
 from flask import g
 from werkzeug.exceptions import Unauthorized
 
-import api.db as db
 import api.logging
+from api.adapters import db
 from api.auth.api_key_auth import User
 from api.route.connexion_validators import get_custom_validator_map
 from api.route.error_handlers import add_error_handlers_to_app
@@ -17,17 +17,14 @@ logger = api.logging.get_logger(__name__)
 
 def create_app(
     check_migrations_current: bool = True,
-    db_session_factory: Optional[db.scoped_session] = None,
     do_close_db: bool = True,
 ) -> connexion.FlaskApp:
-
-    # Initialize the db
-    if db_session_factory is None:
-        db_session_factory = db.init(check_migrations_current=check_migrations_current)
 
     options = {"swagger_url": "/docs"}
     app = connexion.FlaskApp(__name__, specification_dir=get_project_root_dir(), options=options)
     add_error_handlers_to_app(app)
+
+    db.init()
 
     app.add_api(
         "openapi.yml",
@@ -40,8 +37,7 @@ def create_app(
     def push_db() -> None:
         # Attach the DB session factory
         # to the global Flask context
-        g.db = db_session_factory
-        g.connexion_flask_app = app
+        g.db = db.get_connection()
 
     @app.app.teardown_request
     def close_db(exception: Optional[Exception] = None) -> None:
@@ -54,35 +50,12 @@ def create_app(
             db = g.pop("db", None)
 
             if db is not None:
-                db.remove()
+                db.close()
         except Exception:
             logger.exception("Exception while closing DB session")
             pass
 
     return app
-
-
-def db_session_raw() -> db.scoped_session:
-    """Get a plain SQLAlchemy Session."""
-    session: db.scoped_session = g.get("db")
-    if session is None:
-        raise Exception("No database session available in application context")
-
-    return session
-
-
-@contextmanager
-def db_session(close: bool = False) -> Generator[db.scoped_session, None, None]:
-    """Get a SQLAlchemy Session wrapped in some transactional management.
-
-    This commits session when done, rolls back transaction on exceptions,
-    optionally closing the session (which disconnects any entities in the
-    session, so be sure closing is what you want).
-    """
-
-    session = db_session_raw()
-    with db.session_scope(session, close) as session_scoped:
-        yield session_scoped
 
 
 def current_user(is_user_expected: bool = True) -> Optional[User]:
