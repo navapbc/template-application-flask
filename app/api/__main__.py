@@ -23,7 +23,7 @@ def main() -> None:
     logger.info("Running API Application")
 
     app = api.app.create_app()
-    port = os.getenv("PORT", 8080)
+    port = app_config.port
 
     if app_config.environment == "local":
         # If python files are changed, the app will auto-reload

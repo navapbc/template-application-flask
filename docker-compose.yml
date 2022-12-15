@@ -5,8 +5,7 @@ version: '3'
 services:
 
   main-db:
-    image: postgres:14-alpine
-      # Docs for options to the postgres server command:
+    image: postgres:14-alpine # Docs for options to the postgres server command:
     # https://www.postgresql.org/docs/current/app-postgres.html
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     # Load environment variables for local development. 
@@ -34,7 +33,7 @@ services:
       - DB_HOST=main-db
     # Fix running on Apple silicon
     platform: linux/amd64
-    ports: 
+    ports:
       - 8080:8080
     # Mount application directory for local development.
     volumes:
@@ -44,4 +43,5 @@ services:
 
 volumes:
   dbdata:
+
 
