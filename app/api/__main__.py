@@ -5,8 +5,6 @@
 #
 # https://docs.python.org/3/library/__main__.html
 
-import os
-
 import api.app
 import api.logging
 from api.app_config import AppConfig
