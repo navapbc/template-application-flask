@@ -10,8 +10,6 @@ services:
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     # Load environment variables for local development. 
     env_file: ./app/local.env
-    # Fix running on Apple silicon
-    platform: linux/amd64
     ports:
       - "5432:5432"
     volumes:
@@ -31,8 +29,6 @@ services:
       # The env_file defines DB_HOST=localhost for accessing a non-dockerized database. 
       # In the docker-compose, we tell the app to use the dockerized database service 
       - DB_HOST=main-db
-    # Fix running on Apple silicon
-    platform: linux/amd64
     ports:
       - 8080:8080
     # Mount application directory for local development.
