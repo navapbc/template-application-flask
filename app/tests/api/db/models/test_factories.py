@@ -38,7 +38,7 @@ def validate_user_record(user: User, user_expected_values=None):
         assert user.phone_number is not None
         assert user.date_of_birth is not None
         assert user.is_active is not None
-        assert user.role_assignments is not None
+        assert user.roles is not None
 
 
 def test_user_factory_build():

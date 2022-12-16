@@ -71,9 +71,7 @@ def convert_user_records_for_csv(records: list[User]) -> list[UserCsvRecord]:
 
     for user in records:
         user_name = " ".join([user.first_name, user.last_name])
-        roles = (
-            " ".join([role.type for role in user.role_assignments]) if user.role_assignments else ""
-        )
+        roles = " ".join([role.type for role in user.roles]) if user.roles else ""
 
         out_records.append(
             UserCsvRecord(

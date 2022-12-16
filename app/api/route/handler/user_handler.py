@@ -62,7 +62,7 @@ def create_user(api_context: ApiContext) -> UserResponse:
         for request_role in request.roles:
             role_assignments.append(Role(user_id=user.id, role=request_role.role))
 
-        user.role_assignments = role_assignments
+        user.roles = role_assignments
 
     return UserResponse.from_orm(user)
 
@@ -113,8 +113,8 @@ def handle_role_patch(
     # We'll work with just the role description strings to avoid
     # comparing nested objects and values. As roles are unique in the
     # DB per user, any deduplicating this does is fine.
-    if user.role_assignments is not None:
-        current_roles = set([role.type for role in user.role_assignments])
+    if user.roles is not None:
+        current_roles = set([role.type for role in user.roles])
     else:
         current_roles = set()
 
@@ -129,8 +129,8 @@ def handle_role_patch(
     roles_to_add = request_roles - current_roles  # type:ignore
 
     # Go through existing roles and delete the ones that are no longer needed
-    if user.role_assignments:
-        for current_user_role in user.role_assignments:
+    if user.roles:
+        for current_user_role in user.roles:
             if current_user_role.type in roles_to_delete:
                 api_context.db_session.delete(current_user_role)
 

@@ -29,11 +29,11 @@ class User(base.BaseModel, base.IdMixin, base.TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    role_assignments: Optional[list["Role"]] = relationship("RoleAssignment", back_populates="user")
+    roles: Optional[list["Role"]] = relationship("Role", back_populates="user")
 
 
 class Role(base.BaseModel, base.TimestampMixin):
-    __tablename__ = "role_assignment"
+    __tablename__ = "role"
     user_id: Mapped[UUID] = Column(
         postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
     )
@@ -43,4 +43,4 @@ class Role(base.BaseModel, base.TimestampMixin):
     # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
     # https://medium.com/swlh/postgresql-3-ways-to-replace-enum-305861e089bc
     type: str = Column(Enum(RoleType, native_enum=False), primary_key=True)
-    user: User = relationship(User, back_populates="role_assignments")
+    user: User = relationship(User, back_populates="roles")
