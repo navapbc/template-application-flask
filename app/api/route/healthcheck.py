@@ -5,7 +5,7 @@ from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.logging
-import api.route.response as response_util
+from api.route import response
 from api.route.api_context import api_context_manager
 
 logger = api.logging.get_logger(__name__)
@@ -29,11 +29,11 @@ def health() -> flask.Response:
             if not result or result[0] != 1:
                 raise Exception("Connection to DB failure")
 
-            return response_util.success_response(message="Service healthy")
+            return response.ApiResponse(message="Service healthy").as_flask_response()
 
     except Exception:
         logger.exception("Connection to DB failure")
 
-        return response_util.error_response(
-            status_code=ServiceUnavailable, message="Service unavailable", errors=[]
-        )
+        return response.ApiResponse(
+            status_code=ServiceUnavailable.code, message="Service unavailable", errors=[]
+        ).as_flask_response()
