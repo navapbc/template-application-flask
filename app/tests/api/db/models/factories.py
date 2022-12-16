@@ -65,7 +65,7 @@ class RoleAssignmentFactory(BaseFactory):
     user_id = factory.LazyAttribute(lambda u: u.user.id)
     user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
 
-    role = factory.Iterator([r.value for r in user_models.RoleType])
+    type = factory.Iterator([r.value for r in user_models.RoleType])
 
 
 class UserFactory(BaseFactory):

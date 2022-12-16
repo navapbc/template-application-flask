@@ -90,4 +90,4 @@ def test_role_assignment_factory_create(test_db_session, initialize_factories_se
     # a user attached to it with that single role
     role_assignment = RoleAssignmentFactory.create()
     assert role_assignment.user is not None
-    assert len(role_assignment.user.role_assignments) == 1
+    assert len(role_assignment.user.roles) == 1

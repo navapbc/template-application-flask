@@ -58,11 +58,11 @@ def create_user(api_context: ApiContext) -> UserResponse:
     api_context.db_session.add(user)
 
     if request.roles is not None:
-        role_assignments = []
+        roles = []
         for request_role in request.roles:
-            role_assignments.append(Role(user_id=user.id, role=request_role.role))
+            roles.append(Role(user_id=user.id, role=request_role.role))
 
-        user.roles = role_assignments
+        user.roles = roles
 
     return UserResponse.from_orm(user)
 
