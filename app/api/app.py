@@ -71,8 +71,9 @@ def current_user(is_user_expected: bool = True) -> Optional[User]:
 
 
 def configure_app(app: APIFlask) -> None:
-    # Modify the response schema to instead use the format of our Response class
+    # Modify the response schema to instead use the format of our ApiResponse class
     # which adds additional details to the object.
+    # https://apiflask.com/schema/#base-response-schema-customization
     app.config["BASE_RESPONSE_SCHEMA"] = marshmallow_dataclass.class_schema(ApiResponse)
 
     # Set a few values for the Swagger endpoint
