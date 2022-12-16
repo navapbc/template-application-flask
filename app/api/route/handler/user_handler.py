@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import RoleType, User, Role
+from api.db.models.user_models import Role, RoleType, User
 from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
 from api.route.route_utils import get_or_404

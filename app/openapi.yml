@@ -182,7 +182,7 @@ components:
       properties:
         type:
           type: string
-          example: User
+          example: USER
           enum:
             - USER
             - ADMIN

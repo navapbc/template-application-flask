@@ -12,7 +12,6 @@ from sqlalchemy.sql.functions import now as sqlnow
 
 from api.util import datetime_util
 
-
 # Override the default naming of constraints
 # to use suffixes instead:
 # https://stackoverflow.com/questions/4107915/postgresql-default-constraint-names/4108266#4108266

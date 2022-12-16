@@ -3,7 +3,7 @@ from datetime import date, datetime
 import pytest
 
 from api.db.models.user_models import User
-from tests.api.db.models.factories import UserFactory, RoleAssignmentFactory
+from tests.api.db.models.factories import RoleAssignmentFactory, UserFactory
 
 user_params = {
     "first_name": "Alvin",
