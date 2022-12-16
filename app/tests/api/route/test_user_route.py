@@ -253,7 +253,7 @@ def test_patch_user_200_roles(
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set(["ADMIN", "USER"]) == set([role["role"] for role in response_roles])
+    assert set(["ADMIN", "USER"]) == set([role["type"] for role in response_roles])
 
     # Remove a role
     request = {"roles": [{"type": "ADMIN"}]}
@@ -261,7 +261,7 @@ def test_patch_user_200_roles(
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set(["ADMIN"]) == set([role["role"] for role in response_roles])
+    assert set(["ADMIN"]) == set([role["type"] for role in response_roles])
 
     # Remove all roles
     request = {"roles": []}
@@ -269,7 +269,7 @@ def test_patch_user_200_roles(
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set() == set([role["role"] for role in response_roles])
+    assert set() == set([role["type"] for role in response_roles])
 
 
 def test_patch_user_401_unauthorized_token(
