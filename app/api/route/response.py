@@ -1,4 +1,4 @@
-from dataclasses import asdict, dataclass
+import dataclasses
 from typing import Any, Optional, Type
 
 import flask
@@ -7,7 +7,7 @@ from werkzeug.exceptions import HTTPException
 from api.route.models.base_api_model import BaseApiModel
 
 
-@dataclass
+@dataclasses.dataclass
 class ValidationErrorDetail:
     type: str
     message: str = ""
@@ -30,19 +30,13 @@ class ValidationException(Exception):
         self.data = data or {}
 
 
-@dataclass
+@dataclasses.dataclass
 class Response:
     status_code: int
     message: str
     data: Optional[dict | list[dict] | BaseApiModel]
-    warnings: Optional[list[ValidationErrorDetail]] = None
-    errors: Optional[list[ValidationErrorDetail]] = None
-
-    def to_dict(self) -> dict[str, Any]:
-        return exclude_none(asdict(self))
-
-    def to_api_response(self) -> flask.Response:
-        return flask.make_response(flask.jsonify(self.to_dict()), self.status_code)
+    warnings: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
+    errors: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
 
 
 def exclude_none(obj: Any) -> Any:
@@ -72,7 +66,7 @@ def success_response(
     response_object = Response(
         status_code=status_code, message=message, data=data, warnings=warnings
     )
-    return flask.make_response(asdict(response_object), status_code)
+    return flask.make_response(dataclasses.asdict(response_object), status_code)
 
 
 def error_response(
