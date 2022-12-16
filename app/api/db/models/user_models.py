@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
 
-from . import base
+from api.db.models.base import Base, IdMixin, TimestampMixin
 
 logger = api.logging.get_logger(__name__)
 
@@ -19,7 +19,7 @@ class RoleType(str, enum.Enum):
     ADMIN = "ADMIN"
 
 
-class User(base.Base, base.IdMixin, base.TimestampMixin):
+class User(Base, IdMixin, TimestampMixin):
     __tablename__ = "user"
 
     first_name: str = Column(Text, nullable=False)
@@ -32,7 +32,7 @@ class User(base.Base, base.IdMixin, base.TimestampMixin):
     roles: Optional[list["Role"]] = relationship("Role", back_populates="user")
 
 
-class Role(base.Base, base.TimestampMixin):
+class Role(Base, TimestampMixin):
     __tablename__ = "role"
     user_id: Mapped[UUID] = Column(
         postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
