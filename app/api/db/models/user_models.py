@@ -14,12 +14,12 @@ from . import base
 logger = api.logging.get_logger(__name__)
 
 
-class RoleType(enum.Enum):
+class RoleType(str, enum.Enum):
     USER = "USER"
     ADMIN = "ADMIN"
 
 
-class User(base.BaseModel, base.IdMixin, base.TimestampMixin):
+class User(base.Base, base.IdMixin, base.TimestampMixin):
     __tablename__ = "user"
 
     first_name: str = Column(Text, nullable=False)
@@ -32,7 +32,7 @@ class User(base.BaseModel, base.IdMixin, base.TimestampMixin):
     roles: Optional[list["Role"]] = relationship("Role", back_populates="user")
 
 
-class Role(base.BaseModel, base.TimestampMixin):
+class Role(base.Base, base.TimestampMixin):
     __tablename__ = "role"
     user_id: Mapped[UUID] = Column(
         postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
@@ -42,5 +42,5 @@ class Role(base.BaseModel, base.TimestampMixin):
     # when adding a new enum value.
     # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
     # https://medium.com/swlh/postgresql-3-ways-to-replace-enum-305861e089bc
-    type: str = Column(Enum(RoleType, native_enum=False), primary_key=True)
+    type: RoleType = Column(Enum(RoleType, native_enum=False), primary_key=True)
     user: User = relationship(User, back_populates="roles")

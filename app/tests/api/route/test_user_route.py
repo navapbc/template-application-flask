@@ -14,7 +14,7 @@ base_request = {
     "date_of_birth": "2022-01-01",
     "phone_number": "123-456-7890",
     "is_active": True,
-    "roles": [{"role": "ADMIN"}, {"role": "USER"}],
+    "roles": [{"type": "ADMIN"}, {"type": "USER"}],
 }
 
 
@@ -24,7 +24,7 @@ def validate_all_match(request, response, db_record):
             request_roles = request["roles"] if request else None
             response_roles = response["roles"] if response else None
             db_roles = db_record.roles if db_record else None
-            validate_param_match("role", request_roles, response_roles, db_roles)
+            validate_param_match("type", request_roles, response_roles, db_roles)
         else:
             validate_param_match(k, request, response, db_record)
 
@@ -147,7 +147,7 @@ def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
 
 def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     # Make the role a disallowed one
-    request = base_request | {"roles": [{"role": "Mime"}, {"role": "Clown"}]}
+    request = base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]}
 
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
@@ -248,7 +248,7 @@ def test_patch_user_200_roles(
     user = UserFactory.create(roles=[])
 
     # Add two roles
-    request = {"roles": [{"role": "ADMIN"}, {"role": "USER"}]}
+    request = {"roles": [{"type": "ADMIN"}, {"type": "USER"}]}
     response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 200
 
@@ -256,7 +256,7 @@ def test_patch_user_200_roles(
     assert set(["ADMIN", "USER"]) == set([role["role"] for role in response_roles])
 
     # Remove a role
-    request = {"roles": [{"role": "ADMIN"}]}
+    request = {"roles": [{"type": "ADMIN"}]}
     response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 200
 

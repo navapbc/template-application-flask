@@ -180,7 +180,7 @@ components:
     Role:
       type: object
       properties:
-        role:
+        type:
           type: string
           example: User
           enum:

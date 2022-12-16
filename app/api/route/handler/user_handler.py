@@ -14,12 +14,11 @@ logger = api.logging.get_logger(__name__)
 
 
 class RoleParams(BaseRequestModel):
-    role: RoleType
-    created_at: Optional[datetime]
+    type: RoleType
 
 
 class UserParams(BaseRequestModel):
-    user_id: Optional[UUID4]
+    id: Optional[UUID4]
     first_name: str
     middle_name: Optional[str]
     last_name: str
@@ -47,7 +46,7 @@ def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
     user = User(
-        user_id=uuid4(),
+        id=uuid4(),
         first_name=request.first_name,
         middle_name=request.middle_name,
         last_name=request.last_name,
@@ -58,11 +57,7 @@ def create_user(api_context: ApiContext) -> UserResponse:
     api_context.db_session.add(user)
 
     if request.roles is not None:
-        roles = []
-        for request_role in request.roles:
-            roles.append(Role(user_id=user.id, role=request_role.role))
-
-        user.roles = roles
+        user.roles = [Role(user_id=user.id, type=role.type) for role in request.roles]
 
     return UserResponse.from_orm(user)
 
@@ -95,7 +90,7 @@ def get_user(user_id: str, api_context: ApiContext) -> UserResponse:
 
 
 def handle_role_patch(
-    user: User, request_roles: Optional[list[RoleParams]], api_context: ApiContext
+    user: User, request_roles: Optional[list[RoleType]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

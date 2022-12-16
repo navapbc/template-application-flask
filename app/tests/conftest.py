@@ -87,10 +87,10 @@ def test_db(test_db_schema):
     """
 
     # not used directly, but loads models into Base
-    from api.db.models.base import BaseModel
+    from api.db.models.base import Base
 
     engine = api.db.create_db_engine()
-    BaseModel.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
 
     db_session = api.db.init()
     db_session.close()

@@ -28,7 +28,7 @@ metadata = MetaData(
 
 
 @as_declarative(metadata=metadata)
-class BaseModel:
+class Base:
     def _dict(self) -> dict:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
@@ -45,7 +45,7 @@ class BaseModel:
 
         return json_valid_dict
 
-    def copy(self, **kwargs: dict[str, Any]) -> "BaseModel":
+    def copy(self, **kwargs: dict[str, Any]) -> "Base":
         # TODO - Python 3.11 will let us make the return Self instead
         table = self.__table__  # type: ignore
         non_pk_columns = [
