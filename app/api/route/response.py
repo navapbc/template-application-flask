@@ -4,6 +4,8 @@ from typing import Any, Optional, Type
 import flask
 from werkzeug.exceptions import HTTPException
 
+from api.route.models.base_api_model import BaseApiModel
+
 
 @dataclass
 class ValidationErrorDetail:
@@ -32,7 +34,7 @@ class ValidationException(Exception):
 class Response:
     status_code: int
     message: str
-    data: None | dict | list[dict]
+    data: Optional[dict | list[dict] | BaseApiModel]
     warnings: Optional[list[ValidationErrorDetail]] = None
     errors: Optional[list[ValidationErrorDetail]] = None
 
@@ -63,7 +65,7 @@ def exclude_none(obj: Any) -> Any:
 
 def success_response(
     message: str,
-    data: None | dict | list[dict] = None,
+    data: None | BaseApiModel = None,
     warnings: Optional[list[ValidationErrorDetail]] = None,
     status_code: int = 200,
 ) -> Response:

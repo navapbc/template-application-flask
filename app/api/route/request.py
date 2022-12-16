@@ -1,27 +1,37 @@
+from dataclasses import fields
 from typing import Any, Iterable
 
-from pydantic import BaseModel
+from marshmallow_dataclass import dataclass as marshmallow_dataclass
+
+import api.logging
+from api.route.api_context import ApiContext
+from api.route.models.base_api_model import BaseApiModel
+
+logger = api.logging.get_logger(__name__)
 
 
-class BaseRequestModel(BaseModel):
-    class Config:
-        orm_mode = True
-
-    def get_set_params(self) -> Iterable[tuple[str, Any]]:
+@marshmallow_dataclass
+class BaseRequestModel(BaseApiModel):
+    def get_set_params(self, api_context: ApiContext) -> Iterable[tuple[str, Any]]:
         """
-        Utility method for fetching just the parameters that were
-        set when creating the pydantic model. This can be used as
+        Get an iterable that gives all params that
+        were explicitly set in the request.
 
-        ```
-        for key, value in model.get_set_params():
-            ...
-        ```
+        This is necessary as dataclasses don't keep track
+        of the parameters passed into them, and have to either
+        be called with all parameters (which APIFlask defaults
+        to be null for unset params) OR have defaults on the
+        generated init function which would require a separate
+        valid default for every type.
 
-        and is functionally equivalent to:
-        ```
-        for key in model.__fields_set__:
-            value = getattr(model, key)
-        ```
+        Note that this does not handle recursively checking
+        params inside of the request, and only top-level
+        keys will be checked.
         """
-        for k in self.__fields_set__:
-            yield k, getattr(self, k)
+        for field_item in fields(self):
+            key = field_item.name
+
+            if key not in api_context.request_body:
+                continue
+
+            yield key, getattr(self, key)
