@@ -5,7 +5,7 @@ from uuid import uuid4
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import RoleEnum, User, RoleAssignment
+from api.db.models.user_models import RoleType, User, Role
 from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
 from api.route.route_utils import get_or_404
@@ -14,7 +14,7 @@ logger = api.logging.get_logger(__name__)
 
 
 class RoleParams(BaseRequestModel):
-    role: RoleEnum
+    role: RoleType
     created_at: Optional[datetime]
 
 
@@ -60,7 +60,7 @@ def create_user(api_context: ApiContext) -> UserResponse:
     if request.roles is not None:
         role_assignments = []
         for request_role in request.roles:
-            role_assignments.append(RoleAssignment(user_id=user.id, role=request_role.role))
+            role_assignments.append(Role(user_id=user.id, role=request_role.role))
 
         user.role_assignments = role_assignments
 
@@ -114,7 +114,7 @@ def handle_role_patch(
     # comparing nested objects and values. As roles are unique in the
     # DB per user, any deduplicating this does is fine.
     if user.role_assignments is not None:
-        current_roles = set([role.role for role in user.role_assignments])
+        current_roles = set([role.type for role in user.role_assignments])
     else:
         current_roles = set()
 
@@ -131,10 +131,10 @@ def handle_role_patch(
     # Go through existing roles and delete the ones that are no longer needed
     if user.role_assignments:
         for current_user_role in user.role_assignments:
-            if current_user_role.role in roles_to_delete:
+            if current_user_role.type in roles_to_delete:
                 api_context.db_session.delete(current_user_role)
 
     # Add any new roles
     for role in roles_to_add:
-        user_role = RoleAssignment(user_id=user.id, role=role)
+        user_role = Role(user_id=user.id, role=role)
         api_context.db_session.add(user_role)

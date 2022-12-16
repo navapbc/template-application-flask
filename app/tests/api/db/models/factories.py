@@ -60,12 +60,12 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
 
 class RoleAssignmentFactory(BaseFactory):
     class Meta:
-        model = user_models.RoleAssignment
+        model = user_models.Role
 
     user_id = factory.LazyAttribute(lambda u: u.user.id)
     user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
 
-    role = factory.Iterator([r.value for r in user_models.RoleEnum])
+    role = factory.Iterator([r.value for r in user_models.RoleType])
 
 
 class UserFactory(BaseFactory):

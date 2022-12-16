@@ -1,8 +1,8 @@
 """create user and role tables
 
-Revision ID: dcc36768b941
+Revision ID: dc24d095237b
 Revises: 
-Create Date: 2022-12-16 00:40:17.858047
+Create Date: 2022-12-16 00:54:04.519122
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "dcc36768b941"
+revision = "dc24d095237b"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -57,12 +57,12 @@ def upgrade():
         ),
         sa.Column("user_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column(
-            "role", sa.Enum("USER", "ADMIN", name="roleenum", native_enum=False), nullable=False
+            "type", sa.Enum("USER", "ADMIN", name="roletype", native_enum=False), nullable=False
         ),
         sa.ForeignKeyConstraint(
             ["user_id"], ["user.id"], name=op.f("role_assignment_user_id_user_fkey")
         ),
-        sa.PrimaryKeyConstraint("user_id", "role", name=op.f("role_assignment_pkey")),
+        sa.PrimaryKeyConstraint("user_id", "type", name=op.f("role_assignment_pkey")),
     )
     # ### end Alembic commands ###
 

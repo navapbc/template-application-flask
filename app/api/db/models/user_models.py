@@ -14,7 +14,7 @@ from . import base
 logger = api.logging.get_logger(__name__)
 
 
-class RoleEnum(enum.Enum):
+class RoleType(enum.Enum):
     USER = "USER"
     ADMIN = "ADMIN"
 
@@ -29,12 +29,10 @@ class User(base.BaseModel, base.IdMixin, base.TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    role_assignments: Optional[list["RoleAssignment"]] = relationship(
-        "RoleAssignment", back_populates="user"
-    )
+    role_assignments: Optional[list["Role"]] = relationship("RoleAssignment", back_populates="user")
 
 
-class RoleAssignment(base.BaseModel, base.TimestampMixin):
+class Role(base.BaseModel, base.TimestampMixin):
     __tablename__ = "role_assignment"
     user_id: Mapped[UUID] = Column(
         postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
@@ -44,5 +42,5 @@ class RoleAssignment(base.BaseModel, base.TimestampMixin):
     # when adding a new enum value.
     # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
     # https://medium.com/swlh/postgresql-3-ways-to-replace-enum-305861e089bc
-    role: str = Column(Enum(RoleEnum, native_enum=False), primary_key=True)
+    type: str = Column(Enum(RoleType, native_enum=False), primary_key=True)
     user: User = relationship(User, back_populates="role_assignments")
