@@ -1,0 +1,436 @@
+info:
+  title: Template Application Flask
+  description: Template API for a Flask Application
+  contact:
+    name: Nava PBC Engineering
+    url: https://www.navapbc.com
+    email: engineering@navapbc.com
+  version: 0.1.0
+tags:
+- name: Health
+- name: User
+paths:
+  /health:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    default: 200
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                  data:
+                    $ref: '#/components/schemas/HealthOut'
+                  message:
+                    type: string
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                required:
+                - message
+          description: Successful response
+      tags:
+      - Health
+      summary: Health
+  /v1/user:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    default: 200
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                  data:
+                    $ref: '#/components/schemas/UserOut'
+                  message:
+                    type: string
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                required:
+                - message
+          description: Successful response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+      tags:
+      - User
+      summary: POST /v1/user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserIn'
+      security:
+      - ApiKeyAuth: []
+  /v1/user/{user_id}:
+    get:
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    default: 200
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                  data:
+                    $ref: '#/components/schemas/UserOut'
+                  message:
+                    type: string
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                required:
+                - message
+          description: Successful response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      tags:
+      - User
+      summary: User Get
+      security:
+      - ApiKeyAuth: []
+    patch:
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_code:
+                    type: integer
+                    default: 200
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                  data:
+                    $ref: '#/components/schemas/UserOut'
+                  message:
+                    type: string
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
+                required:
+                - message
+          description: Successful response
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      tags:
+      - User
+      summary: User Patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPatchParams'
+      security:
+      - ApiKeyAuth: []
+openapi: 3.0.3
+components:
+  schemas:
+    ValidationErrorDetail:
+      type: object
+      properties:
+        rule:
+          type: string
+          default: null
+          nullable: true
+        value:
+          type: string
+          default: null
+          nullable: true
+        field:
+          type: string
+          default: null
+          nullable: true
+        message:
+          type: string
+          default: ''
+        type:
+          type: string
+      required:
+      - type
+    ValidationError:
+      properties:
+        detail:
+          type: object
+          properties:
+            <location>:
+              type: object
+              properties:
+                <field_name>:
+                  type: array
+                  items:
+                    type: string
+        message:
+          type: string
+      type: object
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        message:
+          type: string
+      type: object
+    HealthOut:
+      type: object
+      properties: {}
+    RoleBase:
+      type: object
+      properties:
+        role_description:
+          type: string
+          enum:
+          - User
+          - Admin
+          - Third Party
+          description: The name of the role
+      required:
+      - role_description
+    UserIn:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          example: 123-456-7890
+        last_name:
+          type: string
+          description: last name of the person
+          example: Doe
+        is_active:
+          type: boolean
+          description: Whether the user is active
+          example: true
+        first_name:
+          type: string
+          description: first name of the person
+          example: Jane
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+          example: '2022-01-15'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleBase'
+        middle_name:
+          type: string
+          default: null
+          nullable: true
+          description: middle name of the person
+          example: Anne
+      required:
+      - date_of_birth
+      - first_name
+      - is_active
+      - last_name
+      - phone_number
+      - roles
+    RoleOut:
+      type: object
+      properties:
+        role_description:
+          type: string
+          enum:
+          - User
+          - Admin
+          - Third Party
+          description: The name of the role
+        created_at:
+          type: string
+          format: date-time
+          default: null
+          nullable: true
+          example: '2022-01-15T12:00:00.000000+00:00'
+        updated_at:
+          type: string
+          format: date-time
+          default: null
+          nullable: true
+          example: '2022-01-15T12:00:00.000000+00:00'
+      required:
+      - role_description
+    UserOut:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          example: 123-456-7890
+        last_name:
+          type: string
+          description: last name of the person
+          example: Doe
+        is_active:
+          type: boolean
+          description: Whether the user is active
+          example: true
+        first_name:
+          type: string
+          description: first name of the person
+          example: Jane
+        user_id:
+          type: string
+          format: uuid
+          example: 2f0f58a0-fcad-465b-b474-ee6c961cd6e3
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+          example: '2022-01-15'
+        updated_at:
+          type: string
+          format: date
+          example: '2022-01-15T12:00:00.000000+00:00'
+        created_at:
+          type: string
+          format: date
+          example: '2022-01-15T12:00:00.000000+00:00'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleOut'
+        middle_name:
+          type: string
+          default: null
+          nullable: true
+          description: middle name of the person
+          example: Anne
+      required:
+      - created_at
+      - date_of_birth
+      - first_name
+      - is_active
+      - last_name
+      - phone_number
+      - roles
+      - updated_at
+      - user_id
+    UserPatchParams:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          default: null
+          nullable: true
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          example: 123-456-7890
+        last_name:
+          type: string
+          default: null
+          nullable: true
+          description: last name of the person
+          example: Doe
+        is_active:
+          type: boolean
+          default: null
+          nullable: true
+          example: true
+        first_name:
+          type: string
+          default: null
+          nullable: true
+          description: first name of the person
+          example: Jane
+        date_of_birth:
+          type: string
+          format: date
+          default: null
+          nullable: true
+          example: '2022-01-15'
+        roles:
+          type: array
+          default: null
+          nullable: true
+          items:
+            $ref: '#/components/schemas/RoleBase'
+        middle_name:
+          type: string
+          default: null
+          nullable: true
+          description: middle name of the person
+          example: Anne
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Auth
+
