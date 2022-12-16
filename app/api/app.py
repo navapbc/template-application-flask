@@ -11,7 +11,7 @@ import api.logging
 from api.auth.api_key_auth import User
 from api.route.error_handlers import add_error_handlers_to_app
 from api.route.healthcheck import healthcheck_blueprint
-from api.route.response import Response
+from api.route.response import ApiResponse
 from api.route.user_route import user_blueprint
 
 logger = api.logging.get_logger(__name__)
@@ -73,7 +73,7 @@ def current_user(is_user_expected: bool = True) -> Optional[User]:
 def configure_app(app: APIFlask) -> None:
     # Modify the response schema to instead use the format of our Response class
     # which adds additional details to the object.
-    app.config["BASE_RESPONSE_SCHEMA"] = marshmallow_dataclass.class_schema(Response)
+    app.config["BASE_RESPONSE_SCHEMA"] = marshmallow_dataclass.class_schema(ApiResponse)
 
     # Set a few values for the Swagger endpoint
     app.config["OPENAPI_VERSION"] = "3.0.3"

@@ -31,7 +31,9 @@ class ValidationException(Exception):
 
 
 @dataclasses.dataclass
-class Response:
+class ApiResponse:
+    """Base response model for all API responses."""
+
     status_code: int
     message: str
     data: Optional[dict | list[dict] | BaseApiModel]
@@ -63,7 +65,7 @@ def success_response(
     warnings: Optional[list[ValidationErrorDetail]] = None,
     status_code: int = 200,
 ) -> flask.Response:
-    response_object = Response(
+    response_object = ApiResponse(
         status_code=status_code, message=message, data=data, warnings=warnings or []
     )
     return flask.make_response(dataclasses.asdict(response_object), status_code)
@@ -77,7 +79,7 @@ def error_response(
     warnings: Optional[list[ValidationErrorDetail]] = None,
 ) -> flask.Response:
     code = status_code.code if status_code.code is not None else 400
-    response_object = Response(
+    response_object = ApiResponse(
         status_code=code, message=message, errors=errors or [], data=data, warnings=warnings or []
     )
     return flask.make_response(dataclasses.asdict(response_object), code)
