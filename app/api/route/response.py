@@ -41,24 +41,6 @@ class ApiResponse:
     errors: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
 
 
-def exclude_none(obj: Any) -> Any:
-    if not isinstance(obj, dict):
-        return obj
-    clean = {}
-    for k, v in obj.items():
-        if "data" == k:  # defer none exclusion of data payload to service layer
-            clean[k] = v
-        elif isinstance(v, dict):
-            nested = exclude_none(v)
-            if len(nested.keys()) > 0:
-                clean[k] = nested
-        elif isinstance(v, list):
-            clean[k] = list(map(exclude_none, v))
-        elif v is not None:
-            clean[k] = v
-    return clean
-
-
 def success_response(
     message: str,
     data: None | BaseApiModel = None,
