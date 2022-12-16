@@ -236,7 +236,7 @@ def test_patch_user_200(client, api_auth_token, test_db_session, initialize_fact
 
     # Verify it is the same user that we created
     # but that the name did in fact change
-    assert user.id == db_record.user_id
+    assert user.id == db_record.id
     assert db_record.first_name != "NotSomethingFakerWillGenerate"
 
 
