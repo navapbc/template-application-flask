@@ -1,4 +1,5 @@
 import flask
+import marshmallow
 from apiflask import APIBlueprint
 from marshmallow_dataclass import dataclass as marshmallow_dataclass
 from sqlalchemy import text
@@ -12,8 +13,7 @@ from api.route.models.base_api_model import BaseApiModel
 logger = api.logging.get_logger(__name__)
 
 
-@marshmallow_dataclass
-class HealthOut(BaseApiModel):
+class HealthOut(marshmallow.Schema):
     message: str
 
 
@@ -21,7 +21,7 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 
 
 @healthcheck_blueprint.get("/healthcheck")
-@healthcheck_blueprint.output(HealthOut.Schema)
+@healthcheck_blueprint.output(HealthOut)
 def healthcheck_get() -> flask.Response:
     logger.info("GET /v1/healthcheck")
 
