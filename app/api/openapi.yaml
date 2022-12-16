@@ -20,21 +20,21 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
                   status_code:
                     type: integer
                     default: 200
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
                   errors:
                     type: array
                     items:
                       $ref: '#/components/schemas/ValidationErrorDetail'
                   data:
                     $ref: '#/components/schemas/HealthOut'
-                  message:
-                    type: string
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
                 required:
                 - message
           description: Successful response
@@ -51,21 +51,21 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
                   status_code:
                     type: integer
                     default: 200
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
                   errors:
                     type: array
                     items:
                       $ref: '#/components/schemas/ValidationErrorDetail'
                   data:
                     $ref: '#/components/schemas/UserOut'
-                  message:
-                    type: string
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
                 required:
                 - message
           description: Successful response
@@ -106,21 +106,21 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
                   status_code:
                     type: integer
                     default: 200
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
                   errors:
                     type: array
                     items:
                       $ref: '#/components/schemas/ValidationErrorDetail'
                   data:
                     $ref: '#/components/schemas/UserOut'
-                  message:
-                    type: string
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
                 required:
                 - message
           description: Successful response
@@ -155,21 +155,21 @@ paths:
               schema:
                 type: object
                 properties:
+                  message:
+                    type: string
                   status_code:
                     type: integer
                     default: 200
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationErrorDetail'
                   errors:
                     type: array
                     items:
                       $ref: '#/components/schemas/ValidationErrorDetail'
                   data:
                     $ref: '#/components/schemas/UserOut'
-                  message:
-                    type: string
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
                 required:
                 - message
           description: Successful response
@@ -207,10 +207,11 @@ components:
     ValidationErrorDetail:
       type: object
       properties:
-        rule:
+        message:
           type: string
-          default: null
-          nullable: true
+          default: ''
+        type:
+          type: string
         value:
           type: string
           default: null
@@ -219,11 +220,10 @@ components:
           type: string
           default: null
           nullable: true
-        message:
+        rule:
           type: string
-          default: ''
-        type:
-          type: string
+          default: null
+          nullable: true
       required:
       - type
     ValidationError:
@@ -251,183 +251,118 @@ components:
     HealthOut:
       type: object
       properties: {}
-    RoleBase:
+    RoleIn:
       type: object
       properties:
         role_description:
           type: string
-          enum:
-          - User
-          - Admin
-          - Third Party
           description: The name of the role
-      required:
-      - role_description
     UserIn:
       type: object
       properties:
-        phone_number:
-          type: string
-          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-          example: 123-456-7890
-        last_name:
-          type: string
-          description: last name of the person
-          example: Doe
         is_active:
           type: boolean
           description: Whether the user is active
-          example: true
-        first_name:
+        last_name:
           type: string
-          description: first name of the person
-          example: Jane
-        date_of_birth:
+          description: The user's last name
+        middle_name:
           type: string
-          format: date
-          description: The users date of birth
-          example: '2022-01-15'
+          description: The user's middle name
+        phone_number:
+          type: string
+          description: The user's phone number
+          example: 123-456-7890
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
         roles:
           type: array
           items:
-            $ref: '#/components/schemas/RoleBase'
-        middle_name:
-          type: string
-          default: null
-          nullable: true
-          description: middle name of the person
-          example: Anne
-      required:
-      - date_of_birth
-      - first_name
-      - is_active
-      - last_name
-      - phone_number
-      - roles
-    RoleOut:
-      type: object
-      properties:
-        role_description:
-          type: string
-          enum:
-          - User
-          - Admin
-          - Third Party
-          description: The name of the role
-        created_at:
-          type: string
-          format: date-time
-          default: null
-          nullable: true
-          example: '2022-01-15T12:00:00.000000+00:00'
-        updated_at:
-          type: string
-          format: date-time
-          default: null
-          nullable: true
-          example: '2022-01-15T12:00:00.000000+00:00'
-      required:
-      - role_description
-    UserOut:
-      type: object
-      properties:
-        phone_number:
-          type: string
-          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-          example: 123-456-7890
-        last_name:
-          type: string
-          description: last name of the person
-          example: Doe
-        is_active:
-          type: boolean
-          description: Whether the user is active
-          example: true
-        first_name:
-          type: string
-          description: first name of the person
-          example: Jane
-        user_id:
-          type: string
-          format: uuid
-          example: 2f0f58a0-fcad-465b-b474-ee6c961cd6e3
+            $ref: '#/components/schemas/RoleIn'
         date_of_birth:
           type: string
           format: date
           description: The users date of birth
-          example: '2022-01-15'
-        updated_at:
+        first_name:
           type: string
-          format: date
-          example: '2022-01-15T12:00:00.000000+00:00'
+          description: The user's first name
+    RoleOut:
+      type: object
+      properties:
         created_at:
           type: string
-          format: date
-          example: '2022-01-15T12:00:00.000000+00:00'
+          format: date-time
+        role_description:
+          type: string
+          description: The name of the role
+        updated_at:
+          type: string
+          format: date-time
+    UserOut:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          description: The user's unique identifier
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        last_name:
+          type: string
+          description: The user's last name
+        middle_name:
+          type: string
+          description: The user's middle name
+        phone_number:
+          type: string
+          description: The user's phone number
+          example: 123-456-7890
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
         roles:
           type: array
           items:
             $ref: '#/components/schemas/RoleOut'
-        middle_name:
-          type: string
-          default: null
-          nullable: true
-          description: middle name of the person
-          example: Anne
-      required:
-      - created_at
-      - date_of_birth
-      - first_name
-      - is_active
-      - last_name
-      - phone_number
-      - roles
-      - updated_at
-      - user_id
-    UserPatchParams:
-      type: object
-      properties:
-        phone_number:
-          type: string
-          default: null
-          nullable: true
-          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-          example: 123-456-7890
-        last_name:
-          type: string
-          default: null
-          nullable: true
-          description: last name of the person
-          example: Doe
-        is_active:
-          type: boolean
-          default: null
-          nullable: true
-          example: true
-        first_name:
-          type: string
-          default: null
-          nullable: true
-          description: first name of the person
-          example: Jane
         date_of_birth:
           type: string
           format: date
-          default: null
-          nullable: true
-          example: '2022-01-15'
-        roles:
-          type: array
-          default: null
-          nullable: true
-          items:
-            $ref: '#/components/schemas/RoleBase'
+          description: The users date of birth
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        first_name:
+          type: string
+          description: The user's first name
+    UserPatchParams:
+      type: object
+      properties:
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        last_name:
+          type: string
+          description: The user's last name
         middle_name:
           type: string
-          default: null
-          nullable: true
-          description: middle name of the person
-          example: Anne
+          description: The user's middle name
+        phone_number:
+          type: string
+          description: The user's phone number
+          example: 123-456-7890
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleIn'
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+        first_name:
+          type: string
+          description: The user's first name
   securitySchemes:
     ApiKeyAuth:
       type: apiKey

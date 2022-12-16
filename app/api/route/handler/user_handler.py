@@ -4,7 +4,7 @@ from uuid import uuid4
 import api.logging
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
-from api.route.models.user_api_models import RoleBase, UserIn, UserOut, UserPatchParams
+from api.route.models.user_api_models import Role, UserIn, UserOut, UserPatchParams
 from api.route.route_utils import get_or_404
 
 logger = api.logging.get_logger(__name__)
@@ -70,7 +70,7 @@ def get_user(user_id: str, api_context: ApiContext) -> UserOut:
 
 
 def handle_role_patch(
-    user: User, request_roles: Optional[list[RoleBase]], api_context: ApiContext
+    user: User, request_roles: Optional[list[Role]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

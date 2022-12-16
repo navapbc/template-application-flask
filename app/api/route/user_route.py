@@ -17,8 +17,8 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 
 
 @user_blueprint.post("/v1/user")
-@user_blueprint.input(UserIn.Schema)
-@user_blueprint.output(UserOut.Schema)
+@user_blueprint.input(UserIn)
+@user_blueprint.output(UserOut)
 @user_blueprint.auth_required(api_key_auth)
 def user_post(user_input: UserIn) -> flask.Response:
     """
@@ -40,8 +40,8 @@ def user_post(user_input: UserIn) -> flask.Response:
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
-@user_blueprint.input(UserPatchParams.Schema)
-@user_blueprint.output(UserOut.Schema)
+@user_blueprint.input(UserPatchParams)
+@user_blueprint.output(UserOut)
 @user_blueprint.auth_required(api_key_auth)
 def user_patch(user_id: str, user_patch_params: UserPatchParams) -> flask.Response:
     logger.info("PATCH /v1/user/:user_id")
@@ -60,7 +60,7 @@ def user_patch(user_id: str, user_patch_params: UserPatchParams) -> flask.Respon
 
 
 @user_blueprint.get("/v1/user/<uuid:user_id>")
-@user_blueprint.output(UserOut.Schema)
+@user_blueprint.output(UserOut)
 @user_blueprint.auth_required(api_key_auth)
 def user_get(user_id: str) -> flask.Response:
     logger.info("GET /v1/user/:user_id")
