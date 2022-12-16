@@ -35,5 +35,5 @@ def health() -> flask.Response:
         logger.exception("Connection to DB failure")
 
         return response.ApiResponse(
-            status_code=ServiceUnavailable.code, message="Service unavailable", errors=[]
+            status_code=ServiceUnavailable.code, message="Service unavailable"
         ).as_flask_response()
