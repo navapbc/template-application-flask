@@ -68,8 +68,11 @@ def success_response(
     data: None | BaseApiModel = None,
     warnings: Optional[list[ValidationErrorDetail]] = None,
     status_code: int = 200,
-) -> Response:
-    return Response(status_code=status_code, message=message, data=data, warnings=warnings)
+) -> flask.Response:
+    response_object = Response(
+        status_code=status_code, message=message, data=data, warnings=warnings
+    )
+    return flask.make_response(asdict(response_object), status_code)
 
 
 def error_response(

@@ -29,7 +29,7 @@ def health() -> flask.Response:
             if not result or result[0] != 1:
                 raise Exception("Connection to DB failure")
 
-            return response_util.success_response(message="Service healthy").to_api_response()
+            return response_util.success_response(message="Service healthy")
 
     except Exception:
         logger.exception("Connection to DB failure")

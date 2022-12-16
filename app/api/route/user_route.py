@@ -34,9 +34,7 @@ def user_post(user: UserIn) -> flask.Response:
             "Successfully inserted user",
             extra=get_user_log_params(response),
         )
-        return response_util.success_response(
-            message="Success", data=response, status_code=201
-        ).to_api_response()
+        return response_util.success_response(message="Success", data=response, status_code=201)
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
@@ -54,9 +52,7 @@ def user_patch(user_id: str, user_patch_params: UserPatchParams) -> flask.Respon
             extra=get_user_log_params(response),
         )
 
-        return response_util.success_response(
-            message="Success", data=response, status_code=200
-        ).to_api_response()
+        return response_util.success_response(message="Success", data=response, status_code=200)
 
 
 @user_blueprint.get("/v1/user/<uuid:user_id>")
@@ -73,9 +69,7 @@ def user_get(user_id: str) -> flask.Response:
             extra=get_user_log_params(response),
         )
 
-        return response_util.success_response(
-            message="Success", data=response, status_code=200
-        ).to_api_response()
+        return response_util.success_response(message="Success", data=response, status_code=200)
 
 
 def get_user_log_params(user_response: UserOut) -> dict[str, Any]:
