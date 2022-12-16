@@ -6,7 +6,6 @@ import marshmallow
 from apiflask import fields
 
 from api.db.models.user_models import RoleEnum
-from api.route.models.param_schema import ParamFieldConfig, ParamSchema
 
 ##############
 # Role Models
