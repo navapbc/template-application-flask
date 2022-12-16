@@ -3,27 +3,24 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Boolean, Column, Date, ForeignKey, Text
-from sqlalchemy.dialects.postgresql import UUID as postgresUUID
+from sqlalchemy import Boolean, Column, Date, ForeignKey, Text, Enum
+from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
 
-from .base import Base, TimestampMixin, uuid_gen
+from . import base
 
 logger = api.logging.get_logger(__name__)
 
 
-class RoleEnum(str, enum.Enum):
-    USER = "User"
-    ADMIN = "Admin"
-    THIRD_PARTY = "Third Party"
+class RoleEnum(enum.Enum):
+    USER = "USER"
+    ADMIN = "ADMIN"
 
 
-class User(Base, TimestampMixin):
+class User(base.BaseModel, base.IdMixin, base.TimestampMixin):
     __tablename__ = "user"
-
-    user_id: Mapped[UUID] = Column(postgresUUID(as_uuid=True), primary_key=True, default=uuid_gen)
 
     first_name: str = Column(Text, nullable=False)
     middle_name: Optional[str] = Column(Text)
@@ -32,16 +29,20 @@ class User(Base, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: Optional[list["UserRole"]] = relationship(
-        "UserRole", uselist=True, back_populates="user"
+    role_assignments: Optional[list["RoleAssignment"]] = relationship(
+        "RoleAssignment", back_populates="user"
     )
 
 
-class UserRole(Base, TimestampMixin):
-    __tablename__ = "user_role"
+class RoleAssignment(base.BaseModel, base.TimestampMixin):
+    __tablename__ = "role_assignment"
     user_id: Mapped[UUID] = Column(
-        postgresUUID(as_uuid=True), ForeignKey("user.user_id"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
     )
-    role_description: str = Column(Text, primary_key=True, nullable=False, index=True)
-
-    user: User = relationship(User, back_populates="roles")
+    # Set native_enum=False to use store enum values as VARCHAR/TEXT.
+    # This is more convenient and avoids needing create a new migration
+    # when adding a new enum value.
+    # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
+    # https://medium.com/swlh/postgresql-3-ways-to-replace-enum-305861e089bc
+    role: str = Column(Enum(RoleEnum, native_enum=False), primary_key=True)
+    user: User = relationship(User, back_populates="role_assignments")

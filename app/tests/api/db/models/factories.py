@@ -58,25 +58,25 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "commit"
 
 
-class UserRoleFactory(BaseFactory):
+class RoleAssignmentFactory(BaseFactory):
     class Meta:
-        model = user_models.UserRole
+        model = user_models.RoleAssignment
 
-    user_id = factory.LazyAttribute(lambda u: u.user.user_id)
+    user_id = factory.LazyAttribute(lambda u: u.user.id)
     user = factory.SubFactory("tests.api.db.models.factories.UserFactory", roles=[])
 
-    role_description = factory.Iterator([r.value for r in user_models.RoleEnum])
+    role = factory.Iterator([r.value for r in user_models.RoleEnum])
 
 
 class UserFactory(BaseFactory):
     class Meta:
         model = user_models.User
 
-    user_id = Generators.UuidObj
+    id = Generators.UuidObj
     first_name = factory.Faker("first_name")
     last_name = factory.Faker("last_name")
     phone_number = "123-456-7890"
     date_of_birth = factory.Faker("date_object")
     is_active = factory.Faker("boolean")
 
-    roles = factory.RelatedFactoryList(UserRoleFactory, size=2, factory_related_name="user")
+    roles = factory.RelatedFactoryList(RoleAssignmentFactory, size=2, factory_related_name="user")

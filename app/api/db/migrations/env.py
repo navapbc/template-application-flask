@@ -15,7 +15,7 @@ from api.util.local import load_local_env_vars  # noqa: E402 isort:skip
 load_local_env_vars()
 
 import api.db as db  # noqa: E402 isort:skip
-from api.db.models.base import Base  # noqa: E402 isort:skip
+from api.db.models.base import BaseModel  # noqa: E402 isort:skip
 import api.logging  # noqa: E402 isort:skip
 
 # this is the Alembic Config object, which provides
@@ -36,7 +36,7 @@ if not config.get_main_option("sqlalchemy.url"):
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = BaseModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
