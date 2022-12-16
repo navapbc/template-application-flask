@@ -1,8 +1,8 @@
 """create user and role tables
 
-Revision ID: e3943bd12c24
-Revises:
-Create Date: 2022-12-16 01:16:49.530644
+Revision ID: 4ff1160282d1
+Revises: 
+Create Date: 2022-12-16 18:42:20.929289
 
 """
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from alembic import op
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "e3943bd12c24"
+revision = "4ff1160282d1"
 down_revision = None
 branch_labels = None
 depends_on = None
