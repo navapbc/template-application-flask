@@ -64,7 +64,7 @@ def success_response(
     status_code: int = 200,
 ) -> flask.Response:
     response_object = Response(
-        status_code=status_code, message=message, data=data, warnings=warnings
+        status_code=status_code, message=message, data=data, warnings=warnings or []
     )
     return flask.make_response(dataclasses.asdict(response_object), status_code)
 
@@ -75,6 +75,9 @@ def error_response(
     errors: list[ValidationErrorDetail],
     data: Optional[dict | list[dict]] = None,
     warnings: Optional[list[ValidationErrorDetail]] = None,
-) -> Response:
+) -> flask.Response:
     code = status_code.code if status_code.code is not None else 400
-    return Response(status_code=code, message=message, errors=errors, data=data, warnings=warnings)
+    response_object = Response(
+        status_code=code, message=message, errors=errors or [], data=data, warnings=warnings or []
+    )
+    return flask.make_response(dataclasses.asdict(response_object), code)

@@ -36,4 +36,4 @@ def health() -> flask.Response:
 
         return response_util.error_response(
             status_code=ServiceUnavailable, message="Service unavailable", errors=[]
-        ).to_api_response()
+        )
