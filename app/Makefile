@@ -55,6 +55,8 @@ clean-volumes: ## Remove project docker volumes (which includes the DB state)
 stop:
 	docker-compose down
 
+check: format-check lint test
+
 ##################################################
 # DB & migrations
 ##################################################
@@ -138,7 +140,7 @@ format-check:
 	$(PY_RUN_CMD) isort --atomic --check-only api tests
 	$(PY_RUN_CMD) black --check api tests
 
-lint: lint-spectral lint-py
+lint: lint-py
 
 lint-py: lint-flake lint-mypy lint-poetry-version
 
@@ -150,10 +152,6 @@ lint-mypy:
 
 lint-poetry-version: ## Check poetry version
 	grep --quiet 'lock-version = "1.1"' poetry.lock
-
-lint-spectral:
-	docker run --rm --tty --cap-drop=ALL --network=none --read-only --volume=$(PWD):/tmp:ro \
-		stoplight/spectral:6 lint /tmp/openapi.yml --ruleset /tmp/.spectral.yaml $(SPECTRAL_POSTPROC)
 
 lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 	$(PY_RUN_CMD) bandit -r . --number 3 --skip B101 -ll -x ./.venv
