@@ -168,7 +168,7 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
             error["type"],
         )
 
-        assert field.startswith("roles.") and field.endswith(".role")
+        assert field.startswith("roles.") and field.endswith(".type")
         assert "is not one of" in message
         assert error_type == "enum"
 
