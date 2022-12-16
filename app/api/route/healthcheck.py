@@ -20,10 +20,10 @@ class HealthOut(marshmallow.Schema):
 healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 
 
-@healthcheck_blueprint.get("/healthcheck")
+@healthcheck_blueprint.get("/health")
 @healthcheck_blueprint.output(HealthOut)
-def healthcheck_get() -> flask.Response:
-    logger.info("GET /v1/healthcheck")
+def health() -> flask.Response:
+    logger.info("GET /v1/health")
 
     try:
         with api_context_manager(is_user_expected=False) as api_context:
