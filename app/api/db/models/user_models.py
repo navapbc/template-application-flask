@@ -8,7 +8,6 @@ from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
-
 from api.db.models.base import Base, IdMixin, TimestampMixin
 
 logger = api.logging.get_logger(__name__)
