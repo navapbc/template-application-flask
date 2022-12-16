@@ -3,7 +3,7 @@ from datetime import date, datetime
 import pytest
 
 from api.db.models.user_models import User
-from tests.api.db.models.factories import RoleAssignmentFactory, UserFactory
+from tests.api.db.models.factories import RoleFactory, UserFactory
 
 user_params = {
     "first_name": "Alvin",
@@ -85,9 +85,9 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     assert len(all_db_records) == 3
 
 
-def test_role_assignment_factory_create(test_db_session, initialize_factories_session):
+def test_role_factory_create(test_db_session, initialize_factories_session):
     # Verify if you build a UserRole directly, it gets
     # a user attached to it with that single role
-    role_assignment = RoleAssignmentFactory.create()
-    assert role_assignment.user is not None
-    assert len(role_assignment.user.roles) == 1
+    role = RoleFactory.create()
+    assert role.user is not None
+    assert len(role.user.roles) == 1

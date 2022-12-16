@@ -58,7 +58,7 @@ class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
         sqlalchemy_session_persistence = "commit"
 
 
-class RoleAssignmentFactory(BaseFactory):
+class RoleFactory(BaseFactory):
     class Meta:
         model = user_models.Role
 
@@ -79,4 +79,4 @@ class UserFactory(BaseFactory):
     date_of_birth = factory.Faker("date_object")
     is_active = factory.Faker("boolean")
 
-    roles = factory.RelatedFactoryList(RoleAssignmentFactory, size=2, factory_related_name="user")
+    roles = factory.RelatedFactoryList(RoleFactory, size=2, factory_related_name="user")
