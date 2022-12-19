@@ -3,7 +3,7 @@ from typing import Any
 import flask
 
 import api.logging as logging
-import api.route.handler.user_handler as user_handler
+import api.services.users as user_handler
 import api.route.response as response_util
 from api.route.api_context import api_context_manager
 
