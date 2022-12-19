@@ -3,8 +3,8 @@ from typing import Any
 import flask
 
 import api.logging as logging
-import api.services.users as user_handler
 import api.route.response as response_util
+import api.services.users as user_handler
 from api.route.api_context import api_context_manager
 
 logger = logging.get_logger(__name__)
