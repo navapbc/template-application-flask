@@ -1,7 +1,7 @@
 """create user and role tables
 
 Revision ID: 4ff1160282d1
-Revises: 
+Revises:
 Create Date: 2022-12-16 18:42:20.929289
 
 """
