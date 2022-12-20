@@ -55,7 +55,6 @@ def validate_param_match(key, request, response, db_record):
 def test_post_user_201(client, api_auth_token, test_db_session):
     request = base_request | {}
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
-    print(response.get_json())
 
     assert response.status_code == 201
 
@@ -63,7 +62,6 @@ def test_post_user_201(client, api_auth_token, test_db_session):
     assert len(results) == 1
     db_record = results[0]
 
-    print("response", response.get_json())
     response_record = response.get_json()["data"]
 
     # Verify the request, response and DB model values all match

@@ -2,16 +2,17 @@ import os
 from contextlib import contextmanager
 from typing import Generator, Optional
 
-import marshmallow_dataclass
 from apiflask import APIFlask
 from flask import g
 
 import api.db as db
 import api.logging
 from api.auth.api_key_auth import User
+from api.route import schemas
 from api.route.error_handlers import add_error_handlers_to_app
 from api.route.healthcheck import healthcheck_blueprint
 from api.route.response import ApiResponse
+from api.route.schemas import response_schema
 from api.route.user_route import user_blueprint
 
 logger = api.logging.get_logger(__name__)
@@ -74,7 +75,7 @@ def configure_app(app: APIFlask) -> None:
     # Modify the response schema to instead use the format of our ApiResponse class
     # which adds additional details to the object.
     # https://apiflask.com/schema/#base-response-schema-customization
-    app.config["BASE_RESPONSE_SCHEMA"] = marshmallow_dataclass.class_schema(ApiResponse)
+    app.config["BASE_RESPONSE_SCHEMA"] = response_schema.ResponseSchema
 
     # Set a few values for the Swagger endpoint
     app.config["OPENAPI_VERSION"] = "3.0.3"
