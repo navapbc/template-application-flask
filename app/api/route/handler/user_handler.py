@@ -45,7 +45,7 @@ class UserResponse(UserParams):
 
 
 def create_user(user_data: dict, api_context: ApiContext) -> User:
-
+    # TODO: move this code to service and/or persistence layer
     user = User(**user_data)
     user.id = uuid4()
 
@@ -59,6 +59,7 @@ def create_user(user_data: dict, api_context: ApiContext) -> User:
 
 
 def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
+    # TODO: move this code to service and/or persistence layer
     user = get_or_404(api_context.db_session, User, user_id)
 
     for key, value in patch_data.items():
@@ -85,6 +86,7 @@ def get_user(user_id: str, api_context: ApiContext) -> User:
     no such record exists.
     """
 
+    # TODO: move this to service and/or persistence layer
     result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
     if result is None:
