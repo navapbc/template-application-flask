@@ -6,7 +6,7 @@ import api.logging as logging
 import api.route.response as response_util
 import api.services.users as user_service
 from api.route.api_context import api_context_manager
-from api.route.models.model import UserResponse
+from api.route.models.user import UserResponse
 
 logger = logging.get_logger(__name__)
 

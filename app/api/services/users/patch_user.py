@@ -2,7 +2,7 @@ from typing import Optional
 
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
-from api.route.models.model import RoleParams, UserPatchParams, UserResponse
+from api.route.models.user import RoleParams, UserPatchParams, UserResponse
 from api.route.route_utils import get_or_404
 
 
