@@ -10,7 +10,7 @@ def test_api_key_auth_success(app, api_auth_token):
     with app.app.app_context():  # So we can attach the user to the flask app
         user_map = api_key_auth(api_auth_token, None)
 
-        assert user_map.get("uid") == API_AUTH_USER.user_id
+        assert user_map.get("uid") == API_AUTH_USER.id
         assert g.get("current_user") == API_AUTH_USER
 
 

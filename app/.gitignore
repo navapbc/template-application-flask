@@ -13,9 +13,12 @@ coverage.*
 .testmondata
 .pytest_cache/
 
-# Python environments
-.env
+# Python virtual environments
 .venv
+
+# Environment variables
+.env
+.envrc
 
 # mypy
 .mypy_cache

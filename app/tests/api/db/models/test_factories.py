@@ -3,7 +3,7 @@ from datetime import date, datetime
 import pytest
 
 from api.db.models.user_models import User
-from tests.api.db.models.factories import UserFactory, UserRoleFactory
+from tests.api.db.models.factories import RoleFactory, UserFactory
 
 user_params = {
     "first_name": "Alvin",
@@ -17,7 +17,7 @@ user_params = {
 
 def validate_user_record(user: User, user_expected_values=None):
     if user_expected_values:
-        assert user.user_id is not None
+        assert user.id is not None
         for k, v in user_expected_values.items():
             user_v = getattr(user, k)
             if k == "roles":
@@ -32,7 +32,7 @@ def validate_user_record(user: User, user_expected_values=None):
 
     else:
         # Otherwise just validate the values are set
-        assert user.user_id is not None
+        assert user.id is not None
         assert user.first_name is not None
         assert user.last_name is not None
         assert user.phone_number is not None
@@ -65,14 +65,14 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     user = UserFactory.create()
     validate_user_record(user)
 
-    db_record = test_db_session.query(User).filter(User.user_id == user.user_id).one_or_none()
+    db_record = test_db_session.query(User).filter(User.id == user.id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, user.for_json())
 
     user = UserFactory.create(**user_params)
     validate_user_record(user, user_params)
 
-    db_record = test_db_session.query(User).filter(User.user_id == user.user_id).one_or_none()
+    db_record = test_db_session.query(User).filter(User.id == user.id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, db_record.for_json())
 
@@ -85,9 +85,9 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     assert len(all_db_records) == 3
 
 
-def test_user_role_factory_create(test_db_session, initialize_factories_session):
+def test_role_factory_create(test_db_session, initialize_factories_session):
     # Verify if you build a UserRole directly, it gets
     # a user attached to it with that single role
-    user_role = UserRoleFactory.create()
-    assert user_role.user is not None
-    assert len(user_role.user.roles) == 1
+    role = RoleFactory.create()
+    assert role.user is not None
+    assert len(role.user.roles) == 1

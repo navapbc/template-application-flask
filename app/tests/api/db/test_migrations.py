@@ -62,7 +62,7 @@ def test_db_setup_via_alembic_migration(test_db_schema_non_session, logging_fix,
     caplog.set_level(logging.INFO)  # noqa: B1
     command.upgrade(alembic_cfg, "head")
     # Verify the migration ran by checking the logs
-    assert "Running upgrade" in caplog.text and "first migration" in caplog.text
+    assert "Running upgrade" in caplog.text
 
 
 def test_db_init_with_migrations(test_db_schema_non_session):

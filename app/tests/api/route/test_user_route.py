@@ -14,7 +14,7 @@ base_request = {
     "date_of_birth": "2022-01-01",
     "phone_number": "123-456-7890",
     "is_active": True,
-    "roles": [{"role_description": "Admin"}, {"role_description": "User"}],
+    "roles": [{"type": "ADMIN"}, {"type": "USER"}],
 }
 
 
@@ -24,7 +24,7 @@ def validate_all_match(request, response, db_record):
             request_roles = request["roles"] if request else None
             response_roles = response["roles"] if response else None
             db_roles = db_record.roles if db_record else None
-            validate_param_match("role_description", request_roles, response_roles, db_roles)
+            validate_param_match("type", request_roles, response_roles, db_roles)
         else:
             validate_param_match(k, request, response, db_record)
 
@@ -147,9 +147,7 @@ def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
 
 def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     # Make the role a disallowed one
-    request = base_request | {
-        "roles": [{"role_description": "Mime"}, {"role_description": "Clown"}]
-    }
+    request = base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]}
 
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
@@ -157,7 +155,7 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     error_list = response.get_json()["errors"]
     # We expect the errors to be in a dict like:
     # {
-    #   'field': 'roles.0.role_description',
+    #   'field': 'roles.0.role',
     #   'message': "'Mime' is not one of ['User', 'Admin', 'Third Party']",
     #   'rule': ['User', 'Admin', 'Third Party'],
     #   'type': 'enum',
@@ -170,7 +168,7 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
             error["type"],
         )
 
-        assert field.startswith("roles.") and field.endswith(".role_description")
+        assert field.startswith("roles.") and field.endswith(".type")
         assert "is not one of" in message
         assert error_type == "enum"
 
@@ -189,7 +187,7 @@ def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_sessio
 
 def test_get_user_200(client, api_auth_token, test_db_session, initialize_factories_session):
     user = UserFactory.create()
-    response = client.get(f"/v1/user/{user.user_id}", headers={"X-Auth": api_auth_token})
+    response = client.get(f"/v1/user/{user.id}", headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 200
     response_record = response.get_json()["data"]
@@ -201,7 +199,7 @@ def test_get_user_401_unauthorized_token(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):
     user = UserFactory.create()
-    response = client.get(f"/v1/user/{user.user_id}", headers={"X-Auth": "incorrect token"})
+    response = client.get(f"/v1/user/{user.id}", headers={"X-Auth": "incorrect token"})
 
     assert response.status_code == 401
     # Verify the error message
@@ -224,9 +222,7 @@ def test_get_user_404_user_not_found(client, api_auth_token, test_db_session):
 def test_patch_user_200(client, api_auth_token, test_db_session, initialize_factories_session):
     user = UserFactory.create(first_name="NotSomethingFakerWillGenerate")
     request = base_request | {}
-    response = client.patch(
-        f"/v1/user/{user.user_id}", json=request, headers={"X-Auth": api_auth_token}
-    )
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 200
 
@@ -240,7 +236,7 @@ def test_patch_user_200(client, api_auth_token, test_db_session, initialize_fact
 
     # Verify it is the same user that we created
     # but that the name did in fact change
-    assert user.user_id == db_record.user_id
+    assert user.id == db_record.id
     assert db_record.first_name != "NotSomethingFakerWillGenerate"
 
 
@@ -252,45 +248,35 @@ def test_patch_user_200_roles(
     user = UserFactory.create(roles=[])
 
     # Add two roles
-    request = {"roles": [{"role_description": "Admin"}, {"role_description": "User"}]}
-    response = client.patch(
-        f"/v1/user/{user.user_id}", json=request, headers={"X-Auth": api_auth_token}
-    )
+    request = {"roles": [{"type": "ADMIN"}, {"type": "USER"}]}
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set(["Admin", "User"]) == set([role["role_description"] for role in response_roles])
+    assert set(["ADMIN", "USER"]) == set([role["type"] for role in response_roles])
 
-    # Add a role + remove a role
-    request = {"roles": [{"role_description": "Admin"}, {"role_description": "Third Party"}]}
-    response = client.patch(
-        f"/v1/user/{user.user_id}", json=request, headers={"X-Auth": api_auth_token}
-    )
+    # Remove a role
+    request = {"roles": [{"type": "ADMIN"}]}
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set(["Admin", "Third Party"]) == set(
-        [role["role_description"] for role in response_roles]
-    )
+    assert set(["ADMIN"]) == set([role["type"] for role in response_roles])
 
     # Remove all roles
     request = {"roles": []}
-    response = client.patch(
-        f"/v1/user/{user.user_id}", json=request, headers={"X-Auth": api_auth_token}
-    )
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]
-    assert set() == set([role["role_description"] for role in response_roles])
+    assert set() == set([role["type"] for role in response_roles])
 
 
 def test_patch_user_401_unauthorized_token(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):
     user = UserFactory.create()
-    response = client.patch(
-        f"/v1/user/{user.user_id}", json={}, headers={"X-Auth": "incorrect token"}
-    )
+    response = client.patch(f"/v1/user/{user.id}", json={}, headers={"X-Auth": "incorrect token"})
 
     assert response.status_code == 401
     # Verify the error message
