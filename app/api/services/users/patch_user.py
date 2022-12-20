@@ -1,39 +1,19 @@
 from typing import Optional
-from uuid import uuid4
 
-import apiflask
-from sqlalchemy import orm
-
-import api.logging
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
 from api.route.route_utils import get_or_404
 
-logger = api.logging.get_logger(__name__)
 
-
-def create_user(user_data: dict, api_context: ApiContext) -> User:
-    # TODO: move this code to service and/or persistence layer
-    user = User(**user_data)
-    user.id = uuid4()
-
-    if user.roles is not None:
-        for role in user.roles:
-            role.user_id = user.id
-
-    api_context.db_session.add(user)
-    api_context.db_session.flush()
-    return user
-
-
+# TODO: separate controller and service concerns
+# https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
-    # TODO: move this code to service and/or persistence layer
     user = get_or_404(api_context.db_session, User, user_id)
 
     for key, value in patch_data.items():
 
         if key == "roles":
-            handle_role_patch(user, value, api_context)
+            _handle_role_patch(user, value, api_context)
             continue
 
         setattr(user, key, value)
@@ -47,17 +27,7 @@ def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
     return user
 
 
-def get_user(user_id: str, api_context: ApiContext) -> User:
-    # TODO: move this to service and/or persistence layer
-    result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
-
-    if result is None:
-        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
-
-    return result
-
-
-def handle_role_patch(
+def _handle_role_patch(
     user: User, request_roles: Optional[list[Role]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.

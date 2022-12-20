@@ -3,7 +3,7 @@ from typing import Any
 from apiflask import APIBlueprint
 
 import api.logging as logging
-import api.route.handler.user_handler as user_handler
+import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
 from api.route import response
@@ -27,8 +27,7 @@ def user_post(user_input: dict) -> dict:
     logger.info("POST /v1/user")
 
     with api_context_manager() as api_context:
-
-        user = user_handler.create_user(user_input, api_context)
+        user = user_service.create_user(user_input, api_context)
 
         logger.info(
             "Successfully inserted user",
@@ -49,7 +48,7 @@ def user_patch(user_id: str, user_patch_params: dict) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:
-        user = user_handler.patch_user(user_id, user_patch_params, api_context)
+        user = user_service.patch_user(user_id, user_patch_params, api_context)
 
         logger.info(
             "Successfully patched user",
@@ -66,7 +65,7 @@ def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
     with api_context_manager() as api_context:
-        user = user_handler.get_user(user_id, api_context)
+        user = user_service.get_user(user_id, api_context)
 
         logger.info(
             "Successfully fetched user",
@@ -76,5 +75,5 @@ def user_get(user_id: str) -> dict:
         return response.ApiResponse(message="Success", data=user).asdict()
 
 
-def get_user_log_params(user_response: User) -> dict[str, Any]:
-    return {"user_id": user_response.id}
+def get_user_log_params(user: User) -> dict[str, Any]:
+    return {"user_id": user.id}
