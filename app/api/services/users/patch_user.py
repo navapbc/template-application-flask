@@ -1,12 +1,9 @@
 from typing import Optional
 
-import api.logging
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
 from api.route.route_utils import get_or_404
 from api.services.model import RoleParams, UserPatchParams, UserResponse
-
-logger = api.logging.get_logger(__name__)
 
 
 def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:

@@ -1,11 +1,8 @@
 from uuid import uuid4
 
-import api.logging
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
 from api.services.model import UserParams, UserResponse
-
-logger = api.logging.get_logger(__name__)
 
 
 def create_user(api_context: ApiContext) -> UserResponse:
