@@ -1,3 +1,4 @@
+import uuid
 from datetime import date
 from typing import Optional
 from uuid import uuid4
@@ -16,7 +17,7 @@ class RoleParams(BaseRequestModel):
 
 
 class UserParams(BaseRequestModel):
-    id: Optional[UUID4]
+    id: Optional[uuid.UUID]
     first_name: str
     middle_name: Optional[str]
     last_name: str
@@ -43,11 +44,11 @@ class UserResponse(UserParams):
 def create_user(user_data: dict, api_context: ApiContext) -> User:
 
     user = User(**user_data)
-    user.user_id = uuid4()
+    user.id = uuid4()
 
     if user.roles is not None:
         for role in user.roles:
-            role.user_id = user.user_id
+            role.user_id = user.id
 
     api_context.db_session.add(user)
     api_context.db_session.flush()
@@ -79,7 +80,7 @@ def get_user(user_id: str, api_context: ApiContext) -> User:
 
 
 def handle_role_patch(
-    user: User, request_role_types: Optional[list[RoleType]], api_context: ApiContext
+    user: User, request_roles: Optional[list[Role]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
@@ -91,7 +92,7 @@ def handle_role_patch(
     # that explicitly adds or removes a single role for a user at a time.
 
     # Shouldn't be called if None, but makes mypy happy
-    if request_role_types is None:
+    if request_roles is None:
         return
 
     # We'll work with just the role description strings to avoid
@@ -102,7 +103,7 @@ def handle_role_patch(
     else:
         current_role_types = set()
 
-    request_role_types = set([role.type for role in request_role_types])
+    request_role_types = set([role.type for role in request_roles])
 
     # If they match, do nothing
     if set(current_role_types) == set(request_role_types):
@@ -110,7 +111,7 @@ def handle_role_patch(
 
     # Figure out which roles need to be deleted and added
     roles_to_delete = current_role_types - request_role_types
-    roles_to_add = request_role_types - current_role_types  # type:ignore
+    roles_to_add = request_role_types - current_role_types
 
     # Go through existing roles and delete the ones that are no longer needed
     if user.roles:

@@ -4,7 +4,7 @@ import marshmallow
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
-from api.db.models.user_models import RoleEnum, User, UserRole
+from api.db.models.user_models import Role, RoleType
 
 ##############
 # Role Models
@@ -13,7 +13,7 @@ from api.db.models.user_models import RoleEnum, User, UserRole
 
 class RoleSchema(marshmallow.Schema):
     role_description = marshmallow_fields.Enum(
-        RoleEnum, description="The name of the role", by_value=True
+        RoleType, description="The name of the role", by_value=True
     )
 
     # Output only fields
@@ -21,8 +21,8 @@ class RoleSchema(marshmallow.Schema):
     updated_at = fields.DateTime(dump_only=True)
 
     @marshmallow.post_load
-    def make_role(self, data: dict, **kwargs: dict[str, Any]) -> UserRole:
-        return UserRole(**data)
+    def make_role(self, data: dict, **kwargs: dict[str, Any]) -> Role:
+        return Role(**data)
 
 
 ##############
