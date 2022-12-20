@@ -4,6 +4,7 @@ from typing import Optional
 import flask
 
 from api.db.models.base import Base
+from api.route.schemas import response_schema
 
 
 @dataclasses.dataclass
@@ -35,13 +36,15 @@ class ApiResponse:
 
     message: str
     data: Optional[Base] = None
-    status_code: int = 200
     warnings: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
     errors: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
 
-    def as_flask_response(self) -> flask.Response:
-        response = dataclasses.asdict(self)
-        if self.data is not None:
-            response["data"] = self.data.for_json()
-
-        return flask.make_response(response, self.status_code)
+    # This method is used to convert ApiResponse objects to a dictionary
+    # This is necessary because APIFlask has a bug that causes an exception to be
+    # thrown when returning objects from routes when when BASE_RESPONSE_SCHEMA is set
+    # (See https://github.com/apiflask/apiflask/issues/384)
+    # Once that issue is fixed, this method can be removed and routes can simply
+    # return ApiResponse objects directly and allow APIFlask to serealize the objects
+    # to JSON automatically.
+    def asdict(self) -> dict:
+        return response_schema.ResponseSchema().dump(self)

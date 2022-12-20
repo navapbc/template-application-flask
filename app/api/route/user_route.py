@@ -35,13 +35,8 @@ def user_post(user_input: dict):  # type: ignore
             "Successfully inserted user",
             extra=get_user_log_params(user),
         )
-        return {
-            "message": "Success",
-            "data": user,
-            "status_code": 201,
-            "warnings": [],
-            "errors": [],
-        }
+
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
@@ -62,13 +57,7 @@ def user_patch(user_id: str, user_patch_params: dict) -> flask.Response:
             extra=get_user_log_params(user),
         )
 
-        return {
-            "message": "Success",
-            "data": user,
-            "status_code": 200,
-            "warnings": [],
-            "errors": [],
-        }
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 @user_blueprint.get("/v1/user/<uuid:user_id>")
@@ -85,13 +74,7 @@ def user_get(user_id: str):  # type: ignore
             extra=get_user_log_params(user),
         )
 
-        return {
-            "message": "Success",
-            "data": user,
-            "status_code": 200,
-            "warnings": [],
-            "errors": [],
-        }
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 def get_user_log_params(user_response: User) -> dict[str, Any]:
