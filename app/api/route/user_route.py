@@ -7,9 +7,9 @@ import api.logging as logging
 import api.route.handler.user_handler as user_handler
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
-from api.route import response, schemas
+from api.route import response
 from api.route.api_context import api_context_manager
-from api.route.schemas import response_schema, user_schemas
+from api.route.schemas import user_schemas
 
 logger = logging.get_logger(__name__)
 
@@ -34,16 +34,6 @@ def user_post(user_input: User):  # type: ignore
         logger.info(
             "Successfully inserted user",
             extra=get_user_log_params(user),
-        )
-        udump = user_schemas.UserSchema().dump(user)
-        rdump = response_schema.ResponseSchema().dump(
-            {
-                "message": "Success",
-                "data": udump,
-                "status_code": 201,
-                "warnings": [],
-                "errors": [],
-            }
         )
         return {
             "message": "Success",

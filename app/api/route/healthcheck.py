@@ -1,12 +1,9 @@
-from typing import Tuple
-
 import marshmallow
 from apiflask import APIBlueprint
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.logging
-from api.route import response
 from api.route.api_context import api_context_manager
 
 logger = api.logging.get_logger(__name__)
@@ -21,7 +18,7 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 
 @healthcheck_blueprint.get("/health")
 @healthcheck_blueprint.output(HealthcheckSchema)
-def health() -> Tuple[dict, int]:
+def health():  # type: ignore
     logger.info("GET /v1/health")
 
     try:
@@ -30,11 +27,21 @@ def health() -> Tuple[dict, int]:
             if not result or result[0] != 1:
                 raise Exception("Connection to DB failure")
 
-            return response.ApiResponse(message="Service healthy").as_flask_response()
+            return {
+                "message": "Service healthy",
+                "data": None,
+                "status_code": 200,
+                "warnings": [],
+                "errors": [],
+            }, 200
 
     except Exception:
         logger.exception("Connection to DB failure")
 
-        return response.ApiResponse(
-            status_code=ServiceUnavailable.code, message="Service unavailable"
-        ).as_flask_response()
+        return {
+            "message": "Service unavailable",
+            "data": None,
+            "status_code": ServiceUnavailable.code,
+            "warnings": [],
+            "errors": [],
+        }, ServiceUnavailable.code
