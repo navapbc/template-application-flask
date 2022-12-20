@@ -29,7 +29,7 @@ class RoleSchema(marshmallow.Schema):
 
 
 class UserSchema(marshmallow.Schema):
-    user_id = fields.UUID(dump_only=True)
+    id = fields.UUID(dump_only=True)
     first_name = fields.String(description="The user's first name", required=True)
     middle_name = fields.String(description="The user's middle name")
     last_name = fields.String(description="The user's last name", required=True)
