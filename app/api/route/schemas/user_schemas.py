@@ -12,9 +12,7 @@ from api.db.models.user_models import Role, RoleType
 
 
 class RoleSchema(marshmallow.Schema):
-    role_description = marshmallow_fields.Enum(
-        RoleType, description="The name of the role", by_value=True
-    )
+    type = marshmallow_fields.Enum(RoleType, description="The name of the role", by_value=True)
 
     # Output only fields
     created_at = fields.DateTime(dump_only=True)
