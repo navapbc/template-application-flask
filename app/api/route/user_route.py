@@ -1,6 +1,5 @@
 from typing import Any
 
-import flask
 from apiflask import APIBlueprint
 
 import api.logging as logging
@@ -21,7 +20,7 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 @user_blueprint.input(user_schemas.UserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: dict):  # type: ignore
+def user_post(user_input: dict) -> dict:
     """
     POST /v1/user
     """
@@ -46,7 +45,7 @@ def user_post(user_input: dict):  # type: ignore
 @user_blueprint.input(user_schemas.UserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_patch(user_id: str, user_patch_params: dict) -> flask.Response:
+def user_patch(user_id: str, user_patch_params: dict) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:
@@ -63,7 +62,7 @@ def user_patch(user_id: str, user_patch_params: dict) -> flask.Response:
 @user_blueprint.get("/v1/user/<uuid:user_id>")
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_get(user_id: str):  # type: ignore
+def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
     with api_context_manager() as api_context:

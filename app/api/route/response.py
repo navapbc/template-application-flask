@@ -1,8 +1,6 @@
 import dataclasses
 from typing import Optional
 
-import flask
-
 from api.db.models.base import Base
 from api.route.schemas import response_schema
 
