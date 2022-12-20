@@ -6,6 +6,7 @@ import api.logging as logging
 import api.route.response as response_util
 import api.services.users as user_handler
 from api.route.api_context import api_context_manager
+from api.services.model import UserResponse
 
 logger = logging.get_logger(__name__)
 
@@ -70,5 +71,5 @@ def user_get(user_id: str) -> flask.Response:
         ).to_api_response()
 
 
-def get_user_log_params(user_response: user_handler.UserResponse) -> dict[str, Any]:
-    return {"user_id": user_response.id}
+def get_user_log_params(user_response: UserResponse) -> dict[str, Any]:
+    return {"user_id": user_response.user_id}
