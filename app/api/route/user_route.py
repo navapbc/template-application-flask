@@ -59,15 +59,19 @@ def user_patch(user_id: str, user_patch_params: dict) -> flask.Response:
             extra=get_user_log_params(user),
         )
 
-        return response.ApiResponse(
-            message="Success", data=user, status_code=200
-        ).as_flask_response()
+        return {
+            "message": "Success",
+            "data": user,
+            "status_code": 200,
+            "warnings": [],
+            "errors": [],
+        }
 
 
 @user_blueprint.get("/v1/user/<uuid:user_id>")
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_get(user_id: str) -> flask.Response:
+def user_get(user_id: str):  # type: ignore
     logger.info("GET /v1/user/:user_id")
 
     with api_context_manager() as api_context:
@@ -78,7 +82,13 @@ def user_get(user_id: str) -> flask.Response:
             extra=get_user_log_params(user),
         )
 
-        return response.ApiResponse(message="Success", data=user).as_flask_response()
+        return {
+            "message": "Success",
+            "data": user,
+            "status_code": 200,
+            "warnings": [],
+            "errors": [],
+        }
 
 
 def get_user_log_params(user_response: User) -> dict[str, Any]:

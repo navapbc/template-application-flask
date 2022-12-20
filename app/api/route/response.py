@@ -43,4 +43,5 @@ class ApiResponse:
         response = dataclasses.asdict(self)
         if self.data is not None:
             response["data"] = self.data.for_json()
+
         return flask.make_response(response, self.status_code)

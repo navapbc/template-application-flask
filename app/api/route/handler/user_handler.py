@@ -3,6 +3,9 @@ from datetime import date
 from typing import Optional
 from uuid import uuid4
 
+import apiflask
+from sqlalchemy import orm
+
 import api.logging
 from api.db.models.user_models import Role, RoleType, User
 from api.route.api_context import ApiContext
@@ -76,7 +79,18 @@ def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
 
 
 def get_user(user_id: str, api_context: ApiContext) -> User:
-    return get_or_404(api_context.db_session, User, user_id)
+    """
+    Utility method for fetching a single record from the DB by
+    its primary key ID, and raising a NotFound exception if
+    no such record exists.
+    """
+
+    result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+
+    if result is None:
+        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
+
+    return result
 
 
 def handle_role_patch(
