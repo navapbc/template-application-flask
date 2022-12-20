@@ -233,6 +233,8 @@ def test_patch_user_200_roles(
     # Add two roles
     request = {"roles": [{"type": "ADMIN"}, {"type": "USER"}]}
     response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+    print(response.get_json())
+
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]

@@ -45,7 +45,10 @@ def user_post(user_input: dict):  # type: ignore
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
-@user_blueprint.input(user_schemas.UserSchema)
+# Allow partial updates. partial=true means requests that are missing
+# required fields will not be rejected.
+# https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading
+@user_blueprint.input(user_schemas.UserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
 def user_patch(user_id: str, user_patch_params: dict) -> flask.Response:
