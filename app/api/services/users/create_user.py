@@ -5,6 +5,8 @@ from api.route.api_context import ApiContext
 from api.route.models.user import UserParams, UserResponse
 
 
+# TODO: separate controller and service concerns
+# https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
