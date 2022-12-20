@@ -1,25 +1,24 @@
-from datetime import date
+from datetime import date, datetime
 from typing import Optional
 
 from pydantic import UUID4
 
 import api.logging
-from api.db.models.user_models import RoleEnum
+from api.db.models.user_models import RoleEnum, User
+from api.route.api_context import ApiContext
 from api.route.request import BaseRequestModel
-
-from .create_user import create_user
-from .get_user import get_user
-from .patch_user import patch_user
+from api.route.route_utils import get_or_404
 
 logger = api.logging.get_logger(__name__)
 
 
 class RoleParams(BaseRequestModel):
-    type: RoleType
+    role_description: RoleEnum
+    created_at: Optional[datetime]
 
 
 class UserParams(BaseRequestModel):
-    id: Optional[UUID4]
+    user_id: Optional[UUID4]
     first_name: str
     middle_name: Optional[str]
     last_name: str
@@ -41,3 +40,9 @@ class UserPatchParams(BaseRequestModel):
 
 class UserResponse(UserParams):
     pass
+
+
+def get_user(user_id: str, api_context: ApiContext) -> UserResponse:
+    user = get_or_404(api_context.db_session, User, user_id)
+
+    return UserResponse.from_orm(user)
