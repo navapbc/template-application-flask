@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from api.db.models.user_models import User, UserRole
+from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
 from api.route.models.user import UserParams, UserResponse
 
@@ -11,7 +11,7 @@ def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
     user = User(
-        user_id=uuid4(),
+        id=uuid4(),
         first_name=request.first_name,
         middle_name=request.middle_name,
         last_name=request.last_name,
@@ -22,12 +22,6 @@ def create_user(api_context: ApiContext) -> UserResponse:
     api_context.db_session.add(user)
 
     if request.roles is not None:
-        user_roles = []
-        for request_role in request.roles:
-            user_roles.append(
-                UserRole(user_id=user.user_id, role_description=request_role.role_description)
-            )
-
-        user.roles = user_roles
+        user.roles = [Role(user_id=user.id, type=role.type) for role in request.roles]
 
     return UserResponse.from_orm(user)

@@ -1,19 +1,18 @@
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
 
 from pydantic import UUID4
 
-from api.db.models.user_models import RoleEnum
+from api.db.models.user_models import RoleType
 from api.route.request import BaseRequestModel
 
 
 class RoleParams(BaseRequestModel):
-    role_description: RoleEnum
-    created_at: Optional[datetime]
+    type: RoleType
 
 
 class UserParams(BaseRequestModel):
-    user_id: Optional[UUID4]
+    id: Optional[UUID4]
     first_name: str
     middle_name: Optional[str]
     last_name: str

@@ -1,8 +1,8 @@
 from typing import Optional
 
-from api.db.models.user_models import User, UserRole
+from api.db.models.user_models import Role, RoleType, User
 from api.route.api_context import ApiContext
-from api.route.models.user import RoleParams, UserPatchParams, UserResponse
+from api.route.models.user import UserPatchParams, UserResponse
 from api.route.route_utils import get_or_404
 
 
@@ -30,7 +30,7 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[RoleParams]], api_context: ApiContext
+    user: User, request_role_types: Optional[list[RoleType]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
@@ -42,34 +42,34 @@ def _handle_role_patch(
     # that explicitly adds or removes a single role for a user at a time.
 
     # Shouldn't be called if None, but makes mypy happy
-    if request_roles is None:
+    if request_role_types is None:
         return
 
     # We'll work with just the role description strings to avoid
     # comparing nested objects and values. As roles are unique in the
     # DB per user, any deduplicating this does is fine.
     if user.roles is not None:
-        current_role_descriptions = set([role.role_description for role in user.roles])
+        current_role_types = set([role.type for role in user.roles])
     else:
-        current_role_descriptions = set()
+        current_role_types = set()
 
-    request_role_descriptions = set([role.role_description for role in request_roles])
+    request_role_types = set([role.type for role in request_role_types])
 
     # If they match, do nothing
-    if set(current_role_descriptions) == set(request_role_descriptions):
+    if set(current_role_types) == set(request_role_types):
         return
 
     # Figure out which roles need to be deleted and added
-    roles_to_delete = current_role_descriptions - request_role_descriptions
-    roles_to_add = request_role_descriptions - current_role_descriptions  # type:ignore
+    roles_to_delete = current_role_types - request_role_types
+    roles_to_add = request_role_types - current_role_types  # type:ignore
 
     # Go through existing roles and delete the ones that are no longer needed
     if user.roles:
         for current_user_role in user.roles:
-            if current_user_role.role_description in roles_to_delete:
+            if current_user_role.type in roles_to_delete:
                 api_context.db_session.delete(current_user_role)
 
     # Add any new roles
-    for role_description in roles_to_add:
-        user_role = UserRole(user_id=user.user_id, role_description=role_description)
+    for role_type in roles_to_add:
+        user_role = Role(user_id=user.id, type=role_type)
         api_context.db_session.add(user_role)

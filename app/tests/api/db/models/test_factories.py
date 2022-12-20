@@ -86,7 +86,7 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
 
 
 def test_role_factory_create(test_db_session, initialize_factories_session):
-    # Verify if you build a UserRole directly, it gets
+    # Verify if you build a Role directly, it gets
     # a user attached to it with that single role
     role = RoleFactory.create()
     assert role.user is not None
