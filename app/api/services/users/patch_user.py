@@ -2,8 +2,8 @@ from typing import Optional
 
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
+from api.route.models.model import RoleParams, UserPatchParams, UserResponse
 from api.route.route_utils import get_or_404
-from api.services.model import RoleParams, UserPatchParams, UserResponse
 
 
 def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:

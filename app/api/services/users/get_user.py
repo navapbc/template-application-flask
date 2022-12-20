@@ -1,7 +1,7 @@
 from api.db.models.user_models import User
 from api.route.api_context import ApiContext
+from api.route.models.model import UserResponse
 from api.route.route_utils import get_or_404
-from api.services.model import UserResponse
 
 
 def get_user(user_id: str, api_context: ApiContext) -> UserResponse:

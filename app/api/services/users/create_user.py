@@ -2,9 +2,10 @@ from uuid import uuid4
 
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
-from api.services.model import UserParams, UserResponse
+from api.route.models.model import UserParams, UserResponse
 
 
+# TODO: take in the UserParams... and return a User object...
 def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
