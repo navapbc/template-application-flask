@@ -144,25 +144,16 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["errors"]
-    # We expect the errors to be in a dict like:
-    # {
-    #   'field': 'roles.0.role',
-    #   'message': "'Mime' is not one of ['User', 'Admin', 'Third Party']",
-    #   'rule': ['User', 'Admin', 'Third Party'],
-    #   'type': 'enum',
-    #   'value': 'Mime'
-    # }
-    for error in error_list:
-        field, message, error_type = (
-            error["field"],
-            error["message"],
-            error["type"],
-        )
+    error_list = response.get_json()["detail"]["json"]
+    # We expect the errors to be like:
+    # {'roles': {'0': {'type': ['Must be one of USER, ADMIN.']}, '1': ...}}
 
-        assert field.startswith("roles.") and field.endswith(".type")
-        assert "is not one of" in message
-        assert error_type == "enum"
+    for key, error_field in error_list["roles"].items():
+        assert key.isnumeric()
+
+        for field, error in error_field.items():
+            assert field == "type"
+            assert "Must be one of: USER, ADMIN." in error[0]
 
 
 def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
