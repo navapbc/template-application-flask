@@ -3,9 +3,10 @@ from typing import Any
 import flask
 
 import api.logging as logging
-import api.route.handler.user_handler as user_handler
 import api.route.response as response_util
+import api.services.users as user_service
 from api.route.api_context import api_context_manager
+from api.route.models.user import UserResponse
 
 logger = logging.get_logger(__name__)
 
@@ -18,8 +19,7 @@ def user_post() -> flask.Response:
     logger.info("POST /v1/user")
 
     with api_context_manager() as api_context:
-
-        response = user_handler.create_user(api_context)
+        response = user_service.create_user(api_context)
 
         logger.info(
             "Successfully inserted user",
@@ -38,7 +38,7 @@ def user_patch(user_id: str) -> flask.Response:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:
-        response = user_handler.patch_user(user_id, api_context)
+        response = user_service.patch_user(user_id, api_context)
 
         logger.info(
             "Successfully patched user",
@@ -58,7 +58,7 @@ def user_get(user_id: str) -> flask.Response:
     logger.info("GET /v1/user/:user_id")
 
     with api_context_manager() as api_context:
-        response = user_handler.get_user(user_id, api_context)
+        response = user_service.get_user(user_id, api_context)
 
         logger.info(
             "Successfully fetched user",
@@ -70,5 +70,5 @@ def user_get(user_id: str) -> flask.Response:
         ).to_api_response()
 
 
-def get_user_log_params(user_response: user_handler.UserResponse) -> dict[str, Any]:
-    return {"user_id": user_response.user_id}
+def get_user_log_params(user_response: UserResponse) -> dict[str, Any]:
+    return {"user_id": user_response.id}

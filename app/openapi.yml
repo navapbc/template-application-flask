@@ -10,7 +10,6 @@ info:
 
 security:
   - api_key: []
-  
 
 servers:
   - url: /v1
@@ -111,7 +110,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '#/components/schemas/SuccessfulResponse'
+                  - $ref: "#/components/schemas/SuccessfulResponse"
                   - properties:
                       data:
                         $ref: "#/components/schemas/UserResponse"
@@ -121,8 +120,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
-
-
 
 components:
   securitySchemes:
@@ -135,7 +132,7 @@ components:
   schemas:
     Date:
       type: string
-      example: '1970-01-01'
+      example: "1970-01-01"
       format: date
 
     UserBase:
@@ -183,13 +180,12 @@ components:
     Role:
       type: object
       properties:
-        role_description:
+        type:
           type: string
-          example: User
+          example: USER
           enum:
-          - User
-          - Admin
-          - Third Party
+            - USER
+            - ADMIN
 
     SuccessfulResponse:
       type: object

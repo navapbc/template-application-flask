@@ -26,7 +26,7 @@ class ApiContext:
         Utility method for getting params to attach to the log as
          `logger.info("msg", extra=api_context.get_log_extra())`
         """
-        return {"user_id": self.current_user.user_id if self.current_user else None}
+        return {"user_id": self.current_user.id if self.current_user else None}
 
 
 @contextmanager

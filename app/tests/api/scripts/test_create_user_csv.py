@@ -35,7 +35,7 @@ def validate_csv_records(db_records, csv_records):
             == f"{db_record.first_name} {db_record.last_name}"
         )
         assert csv_record[USER_CSV_RECORD_HEADERS.roles] == " ".join(
-            [role.role_description for role in db_record.roles]
+            [role.type for role in db_record.roles]
         )
         assert csv_record[USER_CSV_RECORD_HEADERS.is_user_active] == blank_for_null(
             db_record.is_active
