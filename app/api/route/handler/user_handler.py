@@ -4,49 +4,28 @@ from uuid import uuid4
 import api.logging
 from api.db.models.user_models import User, UserRole
 from api.route.api_context import ApiContext
-from api.route.models.user_api_models import Role, UserIn, UserOut, UserPatchParams
 from api.route.route_utils import get_or_404
 
 logger = api.logging.get_logger(__name__)
 
 
-def create_user(request: UserIn, api_context: ApiContext) -> UserOut:
+def create_user(user: User, api_context: ApiContext) -> User:
 
-    user = User(
-        user_id=uuid4(),
-        first_name=request.first_name,
-        middle_name=request.middle_name,
-        last_name=request.last_name,
-        phone_number=request.phone_number,
-        date_of_birth=request.date_of_birth,
-        is_active=request.is_active,
-    )
+    user.user_id = uuid4()
+
+    if user.roles is not None:
+        for role in user.roles:
+            role.user_id = user.user_id
+
     api_context.db_session.add(user)
-
-    if request.roles is not None:
-        user_roles = []
-        for request_role in request.roles:
-            user_roles.append(
-                UserRole(user_id=user.user_id, role_description=request_role.role_description)
-            )
-
-        user.roles = user_roles
-
     api_context.db_session.flush()
-    return UserOut(**UserOut.Schema().dump(user))
+    return user
 
 
-def patch_user(user_id: str, request: UserPatchParams, api_context: ApiContext) -> UserOut:
+def patch_user(user_id: str, request: dict, api_context: ApiContext) -> User:
     user = get_or_404(api_context.db_session, User, user_id)
 
-    for key, value in request.get_set_params(api_context):
-        # Unfortunately there isn't a great way of determining
-        # which values were explicitly set in the request other
-        # than to look at the raw request JSON. Because the objects
-        # get converted to dataclasses, all the values are "set" and
-        # dataclasses don't keep track of the parameters
-        if key not in api_context.request_body:
-            continue
+    for key, value in request.items():
 
         if key == "roles":
             handle_role_patch(user, value, api_context)
@@ -60,17 +39,15 @@ def patch_user(user_id: str, request: UserPatchParams, api_context: ApiContext) 
     api_context.db_session.flush()
     api_context.db_session.refresh(user)
 
-    return UserOut(**UserOut.Schema().dump(user))
+    return user
 
 
-def get_user(user_id: str, api_context: ApiContext) -> UserOut:
-    user = get_or_404(api_context.db_session, User, user_id)
-
-    return UserOut(**UserOut.Schema().dump(user))
+def get_user(user_id: str, api_context: ApiContext) -> User:
+    return get_or_404(api_context.db_session, User, user_id)
 
 
 def handle_role_patch(
-    user: User, request_roles: Optional[list[Role]], api_context: ApiContext
+    user: User, request_roles: Optional[list[UserRole]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

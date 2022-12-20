@@ -5,13 +5,13 @@ from marshmallow_dataclass import dataclass as marshmallow_dataclass
 
 import api.logging
 from api.route.api_context import ApiContext
-from api.route.models.base_api_model import BaseApiModel
+from api.route.schemas.base_api_model import BaseApiSchema
 
 logger = api.logging.get_logger(__name__)
 
 
 @marshmallow_dataclass
-class BaseRequestModel(BaseApiModel):
+class BaseRequestModel(BaseApiSchema):
     def get_set_params(self, api_context: ApiContext) -> Iterable[tuple[str, Any]]:
         """
         Get an iterable that gives all params that

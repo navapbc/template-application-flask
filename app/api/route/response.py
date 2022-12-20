@@ -3,7 +3,7 @@ from typing import Optional
 
 import flask
 
-from api.route.models.base_api_model import BaseApiModel
+from api.db.models.base import Base
 
 
 @dataclasses.dataclass
@@ -34,10 +34,13 @@ class ApiResponse:
     """Base response model for all API responses."""
 
     message: str
-    data: Optional[dict | list[dict] | BaseApiModel] = None
+    data: Optional[Base] = None
     status_code: int = 200
     warnings: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
     errors: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
 
     def as_flask_response(self) -> flask.Response:
-        return flask.make_response(dataclasses.asdict(self), self.status_code)
+        response = dataclasses.asdict(self)
+        if self.data is not None:
+            response["data"] = self.data.for_json()
+        return flask.make_response(response, self.status_code)

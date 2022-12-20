@@ -1,3 +1,4 @@
+import dataclasses
 import uuid
 from datetime import date, datetime
 from decimal import Decimal
@@ -31,6 +32,7 @@ metadata = MetaData(
 
 
 @as_declarative(metadata=metadata)
+@dataclasses.dataclass
 class Base:
     def _dict(self) -> dict:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}

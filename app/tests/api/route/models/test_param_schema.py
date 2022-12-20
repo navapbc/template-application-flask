@@ -3,7 +3,7 @@ from dataclasses import field
 
 from apiflask.validators import OneOf, Regexp
 
-from api.route.models.param_schema import ParamFieldConfig
+from api.route.schemas.param_schema import ParamFieldConfig
 
 
 def base_metadata():

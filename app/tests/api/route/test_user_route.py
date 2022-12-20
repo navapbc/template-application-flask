@@ -46,7 +46,7 @@ def validate_param_match(key, request, response, db_record):
         db_val = db_val.isoformat()
 
     if request is not None:
-        assert req_val == response_val
+        assert response_val == req_val
         assert req_val == db_val
 
     assert response_val == db_val
@@ -62,6 +62,8 @@ def test_post_user_201(client, api_auth_token, test_db_session):
     results = test_db_session.query(User).all()
     assert len(results) == 1
     db_record = results[0]
+
+    print("response", response.get_json())
     response_record = response.get_json()["data"]
 
     # Verify the request, response and DB model values all match

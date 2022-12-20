@@ -1,4 +1,5 @@
-import flask
+from typing import Tuple
+
 import marshmallow
 from apiflask import APIBlueprint
 from sqlalchemy import text
@@ -11,7 +12,7 @@ from api.route.api_context import api_context_manager
 logger = api.logging.get_logger(__name__)
 
 
-class HealthOut(marshmallow.Schema):
+class HealthcheckSchema(marshmallow.Schema):
     message: str
 
 
@@ -19,8 +20,8 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 
 
 @healthcheck_blueprint.get("/health")
-@healthcheck_blueprint.output(HealthOut)
-def health() -> flask.Response:
+@healthcheck_blueprint.output(HealthcheckSchema)
+def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
     try:
