@@ -175,6 +175,7 @@ def test_get_user_200(client, api_auth_token, test_db_session, initialize_factor
     assert response.status_code == 200
     response_record = response.get_json()["data"]
 
+    assert response_record["id"] == str(user.id)
     validate_all_match(None, response_record, user)
 
 
