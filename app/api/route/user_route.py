@@ -1,15 +1,13 @@
-import dataclasses
 from typing import Any
 
 import flask
 from apiflask import APIBlueprint
 
 import api.logging as logging
-from api.route import schemas
 import api.route.handler.user_handler as user_handler
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
-from api.route import response
+from api.route import response, schemas
 from api.route.api_context import api_context_manager
 from api.route.schemas import response_schema, user_schemas
 

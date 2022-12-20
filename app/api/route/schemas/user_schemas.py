@@ -4,7 +4,6 @@ import marshmallow
 from apiflask import fields
 
 from api.db.models.user_models import RoleEnum, User, UserRole
-from api.route.schemas.response_schema import ResponseSchema
 
 ##############
 # Role Models
