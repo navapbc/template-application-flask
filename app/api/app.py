@@ -9,7 +9,6 @@ from werkzeug.exceptions import Unauthorized
 import api.db as db
 import api.logging
 from api.auth.api_key_auth import User
-from api.route.error_handlers import add_error_handlers_to_app
 from api.route.healthcheck import healthcheck_blueprint
 from api.route.schemas import response_schema
 from api.route.user_route import user_blueprint
@@ -32,7 +31,6 @@ def create_app(
     # Add various configurations, and
     # adjustments to the application
     configure_app(app)
-    add_error_handlers_to_app(app)
     register_blueprints(app)
     register_request_handlers(app, db_session_factory, do_close_db)
 
