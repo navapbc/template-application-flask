@@ -4,6 +4,7 @@ from typing import Generator, Optional
 
 from apiflask import APIFlask
 from flask import g
+from werkzeug.exceptions import Unauthorized
 
 import api.db as db
 import api.logging
@@ -65,7 +66,7 @@ def current_user(is_user_expected: bool = True) -> Optional[User]:
     current = g.get("current_user")
     if is_user_expected and current is None:
         logger.error("No current user found for request")
-        # raise Unauthorized
+        raise Unauthorized
     return current
 
 
