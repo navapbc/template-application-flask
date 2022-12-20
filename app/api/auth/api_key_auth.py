@@ -27,20 +27,20 @@ class User:
     # user for demo purposes and is not
     # a production ready approach. It exists
     # purely to define a rough structure / example
-    user_id: uuid.UUID
+    id: uuid.UUID
     sub_id: str
     username: str
 
     def as_dict(self) -> dict[str, Any]:
         # Connexion expects a dictionary it can
         # use .get() on, so convert this to that format
-        return {"uid": self.user_id, "sub": self.sub_id}
+        return {"uid": self.id, "sub": self.sub_id}
 
     def get_user_log_attributes(self) -> dict:
         # Note this gets called during authentication
         # to attach the information to the flask global object
         # which will in turn be attached to the log record
-        return {"current_user.user_id": str(self.user_id)}
+        return {"current_user.id": str(self.id)}
 
 
 API_AUTH_USER = User(uuid.uuid4(), "sub_id_1234", "API auth user")

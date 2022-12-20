@@ -138,7 +138,7 @@ def test_log_message_during_request(app, test_db_session):
         "/fake-endpoint?name=Bob"
     ):
         g.db = test_db_session
-        g.current_user_request_attributes = {"current_user.user_id": "abc123"}
+        g.current_user_request_attributes = {"current_user.id": "abc123"}
 
         logger.info("this is a log message", extra={"key3": "value3", "pii_key": "123456789"})
 

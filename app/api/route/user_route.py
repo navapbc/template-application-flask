@@ -82,4 +82,4 @@ def user_get(user_id: str) -> flask.Response:
 
 
 def get_user_log_params(user_response: User) -> dict[str, Any]:
-    return {"user_id": user_response.user_id}
+    return {"user_id": user_response.id}
