@@ -48,12 +48,6 @@ def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
 
 
 def get_user(user_id: str, api_context: ApiContext) -> User:
-    """
-    Utility method for fetching a single record from the DB by
-    its primary key ID, and raising a NotFound exception if
-    no such record exists.
-    """
-
     # TODO: move this to service and/or persistence layer
     result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
