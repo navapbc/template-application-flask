@@ -1,67 +1,13 @@
-from datetime import date
 from typing import Optional
-from uuid import uuid4
 
-from pydantic import UUID4
-
-import api.logging
 from api.db.models.user_models import Role, RoleType, User
 from api.route.api_context import ApiContext
-from api.route.request import BaseRequestModel
+from api.route.models.user import UserPatchParams, UserResponse
 from api.route.route_utils import get_or_404
 
-logger = api.logging.get_logger(__name__)
 
-
-class RoleParams(BaseRequestModel):
-    type: RoleType
-
-
-class UserParams(BaseRequestModel):
-    id: Optional[UUID4]
-    first_name: str
-    middle_name: Optional[str]
-    last_name: str
-    phone_number: str
-    date_of_birth: date
-    is_active: bool
-    roles: Optional[list[RoleParams]]
-
-
-class UserPatchParams(BaseRequestModel):
-    first_name: Optional[str]
-    middle_name: Optional[str]
-    last_name: Optional[str]
-    phone_number: Optional[str]
-    date_of_birth: Optional[date]
-    is_active: Optional[bool]
-    roles: Optional[list[RoleParams]]
-
-
-class UserResponse(UserParams):
-    pass
-
-
-def create_user(api_context: ApiContext) -> UserResponse:
-    request = UserParams.parse_obj(api_context.request_body)
-
-    user = User(
-        id=uuid4(),
-        first_name=request.first_name,
-        middle_name=request.middle_name,
-        last_name=request.last_name,
-        phone_number=request.phone_number,
-        date_of_birth=request.date_of_birth,
-        is_active=request.is_active,
-    )
-    api_context.db_session.add(user)
-
-    if request.roles is not None:
-        user.roles = [Role(user_id=user.id, type=role.type) for role in request.roles]
-
-    return UserResponse.from_orm(user)
-
-
+# TODO: separate controller and service concerns
+# https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     user = get_or_404(api_context.db_session, User, user_id)
 
@@ -69,7 +15,7 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     for key, value in request.get_set_params():
 
         if key == "roles":
-            handle_role_patch(user, value, api_context)
+            _handle_role_patch(user, value, api_context)
             continue
 
         setattr(user, key, value)
@@ -83,13 +29,7 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     return UserResponse.from_orm(user)
 
 
-def get_user(user_id: str, api_context: ApiContext) -> UserResponse:
-    user = get_or_404(api_context.db_session, User, user_id)
-
-    return UserResponse.from_orm(user)
-
-
-def handle_role_patch(
+def _handle_role_patch(
     user: User, request_role_types: Optional[list[RoleType]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
