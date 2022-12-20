@@ -5,7 +5,6 @@ from api.route.api_context import ApiContext
 from api.route.models.user import UserParams, UserResponse
 
 
-# TODO: take in the UserParams... and return a User object...
 def create_user(api_context: ApiContext) -> UserResponse:
     request = UserParams.parse_obj(api_context.request_body)
 
