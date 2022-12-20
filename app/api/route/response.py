@@ -39,7 +39,7 @@ class ApiResponse:
 
     # This method is used to convert ApiResponse objects to a dictionary
     # This is necessary because APIFlask has a bug that causes an exception to be
-    # thrown when returning objects from routes when when BASE_RESPONSE_SCHEMA is set
+    # thrown when returning objects from routes when BASE_RESPONSE_SCHEMA is set
     # (See https://github.com/apiflask/apiflask/issues/384)
     # Once that issue is fixed, this method can be removed and routes can simply
     # return ApiResponse objects directly and allow APIFlask to serealize the objects
