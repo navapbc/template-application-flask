@@ -1,3 +1,4 @@
+import dataclasses
 from typing import Any
 
 import flask
@@ -21,7 +22,7 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 @user_blueprint.input(user_schemas.UserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: User) -> flask.Response:
+def user_post(user_input: User):  # type: ignore
     """
     POST /v1/user
     """
@@ -35,9 +36,9 @@ def user_post(user_input: User) -> flask.Response:
             "Successfully inserted user",
             extra=get_user_log_params(user),
         )
-        return response.ApiResponse(
-            message="Success", data=user, status_code=201
-        ).as_flask_response()
+        return dataclasses.asdict(
+            response.ApiResponse(message="Success", data=user, status_code=201)
+        )
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
