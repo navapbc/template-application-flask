@@ -22,21 +22,20 @@ paths:
                 properties:
                   message:
                     type: string
-                  status_code:
-                    type: integer
-                    default: 200
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                    description: The message to return
                   errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                      $ref: '#/components/schemas/ValidationError'
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
                   data:
-                    $ref: '#/components/schemas/HealthOut'
-                required:
-                - message
+                    $ref: '#/components/schemas/Healthcheck'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
           description: Successful response
       tags:
       - Health
@@ -45,7 +44,7 @@ paths:
     post:
       parameters: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
@@ -53,21 +52,20 @@ paths:
                 properties:
                   message:
                     type: string
-                  status_code:
-                    type: integer
-                    default: 200
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                    description: The message to return
                   errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                      $ref: '#/components/schemas/ValidationError'
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
                   data:
-                    $ref: '#/components/schemas/UserOut'
-                required:
-                - message
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
           description: Successful response
         '400':
           content:
@@ -88,7 +86,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserIn'
+              $ref: '#/components/schemas/User'
       security:
       - ApiKeyAuth: []
   /v1/user/{user_id}:
@@ -108,21 +106,20 @@ paths:
                 properties:
                   message:
                     type: string
-                  status_code:
-                    type: integer
-                    default: 200
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                    description: The message to return
                   errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                      $ref: '#/components/schemas/ValidationError'
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
                   data:
-                    $ref: '#/components/schemas/UserOut'
-                required:
-                - message
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
           description: Successful response
         '401':
           content:
@@ -157,21 +154,20 @@ paths:
                 properties:
                   message:
                     type: string
-                  status_code:
-                    type: integer
-                    default: 200
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                    description: The message to return
                   errors:
                     type: array
                     items:
-                      $ref: '#/components/schemas/ValidationErrorDetail'
+                      $ref: '#/components/schemas/ValidationError'
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
                   data:
-                    $ref: '#/components/schemas/UserOut'
-                required:
-                - message
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
           description: Successful response
         '400':
           content:
@@ -198,49 +194,30 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserPatchParams'
+              $ref: '#/components/schemas/UserUpdate'
       security:
       - ApiKeyAuth: []
 openapi: 3.0.3
 components:
   schemas:
-    ValidationErrorDetail:
+    ValidationError:
       type: object
       properties:
         message:
           type: string
-          default: ''
-        type:
-          type: string
-        value:
-          type: string
-          default: null
-          nullable: true
-        field:
-          type: string
-          default: null
-          nullable: true
+          description: The message to return
         rule:
           type: string
-          default: null
-          nullable: true
-      required:
-      - type
-    ValidationError:
-      properties:
-        detail:
-          type: object
-          properties:
-            <location>:
-              type: object
-              properties:
-                <field_name>:
-                  type: array
-                  items:
-                    type: string
-        message:
+          description: The rule that failed
+        type:
           type: string
-      type: object
+          description: The type of error
+        value:
+          type: string
+          description: The value that failed
+        field:
+          type: string
+          description: The field that failed
     HTTPError:
       properties:
         detail:
@@ -248,80 +225,77 @@ components:
         message:
           type: string
       type: object
-    HealthOut:
+    Healthcheck:
       type: object
       properties: {}
-    RoleIn:
+    Role:
       type: object
       properties:
-        role_description:
+        updated_at:
           type: string
+          format: date-time
+          readOnly: true
+        type:
           description: The name of the role
-    UserIn:
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    User:
       type: object
       properties:
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        last_name:
-          type: string
-          description: The user's last name
-        middle_name:
-          type: string
-          description: The user's middle name
         phone_number:
           type: string
           description: The user's phone number
           example: 123-456-7890
           pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/RoleIn'
         date_of_birth:
           type: string
           format: date
           description: The users date of birth
-        first_name:
-          type: string
-          description: The user's first name
-    RoleOut:
-      type: object
-      properties:
         created_at:
           type: string
           format: date-time
-        role_description:
+          readOnly: true
+        middle_name:
           type: string
-          description: The name of the role
+          description: The user's middle name
         updated_at:
           type: string
           format: date-time
-    UserOut:
-      type: object
-      properties:
+          readOnly: true
+        last_name:
+          type: string
+          description: The user's last name
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        first_name:
+          type: string
+          description: The user's first name
+        is_active:
+          type: boolean
+          description: Whether the user is active
         user_id:
           type: string
           format: uuid
-          description: The user's unique identifier
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        last_name:
-          type: string
-          description: The user's last name
-        middle_name:
-          type: string
-          description: The user's middle name
+          readOnly: true
+      required:
+      - date_of_birth
+      - first_name
+      - is_active
+      - last_name
+      - phone_number
+      - roles
+    UserUpdate:
+      type: object
+      properties:
         phone_number:
           type: string
           description: The user's phone number
           example: 123-456-7890
           pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/RoleOut'
         date_of_birth:
           type: string
           format: date
@@ -329,40 +303,31 @@ components:
         created_at:
           type: string
           format: date-time
-        updated_at:
-          type: string
-          format: date-time
-        first_name:
-          type: string
-          description: The user's first name
-    UserPatchParams:
-      type: object
-      properties:
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        last_name:
-          type: string
-          description: The user's last name
+          readOnly: true
         middle_name:
           type: string
           description: The user's middle name
-        phone_number:
+        updated_at:
           type: string
-          description: The user's phone number
-          example: 123-456-7890
-          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          format: date-time
+          readOnly: true
+        last_name:
+          type: string
+          description: The user's last name
         roles:
           type: array
           items:
-            $ref: '#/components/schemas/RoleIn'
-        date_of_birth:
-          type: string
-          format: date
-          description: The users date of birth
+            $ref: '#/components/schemas/Role'
         first_name:
           type: string
           description: The user's first name
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        user_id:
+          type: string
+          format: uuid
+          readOnly: true
   securitySchemes:
     ApiKeyAuth:
       type: apiKey
