@@ -21,7 +21,7 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 @user_blueprint.input(user_schemas.UserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: User):  # type: ignore
+def user_post(user_input: dict):  # type: ignore
     """
     POST /v1/user
     """

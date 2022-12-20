@@ -53,7 +53,3 @@ class UserSchema(marshmallow.Schema):
 
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-
-    @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict[str, Any]) -> User:
-        return User(**data)

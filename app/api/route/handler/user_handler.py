@@ -9,8 +9,9 @@ from api.route.route_utils import get_or_404
 logger = api.logging.get_logger(__name__)
 
 
-def create_user(user: User, api_context: ApiContext) -> User:
+def create_user(user_data: dict, api_context: ApiContext) -> User:
 
+    user = User(**user_data)
     user.user_id = uuid4()
 
     if user.roles is not None:
@@ -22,10 +23,10 @@ def create_user(user: User, api_context: ApiContext) -> User:
     return user
 
 
-def patch_user(user_id: str, request: dict, api_context: ApiContext) -> User:
+def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
     user = get_or_404(api_context.db_session, User, user_id)
 
-    for key, value in request.items():
+    for key, value in patch_data.items():
 
         if key == "roles":
             handle_role_patch(user, value, api_context)
