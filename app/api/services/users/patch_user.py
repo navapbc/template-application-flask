@@ -13,7 +13,7 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     for key, value in request.get_set_params():
 
         if key == "roles":
-            handle_role_patch(user, value, api_context)
+            _handle_role_patch(user, value, api_context)
             continue
 
         setattr(user, key, value)
@@ -27,7 +27,7 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     return UserResponse.from_orm(user)
 
 
-def handle_role_patch(
+def _handle_role_patch(
     user: User, request_roles: Optional[list[RoleParams]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
