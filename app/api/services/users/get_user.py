@@ -12,6 +12,8 @@ def get_user(user_id: str, api_context: ApiContext) -> User:
     result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
     if result is None:
+        # TODO move HTTP related logic out of service layer to controller layer and just return None from here
+        # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
         raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
     return result
