@@ -22,3 +22,7 @@ coverage.*
 
 # mypy
 .mypy_cache
+
+# VSCode Workspace
+*.code-workspace
+.vscode
