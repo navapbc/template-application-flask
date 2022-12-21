@@ -49,5 +49,6 @@ class UserSchema(marshmallow.Schema):
     )
     roles = fields.List(fields.Nested(RoleSchema), required=True)
 
+    # Output only fields in addition to id field
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
