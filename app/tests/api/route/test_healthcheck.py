@@ -2,7 +2,7 @@ import api.app as app
 
 
 def test_get_healthcheck_200(client):
-    response = client.get("/v1/healthcheck")
+    response = client.get("/health")
     assert response.status_code == 200
 
 
@@ -13,5 +13,5 @@ def test_get_healthcheck_503_db_bad_state(client, monkeypatch):
 
     monkeypatch.setattr(app, "db_session", err_method)
 
-    response = client.get("/v1/healthcheck")
+    response = client.get("/health")
     assert response.status_code == 503

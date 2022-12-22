@@ -46,7 +46,7 @@ def validate_param_match(key, request, response, db_record):
         db_val = db_val.isoformat()
 
     if request is not None:
-        assert req_val == response_val
+        assert response_val == req_val
         assert req_val == db_val
 
     assert response_val == db_val
@@ -61,6 +61,7 @@ def test_post_user_201(client, api_auth_token, test_db_session):
     results = test_db_session.query(User).all()
     assert len(results) == 1
     db_record = results[0]
+
     response_record = response.get_json()["data"]
 
     # Verify the request, response and DB model values all match
@@ -90,16 +91,21 @@ def test_post_user_400_missing_required_fields(client, api_auth_token, test_db_s
     response = client.post("/v1/user", json={}, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["errors"]
-    required_fields = ["first_name", "last_name", "phone_number", "date_of_birth", "is_active"]
+    error_list = response.get_json()["detail"]["json"]
+    required_fields = [
+        "first_name",
+        "last_name",
+        "phone_number",
+        "date_of_birth",
+        "is_active",
+        "roles",
+    ]
     assert len(error_list) == len(
         required_fields
     ), f"Errored fields don't match expected for empty request {error_list}"
-    for error in error_list:
-        field, message, error_type = error["field"], error["message"], error["type"]
-        assert field in required_fields
-        assert "Field required" in message
-        assert error_type == "value_error.missing"
+    for key, errors in error_list.items():
+        assert key in required_fields
+        assert "Missing data for required field." in errors
 
     # Nothing added to DB
     results = test_db_session.query(User).all()
@@ -119,26 +125,12 @@ def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["errors"]
-    # We expect the errors to be in a dict like:
-    # {
-    #   'field': 'first_name',
-    #   'message': "1 is not of type 'string'",
-    #   'rule': 'string',
-    #   'type': 'type',
-    #   'value': 'int'
-    # }
-    for error in error_list:
-        field, message, error_type, incorrect_type = (
-            error["field"],
-            error["message"],
-            error["type"],
-            error["value"],
-        )
-        assert field in request
-        assert "is not of type" in message
-        assert error_type == "type"
-        assert incorrect_type == str(type(request[field]).__name__)
+    error_list = response.get_json()["detail"]["json"]
+    # We expect an error list like:
+    # {'date_of_birth': ['Not a valid date.'], ...}
+    for key, errors in error_list.items():
+        assert key in request
+        assert "Not a valid" in errors[0]
 
     # Nothing added to DB
     results = test_db_session.query(User).all()
@@ -152,25 +144,16 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["errors"]
-    # We expect the errors to be in a dict like:
-    # {
-    #   'field': 'roles.0.role',
-    #   'message': "'Mime' is not one of ['User', 'Admin', 'Third Party']",
-    #   'rule': ['User', 'Admin', 'Third Party'],
-    #   'type': 'enum',
-    #   'value': 'Mime'
-    # }
-    for error in error_list:
-        field, message, error_type = (
-            error["field"],
-            error["message"],
-            error["type"],
-        )
+    error_list = response.get_json()["detail"]["json"]
+    # We expect the errors to be like:
+    # {'roles': {'0': {'type': ['Must be one of USER, ADMIN.']}, '1': ...}}
 
-        assert field.startswith("roles.") and field.endswith(".type")
-        assert "is not one of" in message
-        assert error_type == "enum"
+    for key, error_field in error_list["roles"].items():
+        assert key.isnumeric()
+
+        for field, error in error_field.items():
+            assert field == "type"
+            assert "Must be one of: USER, ADMIN." in error[0]
 
 
 def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
@@ -192,6 +175,7 @@ def test_get_user_200(client, api_auth_token, test_db_session, initialize_factor
     assert response.status_code == 200
     response_record = response.get_json()["data"]
 
+    assert response_record["id"] == str(user.id)
     validate_all_match(None, response_record, user)
 
 
@@ -216,7 +200,7 @@ def test_get_user_404_user_not_found(client, api_auth_token, test_db_session):
 
     assert response.status_code == 404
     # Verify the error message
-    assert "Could not find User with ID" in response.get_json()["message"]
+    assert "Could not find user with ID" in response.get_json()["message"]
 
 
 def test_patch_user_200(client, api_auth_token, test_db_session, initialize_factories_session):
@@ -250,6 +234,7 @@ def test_patch_user_200_roles(
     # Add two roles
     request = {"roles": [{"type": "ADMIN"}, {"type": "USER"}]}
     response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+
     assert response.status_code == 200
 
     response_roles = response.get_json()["data"]["roles"]

@@ -1,18 +1,18 @@
 from typing import Optional
 
-from api.db.models.user_models import Role, RoleType, User
+from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.route.models.user import UserPatchParams, UserResponse
 from api.route.route_utils import get_or_404
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
-def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
+# TODO: Use classes / objects as inputs to service methods
+# https://github.com/navapbc/template-application-flask/issues/52
+def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
     user = get_or_404(api_context.db_session, User, user_id)
 
-    request = UserPatchParams.parse_obj(api_context.request_body)
-    for key, value in request.get_set_params():
+    for key, value in patch_data.items():
 
         if key == "roles":
             _handle_role_patch(user, value, api_context)
@@ -26,11 +26,11 @@ def patch_user(user_id: str, api_context: ApiContext) -> UserResponse:
     api_context.db_session.flush()
     api_context.db_session.refresh(user)
 
-    return UserResponse.from_orm(user)
+    return user
 
 
 def _handle_role_patch(
-    user: User, request_role_types: Optional[list[RoleType]], api_context: ApiContext
+    user: User, request_roles: Optional[list[Role]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
@@ -42,7 +42,7 @@ def _handle_role_patch(
     # that explicitly adds or removes a single role for a user at a time.
 
     # Shouldn't be called if None, but makes mypy happy
-    if request_role_types is None:
+    if request_roles is None:
         return
 
     # We'll work with just the role description strings to avoid
@@ -53,7 +53,7 @@ def _handle_role_patch(
     else:
         current_role_types = set()
 
-    request_role_types = set([role.type for role in request_role_types])
+    request_role_types = set([role.type for role in request_roles])
 
     # If they match, do nothing
     if set(current_role_types) == set(request_role_types):
@@ -61,7 +61,7 @@ def _handle_role_patch(
 
     # Figure out which roles need to be deleted and added
     roles_to_delete = current_role_types - request_role_types
-    roles_to_add = request_role_types - current_role_types  # type:ignore
+    roles_to_add = request_role_types - current_role_types
 
     # Go through existing roles and delete the ones that are no longer needed
     if user.roles:
