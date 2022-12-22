@@ -10,8 +10,8 @@ import logging
 import sys
 from typing import Any
 
-import api.util.collections.dict
 import api.logging
+import api.util.collections.dict
 
 logger = api.logging.get_logger(__name__)
 

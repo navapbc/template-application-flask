@@ -15,9 +15,7 @@ def test_audit_hook(caplog):
 
     # Various common cases that should not appear in audit log (normal behaviour & too noisy).
     audit.audit_hook("compile", (b"def _(): pass", "<unknown>"))
-    audit.audit_hook(
-        "open", ("/srv/api/__pycache__/status.cpython-310.pyc", "r", 500010)
-    )
+    audit.audit_hook("open", ("/srv/api/__pycache__/status.cpython-310.pyc", "r", 500010))
     audit.audit_hook("os.chmod", (7, 1, -1))
     audit.audit_hook(
         "open", ("/app/.venv/lib/python3.10/site-packages/pytz/zoneinfo/US/Eastern", "r", 524288)
