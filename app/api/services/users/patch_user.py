@@ -3,9 +3,8 @@ from typing import Optional
 import apiflask
 from sqlalchemy import orm
 
-from api.db.models.user_models import Role, RoleType, User
+from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.route.route_utils import get_or_404
 from api.route.schemas import user_schemas
 
 
@@ -41,7 +40,7 @@ def patch_user(
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[RoleType]], api_context: ApiContext
+    user: User, request_roles: Optional[list[user_schemas.RequestRole]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

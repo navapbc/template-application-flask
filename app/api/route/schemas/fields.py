@@ -1,12 +1,12 @@
 import dataclasses
-from typing import Type
 
-import marshmallow
-
-missing = marshmallow.missing
 
 # Type of `missing` used for type annotations
-Missing = Type[missing]
+class Missing:
+    pass
+
+
+missing = Missing()
 
 
 @dataclasses.dataclass

@@ -1,17 +1,21 @@
 import dataclasses
 from datetime import date
-from typing import Any
 
 import marshmallow
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
-from api.db.models.user_models import Role, RoleType
+from api.db.models.user_models import RoleType
 from api.route.schemas.fields import Missing, RequestModel, missing
 
 ##############
 # Role Models
 ##############
+
+
+@dataclasses.dataclass
+class RequestRole(RequestModel):
+    type: RoleType
 
 
 class RoleSchema(marshmallow.Schema):
@@ -21,9 +25,12 @@ class RoleSchema(marshmallow.Schema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
+    # Note that user_id is not included in the API schema since the role
+    # will always be a nested fields of the API user
+
     @marshmallow.post_load
-    def make_role(self, data: dict, **kwargs: dict[str, Any]) -> Role:
-        return Role(**data)
+    def make_role(self, data: dict, **kwargs: dict) -> RequestRole:
+        return RequestRole(**data)
 
 
 ##############
@@ -39,7 +46,7 @@ class RequestUser(RequestModel):
     phone_number: str | Missing = missing
     date_of_birth: date | Missing = missing
     is_active: bool | Missing = missing
-    roles: list[str] | Missing = missing
+    roles: list[RequestRole] | Missing = missing
 
 
 class UserSchema(marshmallow.Schema):
@@ -68,5 +75,5 @@ class UserSchema(marshmallow.Schema):
     updated_at = fields.DateTime(dump_only=True)
 
     @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict[str, Any]) -> RequestUser:
+    def make_user(self, data: dict, **kwargs: dict) -> RequestUser:
         return RequestUser(**data)
