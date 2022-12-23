@@ -1,3 +1,5 @@
+import dataclasses
+from datetime import date
 from typing import Any
 
 import marshmallow
@@ -5,6 +7,7 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import Role, RoleType
+from api.route.schemas.fields import Missing, RequestModel, missing
 
 ##############
 # Role Models
@@ -26,6 +29,17 @@ class RoleSchema(marshmallow.Schema):
 ##############
 # User Models
 ##############
+
+
+@dataclasses.dataclass
+class RequestUser(RequestModel):
+    first_name: str | Missing = missing
+    middle_name: str | Missing = missing
+    last_name: str | Missing = missing
+    phone_number: str | Missing = missing
+    date_of_birth: date | Missing = missing
+    is_active: bool | Missing = missing
+    roles: list[str] | Missing = missing
 
 
 class UserSchema(marshmallow.Schema):
@@ -52,3 +66,7 @@ class UserSchema(marshmallow.Schema):
     # Output only fields in addition to id field
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
+
+    @marshmallow.post_load
+    def make_user(self, data: dict, **kwargs: dict[str, Any]) -> RequestUser:
+        return RequestUser(**data)
