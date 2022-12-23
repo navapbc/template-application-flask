@@ -280,4 +280,4 @@ def test_patch_user_404_user_not_found(client, api_auth_token, test_db_session):
 
     assert response.status_code == 404
     # Verify the error message
-    assert "Could not find User with ID" in response.get_json()["message"]
+    assert "Could not find user with ID" in response.get_json()["message"]

@@ -1,5 +1,6 @@
 from typing import Optional
 
+import apiflask
 from sqlalchemy import orm
 
 from api.db.models.user_models import Role, RoleType, User
@@ -17,6 +18,11 @@ def patch_user(
 ) -> User:
     # TODO: move this to service and/or persistence layer
     user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+
+    if user is None:
+        # TODO move HTTP related logic out of service layer to controller layer and just return None from here
+        # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
+        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
     for key, value in request_user.as_dict().items():
         if key == "roles":
