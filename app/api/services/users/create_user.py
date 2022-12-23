@@ -1,5 +1,3 @@
-from uuid import uuid4
-
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
 from api.route.schemas import user_schemas
