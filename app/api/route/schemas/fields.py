@@ -33,13 +33,20 @@ class RequestModel:
         Recursively converts nested request models to dictionaries.
         """
 
+        # Convert the request model to a dictionary
         all_fields = dataclasses.asdict(self)
+
         result = {}
         for key, value in all_fields.items():
+            # If value is missing, skip the field
             if value is missing:
                 continue
-            if not isinstance(value, RequestModel):
-                result[key] = value
+
+            # If value is a request model, recursively convert it to a dictionary
+            if isinstance(value, RequestModel):
+                result[key] = value.as_dict()
                 continue
-            result[key] = value.as_dict()
+
+            # Otherwise, copy the field to the result
+            result[key] = value
         return result
