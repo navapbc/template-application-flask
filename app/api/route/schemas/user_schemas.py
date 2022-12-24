@@ -6,7 +6,7 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import RoleType
-from api.route.schemas.fields import Missing, RequestModel, missing
+from api.route.schemas.fields import RequestModel
 
 ##############
 # Role Models
@@ -40,13 +40,19 @@ class RoleSchema(marshmallow.Schema):
 
 @dataclasses.dataclass
 class RequestUser(RequestModel):
-    first_name: str | Missing = missing
-    middle_name: str | Missing = missing
-    last_name: str | Missing = missing
-    phone_number: str | Missing = missing
-    date_of_birth: date | Missing = missing
-    is_active: bool | Missing = missing
-    roles: list[RequestRole] | Missing = missing
+    first_name: str | None = None
+    middle_name: str | None = None
+    last_name: str | None = None
+    phone_number: str | None = None
+    date_of_birth: date | None = None
+    is_active: bool | None = None
+    roles: list[RequestRole] | None = None
+
+
+@dataclasses.dataclass
+class PatchData:
+    user: RequestUser
+    fields_to_patch: list[str]
 
 
 class UserSchema(marshmallow.Schema):

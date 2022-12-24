@@ -12,9 +12,7 @@ from api.route.schemas import user_schemas
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(
-    user_id: str, request_user: user_schemas.RequestUser, api_context: ApiContext
-) -> User:
+def patch_user(user_id: str, patch_data: user_schemas.PatchData, api_context: ApiContext) -> User:
     # TODO: move this to service and/or persistence layer
     user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
@@ -23,7 +21,9 @@ def patch_user(
         # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
         raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
-    for key, value in request_user.as_dict().items():
+    for key in patch_data.fields_to_patch:
+        value = getattr(patch_data.user, key)
+
         if key == "roles":
             _handle_role_patch(user, value, api_context)
             continue

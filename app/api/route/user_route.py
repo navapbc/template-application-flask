@@ -1,5 +1,6 @@
 from typing import Any
 
+import flask
 from apiflask import APIBlueprint
 
 import api.logging as logging
@@ -47,8 +48,15 @@ def user_post(user_input: user_schemas.RequestUser) -> dict:
 def user_patch(user_id: str, request_user: user_schemas.RequestUser) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
+    raw_request_data = flask.request.get_json()
+    assert raw_request_data is not None
+
+    patch_request_user = user_schemas.PatchData(
+        user=request_user, fields_to_patch=raw_request_data.keys()
+    )
+
     with api_context_manager() as api_context:
-        user = user_service.patch_user(user_id, request_user, api_context)
+        user = user_service.patch_user(user_id, patch_request_user, api_context)
 
         logger.info(
             "Successfully patched user",

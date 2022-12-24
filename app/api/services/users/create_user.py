@@ -8,6 +8,14 @@ from api.route.schemas import user_schemas
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
 def create_user(request_user: user_schemas.RequestUser, api_context: ApiContext) -> User:
+    user_schemas.UserSchema().validate(request_user.as_dict())
+    assert request_user.first_name is not None
+    assert request_user.middle_name is not None
+    assert request_user.last_name is not None
+    assert request_user.phone_number is not None
+    assert request_user.date_of_birth is not None
+    assert request_user.is_active is not None
+    assert request_user.roles is not None
     # TODO: move this code to service and/or persistence layer
     user = User(
         first_name=request_user.first_name,
