@@ -9,8 +9,10 @@ from api.route.route_utils import get_or_404
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
+def patch_user(user_id: str, user_input: User, api_context: ApiContext) -> User:
     user = get_or_404(api_context.db_session, User, user_id)
+
+    patch_data = user_input.get_set_params()
 
     for key, value in patch_data.items():
 
