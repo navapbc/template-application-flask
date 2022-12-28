@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from datetime import date
 from typing import Optional
 
@@ -12,28 +13,25 @@ class PatchParamsBase:
     _fields_set: dict = None
 
     def __init__(self, data: dict):
+        print("IN PatchParamsBase __init__")
         self._fields_set = data
 
     def get_set_params(self) -> dict:
         return self._fields_set
 
 
-# TODO: dataclass?
-# TODO: maybe extend User?
+@dataclass
 class UserPatchParams(PatchParamsBase):
-    # TODO: all of these should be Optional, yeah?
-    first_name: str
-    middle_name: Optional[str]
-    last_name: str
-    phone_number: str
-    date_of_birth: date
-    is_active: bool
+    first_name: Optional[str] = None
+    middle_name: Optional[str] = None
+    last_name: Optional[str] = None
+    phone_number: Optional[str] = None
+    date_of_birth: Optional[date] = None
+    is_active: Optional[bool] = None
 
     # TODO: fix this
-    roles: Optional[list["Role"]]
+    roles: Optional[list["Role"]] = None
 
-    def __init__(self, data: dict):
+    def load_stuff(self, data: dict):
+        print("IN UserPatchParams load_stuff")
         super().__init__(data)
-
-        for key, value in data.items():
-            setattr(self, key, value)
