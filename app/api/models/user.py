@@ -5,7 +5,6 @@ class PatchParamsBase:
     _fields_set: dict = None
 
     def __init__(self, **kwargs: dict):
-        print("IN PatchParamsBase __init__")
         self._fields_set = kwargs
 
     def get_set_params(self) -> dict:
