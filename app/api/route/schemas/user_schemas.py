@@ -1,5 +1,6 @@
 import dataclasses
 from datetime import date
+from typing import Any, Mapping
 
 import marshmallow
 from apiflask import fields
@@ -39,7 +40,7 @@ class RoleSchema(marshmallow.Schema):
 
 
 @dataclasses.dataclass
-class RequestUser(RequestModel):
+class CreateRequestUser(RequestModel):
     first_name: str | None = None
     middle_name: str | None = None
     last_name: str | None = None
@@ -50,8 +51,8 @@ class RequestUser(RequestModel):
 
 
 @dataclasses.dataclass
-class PatchData:
-    user: RequestUser
+class PatchRequestUser:
+    user: CreateRequestUser
     fields_to_patch: list[str]
 
 
@@ -80,6 +81,17 @@ class UserSchema(marshmallow.Schema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
+
+class CreateUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict) -> RequestUser:
-        return RequestUser(**data)
+    def make_user(self, data: dict, **kwargs: dict) -> CreateRequestUser:
+        return CreateRequestUser(**data)
+
+
+class PatchUserSchema(UserSchema):
+    @marshmallow.post_load
+    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> PatchRequestUser:
+        return PatchRequestUser(
+            user=CreateRequestUser(**data),
+            fields_to_patch=list(data.keys()),
+        )

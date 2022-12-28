@@ -1,6 +1,5 @@
 from typing import Any
 
-import flask
 from apiflask import APIBlueprint
 
 import api.logging as logging
@@ -18,10 +17,10 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 
 
 @user_blueprint.post("/v1/user")
-@user_blueprint.input(user_schemas.UserSchema)
+@user_blueprint.input(user_schemas.CreateUserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: user_schemas.RequestUser) -> dict:
+def user_post(user_input: user_schemas.CreateRequestUser) -> dict:
     """
     POST /v1/user
     """
@@ -42,18 +41,11 @@ def user_post(user_input: user_schemas.RequestUser) -> dict:
 # Allow partial updates. partial=true means requests that are missing
 # required fields will not be rejected.
 # https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading
-@user_blueprint.input(user_schemas.UserSchema(partial=True))
+@user_blueprint.input(user_schemas.PatchUserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_patch(user_id: str, request_user: user_schemas.RequestUser) -> dict:
+def user_patch(user_id: str, patch_request_user: user_schemas.PatchRequestUser) -> dict:
     logger.info("PATCH /v1/user/:user_id")
-
-    raw_request_data = flask.request.get_json()
-    assert raw_request_data is not None
-
-    patch_request_user = user_schemas.PatchData(
-        user=request_user, fields_to_patch=raw_request_data.keys()
-    )
 
     with api_context_manager() as api_context:
         user = user_service.patch_user(user_id, patch_request_user, api_context)

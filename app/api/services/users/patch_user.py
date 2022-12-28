@@ -12,7 +12,9 @@ from api.route.schemas import user_schemas
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(user_id: str, patch_data: user_schemas.PatchData, api_context: ApiContext) -> User:
+def patch_user(
+    user_id: str, patch_data: user_schemas.PatchRequestUser, api_context: ApiContext
+) -> User:
     # TODO: move this to service and/or persistence layer
     user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
