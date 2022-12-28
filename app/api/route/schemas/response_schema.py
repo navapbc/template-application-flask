@@ -1,4 +1,3 @@
-import marshmallow
 from apiflask import fields
 
 from api.route.schemas import request_schema
