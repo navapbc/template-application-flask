@@ -67,7 +67,4 @@ class UserPatchParamsSchema(UserSchema):
     @marshmallow.post_load
     def make_user_patch_params(self, data: dict, **kwargs: dict[str, Any]) -> UserPatchParams:
         print("IN make_user_patch_params")
-        params = UserPatchParams(**data)
-        params.load_stuff(data)
-
-        return params
+        return UserPatchParams(**data)
