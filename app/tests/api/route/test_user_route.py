@@ -257,6 +257,42 @@ def test_patch_user_200_roles(
     assert set() == set([role["type"] for role in response_roles])
 
 
+def test_patch_user_200_subset(
+    client, api_auth_token, test_db_session, initialize_factories_session
+):
+    user = UserFactory.create(phone_number="111-222-3333")
+
+    request = {"phone_number": "123-456-7890"}
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+
+    assert response.status_code == 200
+
+    results = test_db_session.query(User).all()
+    db_record = results[0]
+
+    # Verify it is the same user that we created
+    assert db_record.id == user.id
+
+    # verify that the phone number was changed, but other data was not
+    assert db_record.phone_number == "123-456-7890"
+    assert db_record.first_name == user.first_name
+
+
+def test_patch_user_400_validation_error(
+    client, api_auth_token, test_db_session, initialize_factories_session
+):
+    user = UserFactory.create()
+
+    # request with an invalid parameter
+    request = {"foo": "bar"}
+
+    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+
+    # throws a validation error
+    assert response.status_code == 400
+    assert "Validation error" in response.text
+
+
 def test_patch_user_401_unauthorized_token(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):
