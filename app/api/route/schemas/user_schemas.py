@@ -5,13 +5,14 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import Role, RoleType
+from api.route.schemas import request_schema
 
 ##############
 # Role Models
 ##############
 
 
-class RoleSchema(marshmallow.Schema):
+class RoleSchema(request_schema.OrderedSchema):
     type = marshmallow_fields.Enum(RoleType, description="The name of the role", by_value=True)
 
     # Output only fields
@@ -28,7 +29,7 @@ class RoleSchema(marshmallow.Schema):
 ##############
 
 
-class UserSchema(marshmallow.Schema):
+class UserSchema(request_schema.OrderedSchema):
     id = fields.UUID(dump_only=True)
     first_name = fields.String(description="The user's first name", required=True)
     middle_name = fields.String(description="The user's middle name")

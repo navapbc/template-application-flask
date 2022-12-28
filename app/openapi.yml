@@ -23,20 +23,26 @@ paths:
                   message:
                     type: string
                     description: The message to return
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   data:
                     $ref: '#/components/schemas/Healthcheck'
                   status_code:
                     type: integer
                     description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Service Unavailable
       tags:
       - Health
       summary: Health
@@ -53,19 +59,19 @@ paths:
                   message:
                     type: string
                     description: The message to return
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   data:
                     $ref: '#/components/schemas/User'
                   status_code:
                     type: integer
                     description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '400':
           content:
@@ -107,19 +113,19 @@ paths:
                   message:
                     type: string
                     description: The message to return
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   data:
                     $ref: '#/components/schemas/User'
                   status_code:
                     type: integer
                     description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '401':
           content:
@@ -155,19 +161,19 @@ paths:
                   message:
                     type: string
                     description: The message to return
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   data:
                     $ref: '#/components/schemas/User'
                   status_code:
                     type: integer
                     description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '400':
           content:
@@ -203,21 +209,21 @@ components:
     ValidationError:
       type: object
       properties:
+        type:
+          type: string
+          description: The type of error
         message:
           type: string
           description: The message to return
         rule:
           type: string
           description: The rule that failed
-        type:
-          type: string
-          description: The type of error
-        value:
-          type: string
-          description: The value that failed
         field:
           type: string
           description: The field that failed
+        value:
+          type: string
+          description: The value that failed
     HTTPError:
       properties:
         detail:
@@ -231,19 +237,32 @@ components:
     Role:
       type: object
       properties:
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
         type:
           description: The name of the role
         created_at:
           type: string
           format: date-time
           readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     User:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
         phone_number:
           type: string
           description: The user's phone number
@@ -253,33 +272,20 @@ components:
           type: string
           format: date
           description: The users date of birth
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        middle_name:
-          type: string
-          description: The user's middle name
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-        last_name:
-          type: string
-          description: The user's last name
+        is_active:
+          type: boolean
+          description: Whether the user is active
         roles:
           type: array
           items:
             $ref: '#/components/schemas/Role'
-        first_name:
+        created_at:
           type: string
-          description: The user's first name
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        user_id:
+          format: date-time
+          readOnly: true
+        updated_at:
           type: string
-          format: uuid
+          format: date-time
           readOnly: true
       required:
       - date_of_birth
@@ -291,6 +297,19 @@ components:
     UserUpdate:
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
         phone_number:
           type: string
           description: The user's phone number
@@ -300,33 +319,20 @@ components:
           type: string
           format: date
           description: The users date of birth
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        middle_name:
-          type: string
-          description: The user's middle name
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-        last_name:
-          type: string
-          description: The user's last name
+        is_active:
+          type: boolean
+          description: Whether the user is active
         roles:
           type: array
           items:
             $ref: '#/components/schemas/Role'
-        first_name:
+        created_at:
           type: string
-          description: The user's first name
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        user_id:
+          format: date-time
+          readOnly: true
+        updated_at:
           type: string
-          format: uuid
+          format: date-time
           readOnly: true
   securitySchemes:
     ApiKeyAuth:
