@@ -9,8 +9,3 @@ class PatchParamsBase:
 
     def get_set_params(self) -> dict:
         return self._fields_set
-
-
-# inherit from PatchParamsBase, to set params in a dict
-class UserPatchParams(PatchParamsBase):
-    pass

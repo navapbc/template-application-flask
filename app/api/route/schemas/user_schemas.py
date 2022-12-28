@@ -5,7 +5,7 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import Role, RoleType, User
-from api.models.user import UserPatchParams
+from api.services.models.user import UserPatchParams
 
 ##############
 # Role Models
