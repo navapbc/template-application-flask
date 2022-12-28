@@ -58,7 +58,7 @@ class UserSchema(marshmallow.Schema):
 class UserPostParamsSchema(UserSchema):
     @marshmallow.post_load
     def make_user_post_params(self, data: dict, **kwargs: dict[str, Any]) -> User:
-        return User.create_from_data(data)
+        return User(**data)
 
 
 # re-use the UserSchema instead of defining those again

@@ -30,20 +30,6 @@ class User(Base, IdMixin, TimestampMixin):
 
     roles: Optional[list["Role"]] = relationship("Role", back_populates="user")
 
-    # TODO: this really should not be in the db model
-    _fields_set: dict = None
-
-    # TODO: define return type
-    # TODO: use __init__
-    def create_from_data(data: dict):
-        user = User(**data)
-        user._fields_set = data
-
-        return user
-
-    def get_set_params(self) -> dict:
-        return self._fields_set
-
 
 class Role(Base, TimestampMixin):
     __tablename__ = "role"
