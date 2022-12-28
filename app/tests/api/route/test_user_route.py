@@ -257,6 +257,7 @@ def test_patch_user_200_roles(
     assert set() == set([role["type"] for role in response_roles])
 
 
+# test that we can use the PATCH endpoint to update just a few fields
 def test_patch_user_200_subset(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):
@@ -278,6 +279,7 @@ def test_patch_user_200_subset(
     assert db_record.first_name == user.first_name
 
 
+# test that invalid JSON input is rejected
 def test_patch_user_400_validation_error(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):

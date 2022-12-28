@@ -1,6 +1,6 @@
 from .base import PatchParamsBase
 
 
-# inherit from PatchParamsBase, to set params in a dict
+# Inherit from PatchParamsBase, to persist the original JSON input
 class UserPatchParams(PatchParamsBase):
     pass

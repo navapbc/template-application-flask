@@ -55,14 +55,16 @@ class UserSchema(marshmallow.Schema):
     updated_at = fields.DateTime(dump_only=True)
 
 
+# Validate input according to the UserSchema
+# and convert input into User
 class UserPostParamsSchema(UserSchema):
     @marshmallow.post_load
     def make_user_post_params(self, data: dict, **kwargs: dict[str, Any]) -> User:
         return User(**data)
 
 
-# re-use the UserSchema instead of defining those again
-# but use a different post_load
+# Validate input according to the UserSchema
+# and convert input into UserPatchParams
 class UserPatchParamsSchema(UserSchema):
     @marshmallow.post_load
     def make_user_patch_params(self, data: dict, **kwargs: dict[str, Any]) -> UserPatchParams:
