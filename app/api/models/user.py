@@ -1,15 +1,26 @@
 from datetime import date
-from typing import Any, Optional
+from typing import Optional
 
-from api.db.models.user_models import Role, RoleType, User
+from api.db.models.user_models import Role
 
 # TODO: add User here
 
+# base class for handling params for PATCH endpoints
+# persist the original JSON dict in _fields_set, so
+# that we can determine which values were set by the user
+class PatchParamsBase:
+    _fields_set: dict = None
 
-# TODO: this should not live here
+    def __init__(self, data: dict):
+        self._fields_set = data
+
+    def get_set_params(self) -> dict:
+        return self._fields_set
+
+
 # TODO: dataclass?
 # TODO: maybe extend User?
-class UserPatchParams:
+class UserPatchParams(PatchParamsBase):
     # TODO: all of these should be Optional, yeah?
     first_name: str
     middle_name: Optional[str]
@@ -21,17 +32,8 @@ class UserPatchParams:
     # TODO: fix this
     roles: Optional[list["Role"]]
 
-    # TODO: this should be hidden somewhere else
-    _fields_set: dict = None
-
     def __init__(self, data: dict):
-        print("IN init")
+        super().__init__(data)
+
         for key, value in data.items():
             setattr(self, key, value)
-
-        self._fields_set = data
-
-    # TODO: this should be hidden somewhere
-    # TODO: add comments
-    def get_set_params(self) -> dict:
-        return self._fields_set
