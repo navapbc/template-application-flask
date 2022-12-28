@@ -8,11 +8,10 @@ from api.route.schemas.user_schemas import UserPatchParams
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
-def patch_user(user_id: str, user_input: UserPatchParams, api_context: ApiContext) -> User:
+def patch_user(user_id: str, params: UserPatchParams, api_context: ApiContext) -> User:
     user = get_or_404(api_context.db_session, User, user_id)
 
-    patch_data = user_input.get_set_params()
-
+    patch_data = params.get_set_params()
     for key, value in patch_data.items():
 
         if key == "roles":
