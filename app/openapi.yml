@@ -20,22 +20,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  status_code:
-                    type: integer
-                    description: The HTTP status code
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   message:
                     type: string
                     description: The message to return
                   data:
                     $ref: '#/components/schemas/Healthcheck'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '503':
           content:
@@ -56,22 +56,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  status_code:
-                    type: integer
-                    description: The HTTP status code
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   message:
                     type: string
                     description: The message to return
                   data:
                     $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '400':
           content:
@@ -92,7 +92,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/User'
+              $ref: '#/components/schemas/CreateUser'
       security:
       - ApiKeyAuth: []
   /v1/user/{user_id}:
@@ -110,22 +110,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  status_code:
-                    type: integer
-                    description: The HTTP status code
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   message:
                     type: string
                     description: The message to return
                   data:
                     $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '401':
           content:
@@ -158,22 +158,22 @@ paths:
               schema:
                 type: object
                 properties:
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  status_code:
-                    type: integer
-                    description: The HTTP status code
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
                   message:
                     type: string
                     description: The message to return
                   data:
                     $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
           description: Successful response
         '400':
           content:
@@ -200,7 +200,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserUpdate'
+              $ref: '#/components/schemas/PatchUserUpdate'
       security:
       - ApiKeyAuth: []
 openapi: 3.0.3
@@ -209,21 +209,21 @@ components:
     ValidationError:
       type: object
       properties:
-        value:
-          type: string
-          description: The value that failed
-        rule:
-          type: string
-          description: The rule that failed
         type:
           type: string
           description: The type of error
         message:
           type: string
           description: The message to return
+        rule:
+          type: string
+          description: The rule that failed
         field:
           type: string
           description: The field that failed
+        value:
+          type: string
+          description: The value that failed
     HTTPError:
       properties:
         detail:
@@ -247,41 +247,41 @@ components:
           type: string
           format: date-time
           readOnly: true
-    User:
+    CreateUser:
       type: object
       properties:
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
-        middle_name:
+        id:
           type: string
-          description: The user's middle name
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        created_at:
-          type: string
-          format: date-time
+          format: uuid
           readOnly: true
-        date_of_birth:
-          type: string
-          format: date
-          description: The users date of birth
         first_name:
           type: string
           description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
         phone_number:
           type: string
           description: The user's phone number
           example: 123-456-7890
           pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-        last_name:
+        date_of_birth:
           type: string
-          description: The user's last name
-        id:
+          format: date
+          description: The users date of birth
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        created_at:
           type: string
-          format: uuid
+          format: date-time
           readOnly: true
         updated_at:
           type: string
@@ -294,41 +294,88 @@ components:
       - last_name
       - phone_number
       - roles
-    UserUpdate:
+    User:
       type: object
       properties:
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
-        middle_name:
+        id:
           type: string
-          description: The user's middle name
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        created_at:
-          type: string
-          format: date-time
+          format: uuid
           readOnly: true
-        date_of_birth:
-          type: string
-          format: date
-          description: The users date of birth
         first_name:
           type: string
           description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
         phone_number:
           type: string
           description: The user's phone number
           example: 123-456-7890
           pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-        last_name:
+        date_of_birth:
           type: string
-          description: The user's last name
+          format: date
+          description: The users date of birth
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - date_of_birth
+      - first_name
+      - is_active
+      - last_name
+      - phone_number
+      - roles
+    PatchUserUpdate:
+      type: object
+      properties:
         id:
           type: string
           format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
+        phone_number:
+          type: string
+          description: The user's phone number
+          example: 123-456-7890
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          format: date-time
           readOnly: true
         updated_at:
           type: string

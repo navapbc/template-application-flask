@@ -7,7 +7,7 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import RoleType
-from api.route.schemas.request_schema import RequestModel
+from api.route.schemas import request_schema
 
 ##############
 # Role Models
@@ -15,11 +15,11 @@ from api.route.schemas.request_schema import RequestModel
 
 
 @dataclasses.dataclass
-class RequestRole(RequestModel):
+class RequestRole(request_schema.RequestModel):
     type: RoleType
 
 
-class RoleSchema(marshmallow.Schema):
+class RoleSchema(request_schema.OrderedSchema):
     type = marshmallow_fields.Enum(RoleType, description="The name of the role", by_value=True)
 
     # Output only fields
@@ -40,7 +40,7 @@ class RoleSchema(marshmallow.Schema):
 
 
 @dataclasses.dataclass
-class CreateRequestUser(RequestModel):
+class CreateRequestUser(request_schema.RequestModel):
     first_name: str | None = None
     middle_name: str | None = None
     last_name: str | None = None
@@ -56,7 +56,7 @@ class PatchRequestUser:
     fields_to_patch: list[str]
 
 
-class UserSchema(marshmallow.Schema):
+class UserSchema(request_schema.OrderedSchema):
     id = fields.UUID(dump_only=True)
     first_name = fields.String(description="The user's first name", required=True)
     middle_name = fields.String(description="The user's middle name")
