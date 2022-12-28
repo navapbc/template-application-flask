@@ -2,7 +2,7 @@
 # persist the original JSON dict in _fields_set, so
 # that we can determine which values were set by the user
 class PatchParamsBase:
-    _fields_set: dict = None
+    _fields_set: dict = {}
 
     def __init__(self, **kwargs: dict):
         self._fields_set = kwargs
