@@ -21,14 +21,14 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 @user_blueprint.input(user_schemas.CreateUserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: users.CreateRequestUser) -> dict:
+def user_post(user_params: users.CreateUserParams) -> dict:
     """
     POST /v1/user
     """
     logger.info("POST /v1/user")
 
     with api_context_manager() as api_context:
-        user = user_service.create_user(user_input, api_context)
+        user = user_service.create_user(user_params, api_context)
 
         logger.info(
             "Successfully inserted user",
@@ -45,11 +45,11 @@ def user_post(user_input: users.CreateRequestUser) -> dict:
 @user_blueprint.input(user_schemas.PatchUserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_patch(user_id: str, patch_request_user: users.PatchRequestUser) -> dict:
+def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:
-        user = user_service.patch_user(user_id, patch_request_user, api_context)
+        user = user_service.patch_user(user_id, patch_user_params, api_context)
 
         logger.info(
             "Successfully patched user",

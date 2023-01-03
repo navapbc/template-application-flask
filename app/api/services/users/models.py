@@ -11,7 +11,7 @@ class RequestRole:
 
 
 @dataclasses.dataclass
-class CreateRequestUser:
+class CreateUserParams:
     first_name: str | None = None
     middle_name: str | None = None
     last_name: str | None = None
@@ -21,4 +21,4 @@ class CreateRequestUser:
     roles: list[RequestRole] | None = None
 
 
-PatchRequestUser = patch_params.PatchParams[CreateRequestUser]
+PatchUserParams = patch_params.PatchParams[CreateUserParams]

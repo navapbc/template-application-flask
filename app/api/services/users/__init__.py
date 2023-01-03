@@ -5,13 +5,13 @@ from .get_user import get_user
 from .patch_user import patch_user
 
 # Re-export models
-CreateRequestUser = models.CreateRequestUser
-PatchRequestUser = models.PatchRequestUser
+CreateUserParams = models.CreateUserParams
+PatchUserParams = models.PatchUserParams
 RequestRole = models.RequestRole
 
 __all__ = [
-    "CreateRequestUser",
-    "PatchRequestUser",
+    "CreateUserParams",
+    "PatchUserParams",
     "RequestRole",
     "create_user",
     "get_user",

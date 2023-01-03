@@ -61,14 +61,14 @@ class UserSchema(request_schema.OrderedSchema):
 
 class CreateUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict) -> users.CreateRequestUser:
-        return users.CreateRequestUser(**data)
+    def make_user(self, data: dict, **kwargs: dict) -> users.CreateUserParams:
+        return users.CreateUserParams(**data)
 
 
 class PatchUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> users.PatchRequestUser:
-        return users.PatchRequestUser(
-            resource=users.CreateRequestUser(**data),
+    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> users.PatchUserParams:
+        return users.PatchUserParams(
+            resource=users.CreateUserParams(**data),
             fields_to_patch=list(data.keys()),
         )
