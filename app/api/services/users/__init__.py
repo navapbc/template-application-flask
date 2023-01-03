@@ -7,12 +7,12 @@ from .patch_user import patch_user
 # Re-export models
 CreateUserParams = models.CreateUserParams
 PatchUserParams = models.PatchUserParams
-RequestRole = models.RequestRole
+RoleParams = models.RoleParams
 
 __all__ = [
     "CreateUserParams",
     "PatchUserParams",
-    "RequestRole",
+    "RoleParams",
     "create_user",
     "get_user",
     "patch_user",

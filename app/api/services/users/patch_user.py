@@ -42,7 +42,7 @@ def patch_user(
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[models.RequestRole]], api_context: ApiContext
+    user: User, request_roles: Optional[list[models.RoleParams]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

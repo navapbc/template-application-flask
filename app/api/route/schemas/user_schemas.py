@@ -4,7 +4,7 @@ import marshmallow
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
-from api.db.models.user_models import RoleType
+from api.db.models import user_models
 from api.route.schemas import request_schema
 from api.services import users
 
@@ -14,7 +14,9 @@ from api.services import users
 
 
 class RoleSchema(request_schema.OrderedSchema):
-    type = marshmallow_fields.Enum(RoleType, description="The name of the role", by_value=True)
+    type = marshmallow_fields.Enum(
+        user_models.RoleType, description="The name of the role", by_value=True
+    )
 
     # Output only fields
     created_at = fields.DateTime(dump_only=True)
@@ -24,8 +26,8 @@ class RoleSchema(request_schema.OrderedSchema):
     # will always be a nested fields of the API user
 
     @marshmallow.post_load
-    def make_role(self, data: dict, **kwargs: dict) -> users.RequestRole:
-        return users.RequestRole(**data)
+    def make_role(self, data: dict, **kwargs: dict) -> users.RoleParams:
+        return users.RoleParams(**data)
 
 
 ##############

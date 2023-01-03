@@ -6,7 +6,7 @@ from api.services.core import patch_params
 
 
 @dataclasses.dataclass
-class RequestRole:
+class RoleParams:
     type: user_models.RoleType
 
 
@@ -18,7 +18,7 @@ class CreateUserParams:
     phone_number: str | None = None
     date_of_birth: date | None = None
     is_active: bool | None = None
-    roles: list[RequestRole] | None = None
+    roles: list[RoleParams] | None = None
 
 
 PatchUserParams = patch_params.PatchParams[CreateUserParams]
