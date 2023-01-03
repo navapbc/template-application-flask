@@ -69,6 +69,6 @@ class PatchUserSchema(UserSchema):
     @marshmallow.post_load
     def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> users.PatchRequestUser:
         return users.PatchRequestUser(
-            user=users.CreateRequestUser(**data),
+            resource=users.CreateRequestUser(**data),
             fields_to_patch=list(data.keys()),
         )

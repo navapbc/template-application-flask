@@ -22,7 +22,7 @@ def patch_user(user_id: str, patch_data: models.PatchRequestUser, api_context: A
         raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
     for key in patch_data.fields_to_patch:
-        value = getattr(patch_data.user, key)
+        value = getattr(patch_data.resource, key)
 
         if key == "roles":
             _handle_role_patch(user, value, api_context)

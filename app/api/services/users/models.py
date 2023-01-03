@@ -2,6 +2,7 @@ import dataclasses
 from datetime import date
 
 from api.db.models import user_models
+from api.services.core import patch_params
 
 
 @dataclasses.dataclass
@@ -20,7 +21,4 @@ class CreateRequestUser:
     roles: list[RequestRole] | None = None
 
 
-@dataclasses.dataclass
-class PatchRequestUser:
-    user: CreateRequestUser
-    fields_to_patch: list[str]
+PatchRequestUser = patch_params.PatchParams[CreateRequestUser]
