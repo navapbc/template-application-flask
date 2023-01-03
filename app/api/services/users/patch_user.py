@@ -5,16 +5,14 @@ from sqlalchemy import orm
 
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.route.schemas import user_schemas
+from api.services.users import models
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(
-    user_id: str, patch_data: user_schemas.PatchRequestUser, api_context: ApiContext
-) -> User:
+def patch_user(user_id: str, patch_data: models.PatchRequestUser, api_context: ApiContext) -> User:
     # TODO: move this to service and/or persistence layer
     user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
@@ -42,7 +40,7 @@ def patch_user(
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[user_schemas.RequestRole]], api_context: ApiContext
+    user: User, request_roles: Optional[list[models.RequestRole]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:

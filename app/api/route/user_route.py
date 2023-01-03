@@ -9,6 +9,7 @@ from api.db.models.user_models import User
 from api.route import response
 from api.route.api_context import api_context_manager
 from api.route.schemas import user_schemas
+from api.services import users
 
 logger = logging.get_logger(__name__)
 
@@ -20,7 +21,7 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 @user_blueprint.input(user_schemas.CreateUserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: user_schemas.CreateRequestUser) -> dict:
+def user_post(user_input: users.CreateRequestUser) -> dict:
     """
     POST /v1/user
     """
@@ -44,7 +45,7 @@ def user_post(user_input: user_schemas.CreateRequestUser) -> dict:
 @user_blueprint.input(user_schemas.PatchUserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_patch(user_id: str, patch_request_user: user_schemas.PatchRequestUser) -> dict:
+def user_patch(user_id: str, patch_request_user: users.PatchRequestUser) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:

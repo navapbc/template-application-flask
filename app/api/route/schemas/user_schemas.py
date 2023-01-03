@@ -1,5 +1,3 @@
-import dataclasses
-from datetime import date
 from typing import Any, Mapping
 
 import marshmallow
@@ -8,15 +6,11 @@ from marshmallow import fields as marshmallow_fields
 
 from api.db.models.user_models import RoleType
 from api.route.schemas import request_schema
+from api.services import users
 
 ##############
 # Role Models
 ##############
-
-
-@dataclasses.dataclass
-class RequestRole(request_schema.RequestModel):
-    type: RoleType
 
 
 class RoleSchema(request_schema.OrderedSchema):
@@ -30,30 +24,13 @@ class RoleSchema(request_schema.OrderedSchema):
     # will always be a nested fields of the API user
 
     @marshmallow.post_load
-    def make_role(self, data: dict, **kwargs: dict) -> RequestRole:
-        return RequestRole(**data)
+    def make_role(self, data: dict, **kwargs: dict) -> users.RequestRole:
+        return users.RequestRole(**data)
 
 
 ##############
 # User Models
 ##############
-
-
-@dataclasses.dataclass
-class CreateRequestUser(request_schema.RequestModel):
-    first_name: str | None = None
-    middle_name: str | None = None
-    last_name: str | None = None
-    phone_number: str | None = None
-    date_of_birth: date | None = None
-    is_active: bool | None = None
-    roles: list[RequestRole] | None = None
-
-
-@dataclasses.dataclass
-class PatchRequestUser:
-    user: CreateRequestUser
-    fields_to_patch: list[str]
 
 
 class UserSchema(request_schema.OrderedSchema):
@@ -84,14 +61,14 @@ class UserSchema(request_schema.OrderedSchema):
 
 class CreateUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict) -> CreateRequestUser:
-        return CreateRequestUser(**data)
+    def make_user(self, data: dict, **kwargs: dict) -> users.CreateRequestUser:
+        return users.CreateRequestUser(**data)
 
 
 class PatchUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> PatchRequestUser:
-        return PatchRequestUser(
-            user=CreateRequestUser(**data),
+    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> users.PatchRequestUser:
+        return users.PatchRequestUser(
+            user=users.CreateRequestUser(**data),
             fields_to_patch=list(data.keys()),
         )

@@ -1,16 +1,13 @@
-import dataclasses
-
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.route.schemas import user_schemas
+from api.services.users import models
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def create_user(request_user: user_schemas.CreateRequestUser, api_context: ApiContext) -> User:
-    user_schemas.UserSchema().validate(dataclasses.asdict(request_user))
+def create_user(request_user: models.CreateRequestUser, api_context: ApiContext) -> User:
     assert request_user.first_name is not None
     assert request_user.middle_name is not None
     assert request_user.last_name is not None
