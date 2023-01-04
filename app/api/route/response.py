@@ -1,11 +1,11 @@
-from dataclasses import asdict, dataclass
-from typing import Any, Optional, Type
+import dataclasses
+from typing import Optional
 
-import flask
-from werkzeug.exceptions import HTTPException
+from api.db.models.base import Base
+from api.route.schemas import response_schema
 
 
-@dataclass
+@dataclasses.dataclass
 class ValidationErrorDetail:
     type: str
     message: str = ""
@@ -28,54 +28,21 @@ class ValidationException(Exception):
         self.data = data or {}
 
 
-@dataclass
-class Response:
-    status_code: int
+@dataclasses.dataclass
+class ApiResponse:
+    """Base response model for all API responses."""
+
     message: str
-    data: None | dict | list[dict]
-    warnings: Optional[list[ValidationErrorDetail]] = None
-    errors: Optional[list[ValidationErrorDetail]] = None
+    data: Optional[Base] = None
+    warnings: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
+    errors: list[ValidationErrorDetail] = dataclasses.field(default_factory=list)
 
-    def to_dict(self) -> dict[str, Any]:
-        return exclude_none(asdict(self))
-
-    def to_api_response(self) -> flask.Response:
-        return flask.make_response(flask.jsonify(self.to_dict()), self.status_code)
-
-
-def exclude_none(obj: Any) -> Any:
-    if not isinstance(obj, dict):
-        return obj
-    clean = {}
-    for k, v in obj.items():
-        if "data" == k:  # defer none exclusion of data payload to service layer
-            clean[k] = v
-        elif isinstance(v, dict):
-            nested = exclude_none(v)
-            if len(nested.keys()) > 0:
-                clean[k] = nested
-        elif isinstance(v, list):
-            clean[k] = list(map(exclude_none, v))
-        elif v is not None:
-            clean[k] = v
-    return clean
-
-
-def success_response(
-    message: str,
-    data: None | dict | list[dict] = None,
-    warnings: Optional[list[ValidationErrorDetail]] = None,
-    status_code: int = 200,
-) -> Response:
-    return Response(status_code=status_code, message=message, data=data, warnings=warnings)
-
-
-def error_response(
-    status_code: HTTPException | Type[HTTPException],
-    message: str,
-    errors: list[ValidationErrorDetail],
-    data: Optional[dict | list[dict]] = None,
-    warnings: Optional[list[ValidationErrorDetail]] = None,
-) -> Response:
-    code = status_code.code if status_code.code is not None else 400
-    return Response(status_code=code, message=message, errors=errors, data=data, warnings=warnings)
+    # This method is used to convert ApiResponse objects to a dictionary
+    # This is necessary because APIFlask has a bug that causes an exception to be
+    # thrown when returning objects from routes when BASE_RESPONSE_SCHEMA is set
+    # (See https://github.com/apiflask/apiflask/issues/384)
+    # Once that issue is fixed, this method can be removed and routes can simply
+    # return ApiResponse objects directly and allow APIFlask to serealize the objects
+    # to JSON automatically.
+    def asdict(self) -> dict:
+        return response_schema.ResponseSchema().dump(self)

@@ -134,7 +134,7 @@ def test_log_message_during_request(app, test_db_session):
     api.logging.init("test_logging_method")
     logger = api.logging.get_logger("api.logging.test_logging")
 
-    with catch_logs(level=logging.INFO, logger=logger) as handler, app.app.test_request_context(
+    with catch_logs(level=logging.INFO, logger=logger) as handler, app.test_request_context(
         "/fake-endpoint?name=Bob"
     ):
         g.db = test_db_session
