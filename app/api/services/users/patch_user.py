@@ -1,3 +1,5 @@
+import dataclasses
+from datetime import date
 from typing import Optional
 
 import apiflask
@@ -5,16 +7,26 @@ from sqlalchemy import orm
 
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.services.users import models
+from api.services.core.patch_params import Missing, fields_to_patch, missing
+from api.services.users.create_user import RoleParams
+
+
+@dataclasses.dataclass
+class PatchUserParams:
+    first_name: str | Missing = missing
+    middle_name: str | Missing = missing
+    last_name: str | Missing = missing
+    phone_number: str | Missing = missing
+    date_of_birth: date | Missing = missing
+    is_active: bool | Missing = missing
+    roles: list[RoleParams] | Missing = missing
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(
-    user_id: str, patch_user_params: models.PatchUserParams, api_context: ApiContext
-) -> User:
+def patch_user(user_id: str, patch_user_params: PatchUserParams, api_context: ApiContext) -> User:
     # TODO: move this to service and/or persistence layer
     user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
@@ -23,9 +35,7 @@ def patch_user(
         # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
         raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
-    for key in patch_user_params.fields_to_patch:
-        value = getattr(patch_user_params.resource, key)
-
+    for key, value in fields_to_patch(patch_user_params):
         if key == "roles":
             _handle_role_patch(user, value, api_context)
             continue
@@ -42,7 +52,7 @@ def patch_user(
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[models.RoleParams]], api_context: ApiContext
+    user: User, request_roles: Optional[list[RoleParams]], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
