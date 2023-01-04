@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+from typing import Any
 
 import marshmallow
 from apiflask import fields
@@ -69,7 +69,7 @@ class CreateUserSchema(UserSchema):
 
 class PatchUserSchema(UserSchema):
     @marshmallow.post_load
-    def make_user(self, data: Mapping[str, Any], **kwargs: dict) -> users.PatchUserParams:
+    def make_user(self, data: dict[str, Any], **kwargs: dict) -> users.PatchUserParams:
         return users.PatchUserParams(
             resource=users.CreateUserParams(**data),
             fields_to_patch=list(data.keys()),
