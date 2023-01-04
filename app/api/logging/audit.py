@@ -11,7 +11,7 @@ import sys
 from typing import Any
 
 import api.logging
-import api.util.collections.dict
+import api.util.collections
 
 logger = api.logging.get_logger(__name__)
 
@@ -46,12 +46,13 @@ def audit_hook(event_name: str, args: tuple[Any, ...]) -> None:
     if event_name in IGNORE_AUDIT_EVENTS:
         return
     if event_name == "open" and isinstance(args[0], str) and "/__pycache__/" in args[0]:
+        # Python has a high rate of these events in normal operation.
         return
     if event_name == "os.chmod" and type(args[0]) is int:
         # Gunicorn generates a high volume of these events in normal operation (see workertmp.py)
         return
-    # Disable audit log for timezone files.
     if event_name == "open" and isinstance(args[0], str) and "/pytz/" in args[0]:
+        # The pytz module generates a high volume of these events in normal operation.
         return
 
     audit_log(event_name, args)
@@ -68,4 +69,4 @@ def audit_log(event_name: str, args: tuple[Any, ...]) -> None:
         logger.log(AUDIT, event_name, extra=extra)
 
 
-audit_message_count = api.util.collections.dict.LeastRecentlyUsedDict()
+audit_message_count = api.util.collections.LeastRecentlyUsedDict()
