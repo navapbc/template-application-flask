@@ -1,25 +1,22 @@
-import dataclasses
 from datetime import date
-from typing import Optional
+from typing import TypedDict
 
 import apiflask
 from sqlalchemy import orm
 
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.services.core.patch_params import Missing, fields_to_patch, missing
 from api.services.users.create_user import RoleParams
 
 
-@dataclasses.dataclass
-class PatchUserParams:
-    first_name: str | Missing = missing
-    middle_name: str | Missing = missing
-    last_name: str | Missing = missing
-    phone_number: str | Missing = missing
-    date_of_birth: date | Missing = missing
-    is_active: bool | Missing = missing
-    roles: list[RoleParams] | Missing = missing
+class PatchUserParams(TypedDict, total=False):
+    first_name: str
+    middle_name: str
+    last_name: str
+    phone_number: str
+    date_of_birth: date
+    is_active: bool
+    roles: list[RoleParams]
 
 
 # TODO: separate controller and service concerns
@@ -35,9 +32,9 @@ def patch_user(user_id: str, patch_user_params: PatchUserParams, api_context: Ap
         # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
         raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
-    for key, value in fields_to_patch(patch_user_params):
+    for key, value in patch_user_params.items():
         if key == "roles":
-            _handle_role_patch(user, value, api_context)
+            _handle_role_patch(user, patch_user_params["roles"], api_context)
             continue
 
         setattr(user, key, value)
@@ -52,7 +49,7 @@ def patch_user(user_id: str, patch_user_params: PatchUserParams, api_context: Ap
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[RoleParams]], api_context: ApiContext
+    user: User, request_roles: list[RoleParams], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
@@ -63,10 +60,6 @@ def _handle_role_patch(
     # In a more thorough system, it might make sense to make a patch endpoint
     # that explicitly adds or removes a single role for a user at a time.
 
-    # Shouldn't be called if None, but makes mypy happy
-    if request_roles is None:
-        return
-
     # We'll work with just the role description strings to avoid
     # comparing nested objects and values. As roles are unique in the
     # DB per user, any deduplicating this does is fine.
@@ -75,7 +68,7 @@ def _handle_role_patch(
     else:
         current_role_types = set()
 
-    request_role_types = set([role.type for role in request_roles])
+    request_role_types = set([role["type"] for role in request_roles])
 
     # If they match, do nothing
     if set(current_role_types) == set(request_role_types):
