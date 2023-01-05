@@ -17,10 +17,10 @@ user_blueprint = APIBlueprint("user", __name__, tag="User")
 
 
 @user_blueprint.post("/v1/user")
-@user_blueprint.input(user_schemas.UserSchema)
+@user_blueprint.input(user_schemas.UserPostParamsSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-def user_post(user_input: dict) -> dict:
+def user_post(user_input: User) -> dict:
     """
     POST /v1/user
     """
@@ -41,10 +41,10 @@ def user_post(user_input: dict) -> dict:
 # Allow partial updates. partial=true means requests that are missing
 # required fields will not be rejected.
 # https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading
-@user_blueprint.input(user_schemas.UserSchema(partial=True))
+@user_blueprint.input(user_schemas.UserPatchParamsSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-def user_patch(user_id: str, user_patch_params: dict) -> dict:
+def user_patch(user_id: str, user_patch_params: user_schemas.UserPatchParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
     with api_context_manager() as api_context:

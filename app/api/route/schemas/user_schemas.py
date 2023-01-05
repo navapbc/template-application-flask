@@ -4,7 +4,8 @@ import marshmallow
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
-from api.db.models.user_models import Role, RoleType
+from api.db.models.user_models import Role, RoleType, User
+from api.services.models.user import UserPatchParams
 
 ##############
 # Role Models
@@ -52,3 +53,19 @@ class UserSchema(marshmallow.Schema):
     # Output only fields in addition to id field
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
+
+
+# Validate input according to the UserSchema
+# and convert input into User
+class UserPostParamsSchema(UserSchema):
+    @marshmallow.post_load
+    def make_user_post_params(self, data: dict, **kwargs: dict[str, Any]) -> User:
+        return User(**data)
+
+
+# Validate input according to the UserSchema
+# and convert input into UserPatchParams
+class UserPatchParamsSchema(UserSchema):
+    @marshmallow.post_load
+    def make_user_patch_params(self, data: dict, **kwargs: dict[str, Any]) -> UserPatchParams:
+        return UserPatchParams(**data)
