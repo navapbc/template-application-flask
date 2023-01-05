@@ -1,18 +1,16 @@
-import dataclasses
 from datetime import date
+from typing import TypedDict
 
 from api.db.models import user_models
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
 
 
-@dataclasses.dataclass
-class RoleParams:
+class RoleParams(TypedDict):
     type: user_models.RoleType
 
 
-@dataclasses.dataclass
-class CreateUserParams:
+class CreateUserParams(TypedDict):
     first_name: str
     middle_name: str
     last_name: str
@@ -27,22 +25,15 @@ class CreateUserParams:
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
 def create_user(user_params: CreateUserParams, api_context: ApiContext) -> User:
-    assert user_params.first_name is not None
-    assert user_params.middle_name is not None
-    assert user_params.last_name is not None
-    assert user_params.phone_number is not None
-    assert user_params.date_of_birth is not None
-    assert user_params.is_active is not None
-    assert user_params.roles is not None
     # TODO: move this code to service and/or persistence layer
     user = User(
-        first_name=user_params.first_name,
-        middle_name=user_params.middle_name,
-        last_name=user_params.last_name,
-        phone_number=user_params.phone_number,
-        date_of_birth=user_params.date_of_birth,
-        is_active=user_params.is_active,
-        roles=[Role(type=role.type) for role in user_params.roles],
+        first_name=user_params["first_name"],
+        middle_name=user_params["middle_name"],
+        last_name=user_params["last_name"],
+        phone_number=user_params["phone_number"],
+        date_of_birth=user_params["date_of_birth"],
+        is_active=user_params["is_active"],
+        roles=[Role(type=role["type"]) for role in user_params["roles"]],
     )
     api_context.db_session.add(user)
     api_context.db_session.flush()

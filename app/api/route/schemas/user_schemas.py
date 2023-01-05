@@ -1,10 +1,8 @@
-import marshmallow
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models import user_models
 from api.route.schemas import request_schema
-from api.services import users
 
 ##############
 # Role Models
@@ -22,10 +20,6 @@ class RoleSchema(request_schema.OrderedSchema):
 
     # Note that user_id is not included in the API schema since the role
     # will always be a nested fields of the API user
-
-    @marshmallow.post_load
-    def make_role(self, data: dict, **kwargs: dict) -> users.RoleParams:
-        return users.RoleParams(**data)
 
 
 ##############
@@ -57,15 +51,3 @@ class UserSchema(request_schema.OrderedSchema):
     # Output only fields in addition to id field
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
-
-
-class CreateUserSchema(UserSchema):
-    @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict) -> users.CreateUserParams:
-        return users.CreateUserParams(**data)
-
-
-class PatchUserSchema(UserSchema):
-    @marshmallow.post_load
-    def make_user(self, data: dict, **kwargs: dict) -> users.PatchUserParams:
-        return users.PatchUserParams(**data)
