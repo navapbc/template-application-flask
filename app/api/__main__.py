@@ -7,6 +7,7 @@
 
 import api.app
 import api.logging
+import api.logging.audit
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
@@ -17,6 +18,7 @@ def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
+    api.logging.audit.init_security_logging()
     api.logging.init(__package__)
     logger.info("Running API Application")
 
