@@ -91,72 +91,63 @@ def test_create_and_get_user(client, api_auth_token, roles):
     assert_dict_subset(request, get_response_data)
 
 
-def test_post_user_400_missing_required_fields(client, api_auth_token, test_db_session):
-    # Send an empty post - should fail validation
-    response = client.post("/v1/user", json={}, headers={"X-Auth": api_auth_token})
+@pytest.mark.parametrize(
+    "request_data,expected_response_data",
+    [
+        (
+            {},
+            {
+                "first_name": ["Missing data for required field."],
+                "last_name": ["Missing data for required field."],
+                "phone_number": ["Missing data for required field."],
+                "date_of_birth": ["Missing data for required field."],
+                "is_active": ["Missing data for required field."],
+                "roles": ["Missing data for required field."],
+            },
+        ),
+        (
+            {
+                "first_name": 1,
+                "middle_name": 2,
+                "last_name": 3,
+                "date_of_birth": 4,
+                "phone_number": 5,
+                "is_active": 6,
+                "roles": 7,
+            },
+            {
+                "first_name": ["Not a valid string."],
+                "middle_name": ["Not a valid string."],
+                "last_name": ["Not a valid string."],
+                "phone_number": ["Not a valid string."],
+                "date_of_birth": ["Not a valid date."],
+                "is_active": ["Not a valid boolean."],
+                "roles": ["Not a valid list."],
+            },
+        ),
+        (
+            base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
+            {
+                "roles": {
+                    "0": {"type": ["Must be one of: USER, ADMIN."]},
+                    "1": {"type": ["Must be one of: USER, ADMIN."]},
+                }
+            },
+        ),
+    ],
+)
+def test_create_user_bad_request(
+    client, api_auth_token, test_db_session, request_data, expected_response_data
+):
+    response = client.post("/v1/user", json=request_data, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    errors = response.get_json()["detail"]["json"]
-    expected_errors = {
-        "first_name": ["Missing data for required field."],
-        "last_name": ["Missing data for required field."],
-        "phone_number": ["Missing data for required field."],
-        "date_of_birth": ["Missing data for required field."],
-        "is_active": ["Missing data for required field."],
-        "roles": ["Missing data for required field."],
-    }
-    assert errors == expected_errors
+    response_data = response.get_json()["detail"]["json"]
+    assert response_data == expected_response_data
 
     # Nothing added to DB
     results = test_db_session.query(User).all()
     assert len(results) == 0
-
-
-def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
-    request = {
-        "first_name": 1,
-        "middle_name": 2,
-        "last_name": 3,
-        "date_of_birth": 4,
-        "phone_number": 5,
-        "is_active": 6,
-        "roles": 7,
-    }
-    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 400
-
-    errors = response.get_json()["detail"]["json"]
-    expected_errors = {
-        "first_name": ["Not a valid string."],
-        "middle_name": ["Not a valid string."],
-        "last_name": ["Not a valid string."],
-        "phone_number": ["Not a valid string."],
-        "date_of_birth": ["Not a valid date."],
-        "is_active": ["Not a valid boolean."],
-        "roles": ["Not a valid list."],
-    }
-    assert errors == expected_errors
-
-    # Nothing added to DB
-    results = test_db_session.query(User).all()
-    assert len(results) == 0
-
-
-def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
-    # Make the role a disallowed one
-    request = base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]}
-
-    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 400
-
-    errors = response.get_json()["detail"]["json"]
-    expected_errors = {
-        "roles": {
-            "0": {"type": ["Must be one of: USER, ADMIN."]},
-            "1": {"type": ["Must be one of: USER, ADMIN."]},
-        }
-    }
-    assert errors == expected_errors
 
 
 def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
