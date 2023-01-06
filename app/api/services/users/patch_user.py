@@ -1,21 +1,40 @@
-from typing import Optional
+from datetime import date
+from typing import TypedDict
+
+import apiflask
+from sqlalchemy import orm
 
 from api.db.models.user_models import Role, User
 from api.route.api_context import ApiContext
-from api.route.route_utils import get_or_404
+from api.services.users.create_user import RoleParams
+
+
+class PatchUserParams(TypedDict, total=False):
+    first_name: str
+    middle_name: str
+    last_name: str
+    phone_number: str
+    date_of_birth: date
+    is_active: bool
+    roles: list[RoleParams]
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
-    user = get_or_404(api_context.db_session, User, user_id)
+def patch_user(user_id: str, patch_user_params: PatchUserParams, api_context: ApiContext) -> User:
+    # TODO: move this to service and/or persistence layer
+    user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
-    for key, value in patch_data.items():
+    if user is None:
+        # TODO move HTTP related logic out of service layer to controller layer and just return None from here
+        # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
+        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
+    for key, value in patch_user_params.items():
         if key == "roles":
-            _handle_role_patch(user, value, api_context)
+            _handle_role_patch(user, patch_user_params["roles"], api_context)
             continue
 
         setattr(user, key, value)
@@ -30,7 +49,7 @@ def patch_user(user_id: str, patch_data: dict, api_context: ApiContext) -> User:
 
 
 def _handle_role_patch(
-    user: User, request_roles: Optional[list[Role]], api_context: ApiContext
+    user: User, request_roles: list[RoleParams], api_context: ApiContext
 ) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
@@ -41,10 +60,6 @@ def _handle_role_patch(
     # In a more thorough system, it might make sense to make a patch endpoint
     # that explicitly adds or removes a single role for a user at a time.
 
-    # Shouldn't be called if None, but makes mypy happy
-    if request_roles is None:
-        return
-
     # We'll work with just the role description strings to avoid
     # comparing nested objects and values. As roles are unique in the
     # DB per user, any deduplicating this does is fine.
@@ -53,7 +68,7 @@ def _handle_role_patch(
     else:
         current_role_types = set()
 
-    request_role_types = set([role.type for role in request_roles])
+    request_role_types = set([role["type"] for role in request_roles])
 
     # If they match, do nothing
     if set(current_role_types) == set(request_role_types):
@@ -71,5 +86,6 @@ def _handle_role_patch(
 
     # Add any new roles
     for role_type in roles_to_add:
+        # TODO: instead, add to user.roles directly without user_id=user.id and let SQLAlchemy handle the foreign key assignment
         user_role = Role(user_id=user.id, type=role_type)
         api_context.db_session.add(user_role)

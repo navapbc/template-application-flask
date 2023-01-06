@@ -1,6 +1,5 @@
 from typing import Tuple
 
-import marshmallow
 from apiflask import APIBlueprint
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
@@ -8,11 +7,12 @@ from werkzeug.exceptions import ServiceUnavailable
 import api.logging
 from api.route import response
 from api.route.api_context import api_context_manager
+from api.route.schemas import request_schema
 
 logger = api.logging.get_logger(__name__)
 
 
-class HealthcheckSchema(marshmallow.Schema):
+class HealthcheckSchema(request_schema.OrderedSchema):
     message: str
 
 
