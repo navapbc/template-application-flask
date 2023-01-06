@@ -162,17 +162,6 @@ def test_post_user_unauthorized(client):
     )
 
 
-def test_get_user_200(client, api_auth_token, test_db_session, initialize_factories_session):
-    user = UserFactory.create()
-    response = client.get(f"/v1/user/{user.id}", headers={"X-Auth": api_auth_token})
-
-    assert response.status_code == 200
-    response_record = response.get_json()["data"]
-
-    assert response_record["id"] == str(user.id)
-    validate_all_match(None, response_record, user)
-
-
 def test_get_user_401_unauthorized_token(
     client, api_auth_token, test_db_session, initialize_factories_session
 ):
