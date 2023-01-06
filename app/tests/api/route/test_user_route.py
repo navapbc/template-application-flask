@@ -74,8 +74,12 @@ def test_create_and_get_user(client, api_auth_token, roles):
     print(roles)
     request["roles"] = roles
     post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
+    post_response_data = post_response.get_json()["data"]
 
     assert post_response.status_code == 201
+    assert_dict_subset(request, post_response_data)
+    assert post_response_data["created_at"] is not None
+    assert post_response_data["updated_at"] is not None
 
     # Get the user
     user_id = post_response.get_json()["data"]["id"]
@@ -121,12 +125,17 @@ def test_post_user_400_invalid_types(client, api_auth_token, test_db_session):
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["detail"]["json"]
-    # We expect an error list like:
-    # {'date_of_birth': ['Not a valid date.'], ...}
-    for key, errors in error_list.items():
-        assert key in request
-        assert "Not a valid" in errors[0]
+    errors = response.get_json()["detail"]["json"]
+    expected_errors = {
+        "first_name": ["Not a valid string."],
+        "middle_name": ["Not a valid string."],
+        "last_name": ["Not a valid string."],
+        "phone_number": ["Not a valid string."],
+        "date_of_birth": ["Not a valid date."],
+        "is_active": ["Not a valid boolean."],
+        "roles": ["Not a valid list."],
+    }
+    assert errors == expected_errors
 
     # Nothing added to DB
     results = test_db_session.query(User).all()
