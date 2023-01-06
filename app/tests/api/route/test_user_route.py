@@ -6,7 +6,6 @@ import pytest
 
 from api.db.models.user_models import User
 from tests.api.db.models.factories import UserFactory
-from tests.api.route.route_test_utils import assert_dict_subset
 
 fake = faker.Faker()
 
@@ -22,16 +21,10 @@ base_request = {
 
 
 @pytest.fixture
-def create_user_request():
-    return {
-        "first_name": fake.first_name(),
-        "middle_name": fake.first_name(),
-        "last_name": fake.last_name(),
-        "date_of_birth": "2022-01-01",
-        "phone_number": "123-456-7890",
-        "is_active": True,
-        "roles": [{"type": "ADMIN"}, {"type": "USER"}],
-    }
+def created_user(client, api_auth_token):
+    request = base_request | {}
+    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
+    return response.get_json()["data"]
 
 
 def validate_all_match(request, response, db_record):
@@ -72,13 +65,18 @@ def validate_param_match(key, request, response, db_record):
 def test_create_and_get_user(client, api_auth_token, roles):
     # Create a user
     request = base_request | {}
-    print(roles)
     request["roles"] = roles
     post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     post_response_data = post_response.get_json()["data"]
+    expected_response = {
+        **request,
+        "id": post_response_data["id"],
+        "created_at": post_response_data["created_at"],
+        "updated_at": post_response_data["updated_at"],
+    }
 
     assert post_response.status_code == 201
-    assert_dict_subset(request, post_response_data)
+    assert post_response_data == expected_response
     assert post_response_data["created_at"] is not None
     assert post_response_data["updated_at"] is not None
 
@@ -89,7 +87,7 @@ def test_create_and_get_user(client, api_auth_token, roles):
     assert get_response.status_code == 200
 
     get_response_data = get_response.get_json()["data"]
-    assert_dict_subset(request, get_response_data)
+    assert get_response_data == expected_response
 
 
 @pytest.mark.parametrize(
@@ -184,25 +182,25 @@ def test_get_user_404_user_not_found(client, api_auth_token):
     assert "Could not find user with ID" in response.get_json()["message"]
 
 
-def test_patch_user_200(client, api_auth_token, test_db_session, initialize_factories_session):
-    user = UserFactory.create(first_name="NotSomethingFakerWillGenerate")
-    request = base_request | {}
-    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+def test_patch_user(client, api_auth_token, created_user):
+    user_id = created_user["id"]
+    patch_request = {"first_name": fake.first_name()}
+    patch_response = client.patch(
+        f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
+    )
+    patch_response_data = patch_response.get_json()["data"]
 
-    assert response.status_code == 200
+    assert patch_response.status_code == 200
+    assert patch_response.get_json()["data"]["first_name"] == patch_request["first_name"]
 
-    results = test_db_session.query(User).all()
-    assert len(results) == 1
-    db_record = results[0]
-    response_record = response.get_json()["data"]
+    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response_data = get_response.get_json()["data"]
 
-    # Verify the request, response and DB model values all match
-    validate_all_match(request, response_record, db_record)
-
-    # Verify it is the same user that we created
-    # but that the name did in fact change
-    assert user.id == db_record.id
-    assert db_record.first_name != "NotSomethingFakerWillGenerate"
+    assert get_response_data == {
+        **created_user,
+        **patch_request,
+        "updated_at": patch_response_data["updated_at"],
+    }
 
 
 def test_patch_user_200_roles(
