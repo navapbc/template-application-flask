@@ -87,44 +87,21 @@ def test_create_and_get_user(client, api_auth_token, roles):
     assert_dict_subset(request, get_response_data)
 
 
-def test_post_user_201_empty_array(client, api_auth_token, test_db_session):
-    request = base_request | {"roles": []}
-    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
-
-    assert response.status_code == 201
-
-    results = test_db_session.query(User).all()
-    assert len(results) == 1
-    db_record = results[0]
-    response_record = response.get_json()["data"]
-
-    # Verify the roles portion of the object also matches
-    request_roles = request["roles"]
-    response_roles = response_record["roles"]
-    db_roles = db_record.roles
-    assert 0 == len(request_roles) == len(response_roles) == len(db_roles)
-
-
 def test_post_user_400_missing_required_fields(client, api_auth_token, test_db_session):
     # Send an empty post - should fail validation
     response = client.post("/v1/user", json={}, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["detail"]["json"]
-    required_fields = [
-        "first_name",
-        "last_name",
-        "phone_number",
-        "date_of_birth",
-        "is_active",
-        "roles",
-    ]
-    assert len(error_list) == len(
-        required_fields
-    ), f"Errored fields don't match expected for empty request {error_list}"
-    for key, errors in error_list.items():
-        assert key in required_fields
-        assert "Missing data for required field." in errors
+    errors = response.get_json()["detail"]["json"]
+    expected_errors = {
+        "first_name": ["Missing data for required field."],
+        "last_name": ["Missing data for required field."],
+        "phone_number": ["Missing data for required field."],
+        "date_of_birth": ["Missing data for required field."],
+        "is_active": ["Missing data for required field."],
+        "roles": ["Missing data for required field."],
+    }
+    assert errors == expected_errors
 
     # Nothing added to DB
     results = test_db_session.query(User).all()
