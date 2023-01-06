@@ -84,22 +84,6 @@ def test_create_and_get_user(client, api_auth_token):
     assert_dict_subset(request, get_response_data)
 
 
-def test_post_user_201(client, api_auth_token, test_db_session):
-    request = base_request | {}
-    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
-
-    assert response.status_code == 201
-
-    results = test_db_session.query(User).all()
-    assert len(results) == 1
-    db_record = results[0]
-
-    response_record = response.get_json()["data"]
-
-    # Verify the request, response and DB model values all match
-    validate_all_match(request, response_record, db_record)
-
-
 def test_post_user_201_empty_array(client, api_auth_token, test_db_session):
     request = base_request | {"roles": []}
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
