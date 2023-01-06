@@ -68,7 +68,13 @@ def validate_param_match(key, request, response, db_record):
     assert response_val == db_val
 
 
-@pytest.mark.parametrize("roles", [[], [{"type": "ADMIN"}, {"type": "USER"}]])
+@pytest.mark.parametrize(
+    "roles",
+    [
+        pytest.param([], id="empty roles"),
+        pytest.param([{"type": "ADMIN"}, {"type": "USER"}], id="all roles"),
+    ],
+)
 def test_create_and_get_user(client, api_auth_token, roles):
     # Create a user
     request = base_request | {}
@@ -100,7 +106,7 @@ def test_create_and_get_user(client, api_auth_token, roles):
 @pytest.mark.parametrize(
     "request_data,expected_response_data",
     [
-        (
+        pytest.param(
             {},
             {
                 "first_name": ["Missing data for required field."],
@@ -110,8 +116,9 @@ def test_create_and_get_user(client, api_auth_token, roles):
                 "is_active": ["Missing data for required field."],
                 "roles": ["Missing data for required field."],
             },
+            id="missing all required fields",
         ),
-        (
+        pytest.param(
             {
                 "first_name": 1,
                 "middle_name": 2,
@@ -130,8 +137,9 @@ def test_create_and_get_user(client, api_auth_token, roles):
                 "is_active": ["Not a valid boolean."],
                 "roles": ["Not a valid list."],
             },
+            id="invalid types",
         ),
-        (
+        pytest.param(
             base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
             {
                 "roles": {
@@ -139,6 +147,7 @@ def test_create_and_get_user(client, api_auth_token, roles):
                     "1": {"type": ["Must be one of: USER, ADMIN."]},
                 }
             },
+            id="invalid role type",
         ),
     ],
 )
@@ -154,15 +163,6 @@ def test_create_user_bad_request(
     # Nothing added to DB
     results = test_db_session.query(User).all()
     assert len(results) == 0
-
-
-def test_get_user_not_found(client, api_auth_token):
-    random_id = uuid.uuid4()
-    response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": api_auth_token})
-
-    assert response.status_code == 404
-    # Verify the error message
-    assert "Could not find user with ID" in response.get_json()["message"]
 
 
 def test_patch_user(client, api_auth_token, created_user):
@@ -219,9 +219,9 @@ def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
 @pytest.mark.parametrize(
     "method,url,body",
     [
-        ("post", "/v1/user", base_request),
-        ("get", f"/v1/user/{uuid.uuid4()}", None),
-        ("patch", f"/v1/user/{uuid.uuid4()}", {}),
+        pytest.param("post", "/v1/user", base_request, id="post"),
+        pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
+        pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
     ],
 )
 def test_unauthorized(client, method, url, body):
@@ -235,13 +235,16 @@ def test_unauthorized(client, method, url, body):
     )
 
 
-def test_patch_user_not_found(client, api_auth_token, test_db_session):
-    response = client.patch(
-        f"/v1/user/{uuid.uuid4()}",
-        json={},
-        headers={"X-Auth": api_auth_token},
-    )
+@pytest.mark.parametrize(
+    "method,url,body",
+    [
+        pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
+        pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
+    ],
+)
+def test_not_found(client, api_auth_token, method, url, body):
+    response = getattr(client, method)(url, json=body, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404
     # Verify the error message
-    assert "Could not find user with ID" in response.get_json()["message"]
+    assert "Could not find user with ID " in response.get_json()["message"]
