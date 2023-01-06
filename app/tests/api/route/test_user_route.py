@@ -1,4 +1,5 @@
 from datetime import date
+import uuid
 
 import faker
 import pytest
@@ -162,11 +163,9 @@ def test_post_user_unauthorized(client):
     )
 
 
-def test_get_user_401_unauthorized_token(
-    client, api_auth_token, test_db_session, initialize_factories_session
-):
-    user = UserFactory.create()
-    response = client.get(f"/v1/user/{user.id}", headers={"X-Auth": "incorrect token"})
+def test_get_user_unauthorized(client):
+    random_id = uuid.uuid4()
+    response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": "incorrect token"})
 
     assert response.status_code == 401
     # Verify the error message
