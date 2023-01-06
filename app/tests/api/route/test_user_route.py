@@ -1,9 +1,11 @@
 from datetime import date
 
 import faker
+import pytest
 
 from api.db.models.user_models import User
 from tests.api.db.models.factories import UserFactory
+from tests.api.route.route_test_utils import assert_dict_subset
 
 fake = faker.Faker()
 
@@ -16,6 +18,19 @@ base_request = {
     "is_active": True,
     "roles": [{"type": "ADMIN"}, {"type": "USER"}],
 }
+
+
+@pytest.fixture
+def create_user_request():
+    return {
+        "first_name": fake.first_name(),
+        "middle_name": fake.first_name(),
+        "last_name": fake.last_name(),
+        "date_of_birth": "2022-01-01",
+        "phone_number": "123-456-7890",
+        "is_active": True,
+        "roles": [{"type": "ADMIN"}, {"type": "USER"}],
+    }
 
 
 def validate_all_match(request, response, db_record):
@@ -50,6 +65,23 @@ def validate_param_match(key, request, response, db_record):
         assert req_val == db_val
 
     assert response_val == db_val
+
+
+def test_create_and_get_user(client, api_auth_token):
+    # Create a user
+    request = base_request | {}
+    post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
+
+    assert post_response.status_code == 201
+
+    # Get the user
+    user_id = post_response.get_json()["data"]["id"]
+    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+
+    assert get_response.status_code == 200
+
+    get_response_data = get_response.get_json()["data"]
+    assert_dict_subset(request, get_response_data)
 
 
 def test_post_user_201(client, api_auth_token, test_db_session):
