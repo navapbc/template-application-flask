@@ -1,6 +1,6 @@
+import uuid
 from datetime import date
 from itertools import chain, combinations
-import uuid
 
 import faker
 import pytest
