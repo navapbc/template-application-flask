@@ -171,18 +171,19 @@ def test_patch_user(client, api_auth_token, created_user):
         f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
     patch_response_data = patch_response.get_json()["data"]
-
-    assert patch_response.status_code == 200
-    assert patch_response.get_json()["data"]["first_name"] == patch_request["first_name"]
-
-    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
-    get_response_data = get_response.get_json()["data"]
-
-    assert get_response_data == {
+    expected_response_data = {
         **created_user,
         **patch_request,
         "updated_at": patch_response_data["updated_at"],
     }
+
+    assert patch_response.status_code == 200
+    assert patch_response_data == expected_response_data
+
+    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response_data = get_response.get_json()["data"]
+
+    assert get_response_data == expected_response_data
 
 
 @pytest.mark.parametrize("initial_roles", powerset([{"type": "ADMIN"}, {"type": "USER"}]))
@@ -202,17 +203,19 @@ def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
         f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
     patch_response_data = patch_response.get_json()["data"]
-
-    assert patch_response.status_code == 200
-
-    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
-    get_response_data = get_response.get_json()["data"]
-
-    assert get_response_data == {
+    expected_response_data = {
         **created_user,
         **patch_request,
         "updated_at": patch_response_data["updated_at"],
     }
+
+    assert patch_response.status_code == 200
+    assert patch_response_data == expected_response_data
+
+    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response_data = get_response.get_json()["data"]
+
+    assert get_response_data == expected_response_data
 
 
 @pytest.mark.parametrize(
