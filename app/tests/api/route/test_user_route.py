@@ -6,7 +6,6 @@ import faker
 import pytest
 
 from api.db.models.user_models import User
-from tests.api.db.models.factories import UserFactory
 
 fake = faker.Faker()
 
