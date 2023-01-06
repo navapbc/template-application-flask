@@ -156,30 +156,6 @@ def test_create_user_bad_request(
     assert len(results) == 0
 
 
-def test_post_user_unauthorized(client):
-    request = base_request
-    response = client.post("/v1/user", json=request, headers={"X-Auth": "incorrect token"})
-    assert response.status_code == 401
-
-    # Verify the error message
-    assert (
-        "The server could not verify that you are authorized to access the URL requested"
-        in response.get_json()["message"]
-    )
-
-
-def test_get_user_unauthorized(client):
-    random_id = uuid.uuid4()
-    response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": "incorrect token"})
-
-    assert response.status_code == 401
-    # Verify the error message
-    assert (
-        "The server could not verify that you are authorized to access the URL requested"
-        in response.get_json()["message"]
-    )
-
-
 def test_get_user_404_user_not_found(client, api_auth_token):
     random_id = uuid.uuid4()
     response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": api_auth_token})
@@ -240,11 +216,16 @@ def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
     }
 
 
-def test_patch_user_401_unauthorized_token(
-    client, api_auth_token, test_db_session, initialize_factories_session
-):
-    user = UserFactory.create()
-    response = client.patch(f"/v1/user/{user.id}", json={}, headers={"X-Auth": "incorrect token"})
+@pytest.mark.parametrize(
+    "method,url,body",
+    [
+        ("post", "/v1/user", base_request),
+        ("get", f"/v1/user/{uuid.uuid4()}", None),
+        ("patch", f"/v1/user/{uuid.uuid4()}", base_request),
+    ],
+)
+def test_unauthorized(client, method, url, body):
+    response = getattr(client, method)(url, json=body, headers={"X-Auth": "incorrect token"})
 
     assert response.status_code == 401
     # Verify the error message
