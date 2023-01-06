@@ -67,9 +67,12 @@ def validate_param_match(key, request, response, db_record):
     assert response_val == db_val
 
 
-def test_create_and_get_user(client, api_auth_token):
+@pytest.mark.parametrize("roles", [[], [{"type": "ADMIN"}, {"type": "USER"}]])
+def test_create_and_get_user(client, api_auth_token, roles):
     # Create a user
     request = base_request | {}
+    print(roles)
+    request["roles"] = roles
     post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
 
     assert post_response.status_code == 201

@@ -1,4 +1,8 @@
-import flatdict
+from flatten_dict import flatten as flatten_dict
+
+
+def flatten(d: dict):
+    return flatten_dict(d, enumerate_types=(list,))
 
 
 def assert_dict_subset(subdict, superdict):
@@ -9,7 +13,3 @@ def assert_dict_subset(subdict, superdict):
     :param dictionary: The dictionary that is expected to be a superset
     """
     assert set(flatten(subdict).items()) <= set(flatten(superdict).items())
-
-
-def flatten(d: dict) -> flatdict.FlatterDict:
-    return flatdict.FlatterDict(d, delimiter=".")
