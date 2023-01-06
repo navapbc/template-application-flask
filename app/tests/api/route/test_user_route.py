@@ -1,4 +1,5 @@
 from datetime import date
+from itertools import chain, combinations
 import uuid
 
 import faker
@@ -18,6 +19,12 @@ base_request = {
     "is_active": True,
     "roles": [{"type": "ADMIN"}, {"type": "USER"}],
 }
+
+
+def powerset(iterable):
+    "powerset([1,2,3]) --> [] [1] [2] [3] [1,2] [1,3] [2,3] [1,2,3]"
+    s = list(iterable)
+    return map(list, chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
 
 
 @pytest.fixture
@@ -203,37 +210,34 @@ def test_patch_user(client, api_auth_token, created_user):
     }
 
 
-def test_patch_user_200_roles(
-    client, api_auth_token, test_db_session, initialize_factories_session
-):
-    # testing that the role change logic specifically works
-    # Create a user with no roles
-    user = UserFactory.create(roles=[])
+@pytest.mark.parametrize("initial_roles", powerset([{"type": "ADMIN"}, {"type": "USER"}]))
+@pytest.mark.parametrize("updated_roles", powerset([{"type": "ADMIN"}, {"type": "USER"}]))
+def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
+    post_request = {
+        **base_request,
+        "roles": initial_roles,
+    }
+    created_user = client.post(
+        "/v1/user", json=post_request, headers={"X-Auth": api_auth_token}
+    ).get_json()["data"]
+    user_id = created_user["id"]
 
-    # Add two roles
-    request = {"roles": [{"type": "ADMIN"}, {"type": "USER"}]}
-    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
+    patch_request = {"roles": updated_roles}
+    patch_response = client.patch(
+        f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
+    )
+    patch_response_data = patch_response.get_json()["data"]
 
-    assert response.status_code == 200
+    assert patch_response.status_code == 200
 
-    response_roles = response.get_json()["data"]["roles"]
-    assert set(["ADMIN", "USER"]) == set([role["type"] for role in response_roles])
+    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response_data = get_response.get_json()["data"]
 
-    # Remove a role
-    request = {"roles": [{"type": "ADMIN"}]}
-    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 200
-
-    response_roles = response.get_json()["data"]["roles"]
-    assert set(["ADMIN"]) == set([role["type"] for role in response_roles])
-
-    # Remove all roles
-    request = {"roles": []}
-    response = client.patch(f"/v1/user/{user.id}", json=request, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 200
-
-    response_roles = response.get_json()["data"]["roles"]
-    assert set() == set([role["type"] for role in response_roles])
+    assert get_response_data == {
+        **created_user,
+        **patch_request,
+        "updated_at": patch_response_data["updated_at"],
+    }
 
 
 def test_patch_user_401_unauthorized_token(
