@@ -156,7 +156,7 @@ def test_create_user_bad_request(
     assert len(results) == 0
 
 
-def test_get_user_404_user_not_found(client, api_auth_token):
+def test_get_user_not_found(client, api_auth_token):
     random_id = uuid.uuid4()
     response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": api_auth_token})
 
@@ -221,7 +221,7 @@ def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
     [
         ("post", "/v1/user", base_request),
         ("get", f"/v1/user/{uuid.uuid4()}", None),
-        ("patch", f"/v1/user/{uuid.uuid4()}", base_request),
+        ("patch", f"/v1/user/{uuid.uuid4()}", {}),
     ],
 )
 def test_unauthorized(client, method, url, body):
@@ -235,9 +235,9 @@ def test_unauthorized(client, method, url, body):
     )
 
 
-def test_patch_user_404_user_not_found(client, api_auth_token, test_db_session):
+def test_patch_user_not_found(client, api_auth_token, test_db_session):
     response = client.patch(
-        "/v1/user/cd1dcc81-2759-461b-8c09-9ba9be669bf9",
+        f"/v1/user/{uuid.uuid4()}",
         json={},
         headers={"X-Auth": api_auth_token},
     )
