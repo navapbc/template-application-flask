@@ -150,8 +150,8 @@ def test_create_user_bad_request(
     assert len(results) == 0
 
 
-def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
-    request = base_request | {}
+def test_post_user_unauthorized(client):
+    request = base_request
     response = client.post("/v1/user", json=request, headers={"X-Auth": "incorrect token"})
     assert response.status_code == 401
 
