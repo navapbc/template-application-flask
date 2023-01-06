@@ -149,16 +149,14 @@ def test_post_user_400_invalid_enums(client, api_auth_token, test_db_session):
     response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
-    error_list = response.get_json()["detail"]["json"]
-    # We expect the errors to be like:
-    # {'roles': {'0': {'type': ['Must be one of USER, ADMIN.']}, '1': ...}}
-
-    for key, error_field in error_list["roles"].items():
-        assert key.isnumeric()
-
-        for field, error in error_field.items():
-            assert field == "type"
-            assert "Must be one of: USER, ADMIN." in error[0]
+    errors = response.get_json()["detail"]["json"]
+    expected_errors = {
+        "roles": {
+            "0": {"type": ["Must be one of: USER, ADMIN."]},
+            "1": {"type": ["Must be one of: USER, ADMIN."]},
+        }
+    }
+    assert errors == expected_errors
 
 
 def test_post_user_401_unauthorized_token(client, api_auth_token, test_db_session):
