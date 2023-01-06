@@ -175,10 +175,9 @@ def test_get_user_unauthorized(client):
     )
 
 
-def test_get_user_404_user_not_found(client, api_auth_token, test_db_session):
-    response = client.get(
-        "/v1/user/cd1dcc81-2759-461b-8c09-9ba9be669bf9", headers={"X-Auth": api_auth_token}
-    )
+def test_get_user_404_user_not_found(client, api_auth_token):
+    random_id = uuid.uuid4()
+    response = client.get(f"/v1/user/{random_id}", headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404
     # Verify the error message
