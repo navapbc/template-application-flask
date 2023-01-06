@@ -124,6 +124,9 @@ db-migrate-heads: ## Show migrations marked as a head
 test:
 	$(PY_RUN_CMD) pytest $(args)
 
+test-watch:
+	$(PY_RUN_CMD) ptw $(args)
+
 test-coverage:
 	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest $(args)
 	$(PY_RUN_CMD) coverage report
