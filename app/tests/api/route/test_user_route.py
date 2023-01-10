@@ -9,15 +9,22 @@ from api.db.models.user_models import User
 
 fake = faker.Faker()
 
-base_request = {
-    "first_name": fake.first_name(),
-    "middle_name": fake.first_name(),
-    "last_name": fake.last_name(),
-    "date_of_birth": "2022-01-01",
-    "phone_number": "123-456-7890",
-    "is_active": True,
-    "roles": [{"type": "ADMIN"}, {"type": "USER"}],
-}
+
+def get_base_request():
+    return {
+        "first_name": fake.first_name(),
+        "middle_name": fake.first_name(),
+        "last_name": fake.last_name(),
+        "date_of_birth": "2022-01-01",
+        "phone_number": "123-456-7890",
+        "is_active": True,
+        "roles": [{"type": "ADMIN"}, {"type": "USER"}],
+    }
+
+
+@pytest.fixture
+def base_request():
+    return get_base_request()
 
 
 def powerset(iterable):
@@ -27,9 +34,8 @@ def powerset(iterable):
 
 
 @pytest.fixture
-def created_user(client, api_auth_token):
-    request = base_request | {}
-    response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
+def created_user(client, api_auth_token, base_request):
+    response = client.post("/v1/user", json=base_request, headers={"X-Auth": api_auth_token})
     return response.get_json()["data"]
 
 
@@ -63,10 +69,12 @@ def validate_param_match(key, request, response, db_record):
         pytest.param([{"type": "ADMIN"}, {"type": "USER"}], id="all roles"),
     ],
 )
-def test_create_and_get_user(client, api_auth_token, roles):
+def test_create_and_get_user(client, base_request, api_auth_token, roles):
     # Create a user
-    request = base_request | {}
-    request["roles"] = roles
+    request = {
+        **base_request,
+        "roles": roles,
+    }
     post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
     post_response_data = post_response.get_json()["data"]
     expected_response = {
@@ -128,7 +136,7 @@ def test_create_and_get_user(client, api_auth_token, roles):
             id="invalid types",
         ),
         pytest.param(
-            base_request | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
+            get_base_request() | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
             {
                 "roles": {
                     "0": {"type": ["Must be one of: USER, ADMIN."]},
@@ -177,7 +185,7 @@ def test_patch_user(client, api_auth_token, created_user):
 
 @pytest.mark.parametrize("initial_roles", powerset([{"type": "ADMIN"}, {"type": "USER"}]))
 @pytest.mark.parametrize("updated_roles", powerset([{"type": "ADMIN"}, {"type": "USER"}]))
-def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
+def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, updated_roles):
     post_request = {
         **base_request,
         "roles": initial_roles,
@@ -210,7 +218,7 @@ def test_patch_user_roles(client, api_auth_token, initial_roles, updated_roles):
 @pytest.mark.parametrize(
     "method,url,body",
     [
-        pytest.param("post", "/v1/user", base_request, id="post"),
+        pytest.param("post", "/v1/user", get_base_request(), id="post"),
         pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
         pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
     ],
