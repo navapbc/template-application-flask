@@ -20,18 +20,23 @@ def main() -> None:
 
     api.logging.audit.init_security_logging()
     api.logging.init(__package__)
-    logger.info("Running API Application")
 
     app = api.app.create_app()
+    environment = app_config.environment
+    host = app_config.host
     port = app_config.port
+
+    logger.info(
+        "Running API Application", extra={"environment": environment, "host": host, "port": port}
+    )
 
     if app_config.environment == "local":
         # If python files are changed, the app will auto-reload
         # Note this doesn't have the OpenAPI yaml file configured at the moment
-        app.run(port=port, use_reloader=True, reloader_type="stat")
+        app.run(host=host, port=port, use_reloader=True, reloader_type="stat")
     else:
         # Don't enable the reloader if non-local
-        app.run(port=port)
+        app.run(host=host, port=port)
 
 
 main()
