@@ -8,23 +8,31 @@ import psycopg2
 import sqlalchemy.pool as pool
 from apiflask import APIFlask
 from sqlalchemy import create_engine, MetaData
-from sqlalchemy.engine import Engine, URL
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
 from api.db.migrations.run import have_all_migrations_run
 
+# Re-export the Session type that is returned by the get_session() method
+# to be used for type hints.
+Session = scoped_session
+
 logger = api.logging.get_logger(__name__)
 
-db: flask_sqlalchemy.SQLAlchemy
+# The flask_sqlalchemy.SQLAlchemy instance.
+# _db.session is the scoped_session instance that is automatically scoped to
+# the current request. The type of _db.session `type(_db.session)` is
+# `scoped_session`, which we re-export as `Session``.
+_db: flask_sqlalchemy.SQLAlchemy
 
 
 def init2(
     flask_app: APIFlask,
     config: Optional[DbConfig] = None,
 ):
-    global db
+    global _db
 
     db_config: DbConfig = config if config is not None else get_db_config()
 
@@ -39,7 +47,7 @@ def init2(
     }
 
     # create the extension
-    db = flask_sqlalchemy.SQLAlchemy(
+    _db = flask_sqlalchemy.SQLAlchemy(
         # Override the default naming of constraints
         # to use suffixes instead:
         # https://stackoverflow.com/questions/4107915/postgresql-default-constraint-names/4108266#4108266
@@ -59,7 +67,7 @@ def init2(
     )
 
     # initialize the Flask app with the Flask-SQLAlchemy extension
-    db.init_app(flask_app)
+    _db.init_app(flask_app)
 
 
 def init(
@@ -223,5 +231,5 @@ def make_connection_uri(config: DbConfig) -> str:
     return uri
 
 
-def get_session():
-    return db.session
+def get_session() -> Session:
+    return _db.session
