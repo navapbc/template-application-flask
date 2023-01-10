@@ -56,13 +56,13 @@ def validate_param_match(key, request, response, db_record):
     assert response_val == db_val
 
 
-@pytest.mark.parametrize(
-    "roles",
-    [
-        pytest.param([], id="empty roles"),
-        pytest.param([{"type": "ADMIN"}, {"type": "USER"}], id="all roles"),
-    ],
-)
+test_create_and_get_user_data = [
+    pytest.param([], id="empty roles"),
+    pytest.param([{"type": "ADMIN"}, {"type": "USER"}], id="all roles"),
+]
+
+
+@pytest.mark.parametrize("roles", test_create_and_get_user_data)
 def test_create_and_get_user(client, base_request, api_auth_token, roles):
     # Create a user
     request = {
@@ -93,54 +93,54 @@ def test_create_and_get_user(client, base_request, api_auth_token, roles):
     assert get_response_data == expected_response
 
 
-@pytest.mark.parametrize(
-    "request_data,expected_response_data",
-    [
-        pytest.param(
-            {},
-            {
-                "first_name": ["Missing data for required field."],
-                "last_name": ["Missing data for required field."],
-                "phone_number": ["Missing data for required field."],
-                "date_of_birth": ["Missing data for required field."],
-                "is_active": ["Missing data for required field."],
-                "roles": ["Missing data for required field."],
-            },
-            id="missing all required fields",
-        ),
-        pytest.param(
-            {
-                "first_name": 1,
-                "middle_name": 2,
-                "last_name": 3,
-                "date_of_birth": 4,
-                "phone_number": 5,
-                "is_active": 6,
-                "roles": 7,
-            },
-            {
-                "first_name": ["Not a valid string."],
-                "middle_name": ["Not a valid string."],
-                "last_name": ["Not a valid string."],
-                "phone_number": ["Not a valid string."],
-                "date_of_birth": ["Not a valid date."],
-                "is_active": ["Not a valid boolean."],
-                "roles": ["Not a valid list."],
-            },
-            id="invalid types",
-        ),
-        pytest.param(
-            get_base_request() | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
-            {
-                "roles": {
-                    "0": {"type": ["Must be one of: USER, ADMIN."]},
-                    "1": {"type": ["Must be one of: USER, ADMIN."]},
-                }
-            },
-            id="invalid role type",
-        ),
-    ],
-)
+test_create_user_bad_request_data = [
+    pytest.param(
+        {},
+        {
+            "first_name": ["Missing data for required field."],
+            "last_name": ["Missing data for required field."],
+            "phone_number": ["Missing data for required field."],
+            "date_of_birth": ["Missing data for required field."],
+            "is_active": ["Missing data for required field."],
+            "roles": ["Missing data for required field."],
+        },
+        id="missing all required fields",
+    ),
+    pytest.param(
+        {
+            "first_name": 1,
+            "middle_name": 2,
+            "last_name": 3,
+            "date_of_birth": 4,
+            "phone_number": 5,
+            "is_active": 6,
+            "roles": 7,
+        },
+        {
+            "first_name": ["Not a valid string."],
+            "middle_name": ["Not a valid string."],
+            "last_name": ["Not a valid string."],
+            "phone_number": ["Not a valid string."],
+            "date_of_birth": ["Not a valid date."],
+            "is_active": ["Not a valid boolean."],
+            "roles": ["Not a valid list."],
+        },
+        id="invalid types",
+    ),
+    pytest.param(
+        get_base_request() | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
+        {
+            "roles": {
+                "0": {"type": ["Must be one of: USER, ADMIN."]},
+                "1": {"type": ["Must be one of: USER, ADMIN."]},
+            }
+        },
+        id="invalid role type",
+    ),
+]
+
+
+@pytest.mark.parametrize("request_data,expected_response_data", test_create_user_bad_request_data)
 def test_create_user_bad_request(
     client, api_auth_token, test_db_session, request_data, expected_response_data
 ):
@@ -209,35 +209,33 @@ def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, u
     assert get_response_data == expected_response_data
 
 
-@pytest.mark.parametrize(
-    "method,url,body",
-    [
-        pytest.param("post", "/v1/user", get_base_request(), id="post"),
-        pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
-        pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
-    ],
-)
+test_unauthorized_data = [
+    pytest.param("post", "/v1/user", get_base_request(), id="post"),
+    pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
+    pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
+]
+
+
+@pytest.mark.parametrize("method,url,body", test_unauthorized_data)
 def test_unauthorized(client, method, url, body):
+    expected_message = (
+        "The server could not verify that you are authorized to access the URL requested"
+    )
     response = getattr(client, method)(url, json=body, headers={"X-Auth": "incorrect token"})
 
     assert response.status_code == 401
-    # Verify the error message
-    assert (
-        "The server could not verify that you are authorized to access the URL requested"
-        in response.get_json()["message"]
-    )
+    assert response.get_json()["message"] == expected_message
 
 
-@pytest.mark.parametrize(
-    "method,url,body",
-    [
-        pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
-        pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
-    ],
-)
+test_not_found_data = [
+    pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
+    pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
+]
+
+
+@pytest.mark.parametrize("method,url,body", test_not_found_data)
 def test_not_found(client, api_auth_token, method, url, body):
     response = getattr(client, method)(url, json=body, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404
-    # Verify the error message
     assert "Could not find user with ID " in response.get_json()["message"]
