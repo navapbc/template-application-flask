@@ -175,6 +175,9 @@ create-user-csv:
 # Miscellaneous Utilities
 ##################################################
 
+login: start ## Start shell in running container
+	docker exec -it $(APP_NAME) bash
+
 # Pauses for 5 seconds
 sleep-5:
 	sleep 5
