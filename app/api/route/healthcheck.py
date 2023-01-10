@@ -27,7 +27,7 @@ def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
     try:
-        result = db.session.execute(text("SELECT 1 AS healthy")).first()
+        result = db.get_session().execute(text("SELECT 1 AS healthy")).first()
         if not result or result[0] != 1:
             raise Exception("Connection to DB failure")
 

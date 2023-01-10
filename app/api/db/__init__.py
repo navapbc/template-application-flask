@@ -28,7 +28,6 @@ def init2(
 
     db_config: DbConfig = config if config is not None else get_db_config()
 
-    # configure the SQLite database, relative to the app instance folder
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = make_connection_uri(db_config)
     flask_app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
         # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
@@ -225,4 +224,4 @@ def make_connection_uri(config: DbConfig) -> str:
 
 
 def get_session():
-    pass
+    return db.session
