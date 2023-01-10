@@ -91,6 +91,16 @@ plugins = ["sqlalchemy.ext.mypy.plugin"]
 module = "api.db.migrations.versions.*"
 disallow_untyped_defs = false
 
+[tool.pytest.ini_options]
+# Ignore deprecation warnings in library code.
+# When a library has addressed its deprecation issues and we've updated the
+# library, we can remove the ignore filter for that library.
+filterwarnings = [
+  "ignore::DeprecationWarning:botocore.*",
+  "ignore::DeprecationWarning:apispec.*",
+  "ignore::DeprecationWarning:certifi.*",
+]
+
 [tool.coverage.run]
 omit = [
   "api/db/migrations/*.py",
