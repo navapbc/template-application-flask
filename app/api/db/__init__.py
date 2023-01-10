@@ -3,10 +3,12 @@ import urllib.parse
 from contextlib import contextmanager
 from typing import Any, Generator, Optional
 
+import flask_sqlalchemy
 import psycopg2
 import sqlalchemy.pool as pool
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from apiflask import APIFlask
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy.engine import Engine, URL
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 import api.logging
@@ -14,6 +16,51 @@ from api.db.db_config import DbConfig, get_db_config
 from api.db.migrations.run import have_all_migrations_run
 
 logger = api.logging.get_logger(__name__)
+
+db: flask_sqlalchemy.SQLAlchemy
+
+
+def init2(
+    flask_app: APIFlask,
+    config: Optional[DbConfig] = None,
+):
+    global db
+
+    db_config: DbConfig = config if config is not None else get_db_config()
+
+    # configure the SQLite database, relative to the app instance folder
+    flask_app.config["SQLALCHEMY_DATABASE_URI"] = make_connection_uri(db_config)
+    flask_app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
+        # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#psycopg2-fast-execution-helpers
+        "executemany_mode": "batch",
+        "hide_parameters": db_config.hide_sql_parameter_logs,
+        # TODO: Don't think we need this as we aren't using JSON columns, but keeping for reference
+        # json_serializer=lambda o: json.dumps(o, default=pydantic.json.pydantic_encoder),
+    }
+
+    # create the extension
+    db = flask_sqlalchemy.SQLAlchemy(
+        # Override the default naming of constraints
+        # to use suffixes instead:
+        # https://stackoverflow.com/questions/4107915/postgresql-default-constraint-names/4108266#4108266
+        metadata=MetaData(
+            naming_convention={
+                "ix": "%(column_0_label)s_idx",
+                "uq": "%(table_name)s_%(column_0_name)s_uniq",
+                "ck": "%(table_name)s_`%(constraint_name)s_check`",
+                "fk": "%(table_name)s_%(column_0_name)s_%(referred_table_name)s_fkey",
+                "pk": "%(table_name)s_pkey",
+            }
+        ),
+        session_options={
+            "autocommit": False,
+            "expire_on_commit": False,
+        },
+    )
+
+    # initialize the Flask app with the Flask-SQLAlchemy extension
+    db.init_app(flask_app)
 
 
 def init(
@@ -175,3 +222,7 @@ def make_connection_uri(config: DbConfig) -> str:
     uri = f"postgresql://{netloc}/{db_name}?options=-csearch_path={schema}"
 
     return uri
+
+
+def get_session():
+    pass

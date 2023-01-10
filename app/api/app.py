@@ -4,6 +4,7 @@ from typing import Generator, Optional
 
 from apiflask import APIFlask
 from flask import g
+from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import Unauthorized
 
 import api.db as db
@@ -23,10 +24,12 @@ def create_app(
 ) -> APIFlask:
 
     # Initialize the db
-    if db_session_factory is None:
-        db_session_factory = db.init(check_migrations_current=check_migrations_current)
+    # if db_session_factory is None:
+    #     db_session_factory = db.init(check_migrations_current=check_migrations_current)
 
     app = APIFlask(__name__)
+
+    db.init2(app)
 
     # Add various configurations, and
     # adjustments to the application
@@ -102,27 +105,28 @@ def register_blueprints(app: APIFlask) -> None:
 def register_request_handlers(
     app: APIFlask, db_session_factory: db.scoped_session, do_close_db: bool
 ) -> None:
-    @app.before_request
-    def push_db() -> None:
-        # Attach the DB session factory
-        # to the global Flask context
-        g.db = db_session_factory
+    pass
+    # @app.before_request
+    # def push_db() -> None:
+    #     # Attach the DB session factory
+    #     # to the global Flask context
+    #     g.db = db_session_factory
 
-    @app.teardown_request
-    def close_db(exception: Optional[BaseException] = None) -> None:
-        if not do_close_db:
-            logger.debug("Not closing DB session")
-            return
+    # @app.teardown_request
+    # def close_db(exception: Optional[BaseException] = None) -> None:
+    #     if not do_close_db:
+    #         logger.debug("Not closing DB session")
+    #         return
 
-        try:
-            logger.debug("Closing DB session")
-            db = g.pop("db", None)
+    #     try:
+    #         logger.debug("Closing DB session")
+    #         db = g.pop("db", None)
 
-            if db is not None:
-                db.remove()
+    #         if db is not None:
+    #             db.remove()
 
-        except Exception:
-            logger.exception("Exception while closing DB session")
+    #     except Exception:
+    #         logger.exception("Exception while closing DB session")
 
 
 def get_project_root_dir() -> str:

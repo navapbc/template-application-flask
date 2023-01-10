@@ -5,6 +5,7 @@ from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.logging
+from api import db
 from api.route import response
 from api.route.api_context import api_context_manager
 from api.route.schemas import request_schema
@@ -26,12 +27,11 @@ def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
     try:
-        with api_context_manager(is_user_expected=False) as api_context:
-            result = api_context.db_session.execute(text("SELECT 1 AS healthy")).first()
-            if not result or result[0] != 1:
-                raise Exception("Connection to DB failure")
+        result = db.session.execute(text("SELECT 1 AS healthy")).first()
+        if not result or result[0] != 1:
+            raise Exception("Connection to DB failure")
 
-            return response.ApiResponse(message="Service healthy").asdict(), 200
+        return response.ApiResponse(message="Service healthy").asdict(), 200
 
     except Exception:
         logger.exception("Connection to DB failure")
