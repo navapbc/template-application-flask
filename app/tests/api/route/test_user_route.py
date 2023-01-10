@@ -1,11 +1,11 @@
 import uuid
 from datetime import date
-from itertools import chain, combinations
 
 import faker
 import pytest
 
 from api.db.models.user_models import User
+from tests.api.util.parametrize_utils import powerset
 
 fake = faker.Faker()
 
@@ -25,12 +25,6 @@ def get_base_request():
 @pytest.fixture
 def base_request():
     return get_base_request()
-
-
-def powerset(iterable):
-    """powerset([1,2,3]) --> [] [1] [2] [3] [1,2] [1,3] [2,3] [1,2,3]"""
-    s = list(iterable)
-    return map(list, chain.from_iterable(combinations(s, r) for r in range(len(s) + 1)))
 
 
 @pytest.fixture
