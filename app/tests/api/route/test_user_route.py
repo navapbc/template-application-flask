@@ -228,14 +228,16 @@ def test_unauthorized(client, method, url, body):
 
 
 test_not_found_data = [
-    pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
-    pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
+    pytest.param("get", None, id="get"),
+    pytest.param("patch", {}, id="patch"),
 ]
 
 
-@pytest.mark.parametrize("method,url,body", test_not_found_data)
-def test_not_found(client, api_auth_token, method, url, body):
+@pytest.mark.parametrize("method,body", test_not_found_data)
+def test_not_found(client, api_auth_token, method, body):
+    user_id = uuid.uuid4()
+    url = f"/v1/user/{user_id}"
     response = getattr(client, method)(url, json=body, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404
-    assert "Could not find user with ID " in response.get_json()["message"]
+    assert response.get_json()["message"] == f"Could not find user with ID {user_id}"
