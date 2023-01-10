@@ -9,7 +9,7 @@ import sqlalchemy.pool as pool
 from apiflask import APIFlask
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.engine import Engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from sqlalchemy.orm import scoped_session, sessionmaker, session
 
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
@@ -17,7 +17,7 @@ from api.db.migrations.run import have_all_migrations_run
 
 # Re-export the Session type that is returned by the get_session() method
 # to be used for type hints.
-Session = scoped_session
+Session = session.Session
 
 logger = api.logging.get_logger(__name__)
 
@@ -232,4 +232,8 @@ def make_connection_uri(config: DbConfig) -> str:
 
 
 def get_session() -> Session:
-    return _db.session
+    # _db.session is a scoped_session. Calling `_db.session` returns the
+    # current Session i.e. the session for the current Flask request
+    # see https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.session
+    # and https://docs.sqlalchemy.org/en/20/orm/contextual.html
+    return _db.session()
