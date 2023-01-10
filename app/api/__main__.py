@@ -23,6 +23,9 @@ def main() -> None:
 
     app = api.app.create_app()
     environment = app_config.environment
+
+    # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be
+    # accessed from outside the container. See Dockerfile
     host = app_config.host
     port = app_config.port
 

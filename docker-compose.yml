@@ -31,12 +31,6 @@ services:
     env_file: ./app/local.env
     # NOTE: These values take precedence if the same value is specified in the env_file.
     environment:
-      # When running in the container, set the host to 0.0.0.0 so that the app can be
-      # accessed from outside the container. This needs to be set to override the
-      # setting in local.env
-      # (see app_config.py)
-      - HOST=0.0.0.0
-
       # The env_file defines DB_HOST=localhost for accessing a non-dockerized database. 
       # In the docker-compose, we tell the app to use the dockerized database service 
       - DB_HOST=main-db
