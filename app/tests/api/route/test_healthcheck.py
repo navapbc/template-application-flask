@@ -1,3 +1,4 @@
+from api import db
 import api.app as app
 
 
@@ -11,7 +12,7 @@ def test_get_healthcheck_503_db_bad_state(client, monkeypatch):
     def err_method(*args):
         raise Exception("Fake Error")
 
-    monkeypatch.setattr(app, "db_session", err_method)
+    monkeypatch.setattr(db, "get_session", err_method)
 
     response = client.get("/health")
     assert response.status_code == 503
