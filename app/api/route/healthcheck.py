@@ -7,7 +7,6 @@ from werkzeug.exceptions import ServiceUnavailable
 import api.logging
 from api import db
 from api.route import response
-from api.route.api_context import api_context_manager
 from api.route.schemas import request_schema
 
 logger = api.logging.get_logger(__name__)
