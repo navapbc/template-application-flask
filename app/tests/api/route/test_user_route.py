@@ -33,17 +33,6 @@ def created_user(client, api_auth_token):
     return response.get_json()["data"]
 
 
-def validate_all_match(request, response, db_record):
-    for k in base_request.keys():
-        if k == "roles":
-            request_roles = request["roles"] if request else None
-            response_roles = response["roles"] if response else None
-            db_roles = db_record.roles if db_record else None
-            validate_param_match("type", request_roles, response_roles, db_roles)
-        else:
-            validate_param_match(k, request, response, db_record)
-
-
 def validate_param_match(key, request, response, db_record):
     if isinstance(response, list):
         # If comparing a list parameter, fetch all of the
