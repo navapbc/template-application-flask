@@ -125,7 +125,7 @@ test:
 	$(PY_RUN_CMD) pytest $(args)
 
 test-watch:
-	$(PY_RUN_CMD) ptw $(args)
+	$(PY_RUN_CMD) pytest-watch --clear $(args)
 
 test-coverage:
 	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest $(args)
