@@ -13,6 +13,7 @@ import api.app as app_entry
 import api.db
 import api.logging
 from api.db import models
+from tests.lib import db_utils
 
 logger = api.logging.get_logger(__name__)
 
@@ -42,28 +43,6 @@ def monkeypatch_module(request):
     mpatch.undo()
 
 
-def exec_sql_admin(sql):
-    db_admin_config = api.db.get_db_config()
-    engine = api.db.create_db_engine(db_admin_config)
-    with engine.connect() as connection:
-        connection.execute(sql)
-
-
-def db_schema_create(schema_name):
-    """Create a database schema."""
-    db_config = api.db.get_db_config()
-    db_test_user = db_config.username
-
-    exec_sql_admin(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
-    logger.info("create schema %s", schema_name)
-
-
-def db_schema_drop(schema_name):
-    """Drop a database schema."""
-    exec_sql_admin(f"DROP SCHEMA {schema_name} CASCADE;")
-    logger.info("drop schema %s", schema_name)
-
-
 @pytest.fixture(scope="session")
 def test_db(monkeypatch_session):
     """
@@ -72,21 +51,9 @@ def test_db(monkeypatch_session):
     """
 
     schema_name = f"test_schema_{uuid.uuid4().int}"
-
-    monkeypatch_session.setenv("DB_SCHEMA", schema_name)
-    monkeypatch_session.setenv("POSTGRES_DB", "main-db")
-    monkeypatch_session.setenv("POSTGRES_USER", "local_db_user")
-    monkeypatch_session.setenv("POSTGRES_PASSWORD", "secret123")
-    monkeypatch_session.setenv("ENVIRONMENT", "local")
-
-    db_schema_create(schema_name)
-    try:
-        db_engine = api.db.create_db_engine()
+    with db_utils.mock_db(monkeypatch_session, schema_name) as db_engine:
         models.metadata.create_all(bind=db_engine)
-
         yield db_engine
-    finally:
-        db_schema_drop(schema_name)
 
 
 @pytest.fixture

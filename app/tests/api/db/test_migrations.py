@@ -8,7 +8,7 @@ from alembic.util.exc import CommandError
 
 import api.db
 from api.db.migrations.run import alembic_cfg
-from tests.conftest import db_schema_create, db_schema_drop
+from tests.lib import db_utils
 
 
 def test_only_single_head_revision_in_migrations():
@@ -44,18 +44,7 @@ def test_db_schema_non_session(monkeypatch):
     so copied here with that adjusted
     """
     schema_name = "test_schema_session_1234"
-
-    monkeypatch.setenv("DB_SCHEMA", schema_name)
-    monkeypatch.setenv("POSTGRES_DB", "main-db")
-    monkeypatch.setenv("POSTGRES_USER", "local_db_user")
-    monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
-    monkeypatch.setenv("ENVIRONMENT", "local")
-
-    db_schema_create(schema_name)
-    try:
-        yield schema_name
-    finally:
-        db_schema_drop(schema_name)
+    return db_utils.mock_db(monkeypatch, schema_name)
 
 
 def test_db_setup_via_alembic_migration(test_db_schema_non_session, logging_fix, caplog):

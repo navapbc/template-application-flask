@@ -1,19 +1,22 @@
+import contextlib
 import os
 import urllib.parse
-import contextlib
 from contextlib import contextmanager
 from typing import Any, Generator, Optional
 
-import sqlalchemy
 import psycopg2
+import sqlalchemy
 import sqlalchemy.pool as pool
 from apiflask import APIFlask
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import scoped_session, sessionmaker, session
+from sqlalchemy import engine
+from sqlalchemy.orm import scoped_session, session, sessionmaker
 
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
 from api.db.migrations.run import have_all_migrations_run
+
+# Re-export the Engine type that is returned by the create_db_engine() method
+Engine = engine.Engine
 
 # Re-export the Session type that is returned by the get_session() method
 # to be used for type hints.
