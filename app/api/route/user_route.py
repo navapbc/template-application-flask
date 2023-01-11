@@ -4,10 +4,10 @@ from apiflask import APIBlueprint
 
 import api.logging as logging
 import api.services.users as user_service
+from api import db
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
 from api.route import response
-from api.route.api_context import api_context_manager
 from api.route.schemas import user_schemas
 from api.services import users
 
@@ -27,8 +27,8 @@ def user_post(user_params: users.CreateUserParams) -> dict:
     """
     logger.info("POST /v1/user")
 
-    with api_context_manager() as api_context:
-        user = user_service.create_user(user_params, api_context)
+    with db.get_session() as db_session:
+        user = user_service.create_user(db_session, user_params)
 
         logger.info(
             "Successfully inserted user",
@@ -48,8 +48,8 @@ def user_post(user_params: users.CreateUserParams) -> dict:
 def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
-    with api_context_manager() as api_context:
-        user = user_service.patch_user(user_id, patch_user_params, api_context)
+    with db.get_session() as db_session:
+        user = user_service.patch_user(db_session, user_id, patch_user_params)
 
         logger.info(
             "Successfully patched user",
@@ -65,8 +65,8 @@ def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
 def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
-    with api_context_manager() as api_context:
-        user = user_service.get_user(user_id, api_context)
+    with db.get_session() as db_session:
+        user = user_service.get_user(db_session, user_id)
 
         logger.info(
             "Successfully fetched user",

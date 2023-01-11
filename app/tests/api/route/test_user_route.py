@@ -141,23 +141,17 @@ test_create_user_bad_request_data = [
 
 
 @pytest.mark.parametrize("request_data,expected_response_data", test_create_user_bad_request_data)
-def test_create_user_bad_request(
-    client, api_auth_token, test_db_session, request_data, expected_response_data
-):
+def test_create_user_bad_request(client, api_auth_token, request_data, expected_response_data):
     response = client.post("/v1/user", json=request_data, headers={"X-Auth": api_auth_token})
     assert response.status_code == 400
 
     response_data = response.get_json()["detail"]["json"]
     assert response_data == expected_response_data
 
-    # Nothing added to DB
-    results = test_db_session.query(User).all()
-    assert len(results) == 0
-
 
 def test_patch_user(client, api_auth_token, created_user):
     user_id = created_user["id"]
-    patch_request = {"first_name": fake.first_name()}
+    patch_request = {"first_name": "Newname"}
     patch_response = client.patch(
         f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )

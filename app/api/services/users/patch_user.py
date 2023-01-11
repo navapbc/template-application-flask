@@ -4,8 +4,8 @@ from typing import TypedDict
 import apiflask
 from sqlalchemy import orm
 
+from api import db
 from api.db.models.user_models import Role, User
-from api.route.api_context import ApiContext
 from api.services.users.create_user import RoleParams
 
 
@@ -23,34 +23,38 @@ class PatchUserParams(TypedDict, total=False):
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def patch_user(user_id: str, patch_user_params: PatchUserParams, api_context: ApiContext) -> User:
-    # TODO: move this to service and/or persistence layer
-    user = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+def patch_user(
+    db_session: db.Session,
+    user_id: str,
+    patch_user_params: PatchUserParams,
+) -> User:
 
-    if user is None:
-        # TODO move HTTP related logic out of service layer to controller layer and just return None from here
-        # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
-        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
+    with db_session.begin():
+        # TODO: move this to service and/or persistence layer
+        user = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
-    for key, value in patch_user_params.items():
-        if key == "roles":
-            _handle_role_patch(user, patch_user_params["roles"], api_context)
-            continue
+        if user is None:
+            # TODO move HTTP related logic out of service layer to controller layer and just return None from here
+            # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
+            raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
-        setattr(user, key, value)
+        for key, value in patch_user_params.items():
+            if key == "roles":
+                _handle_role_patch(db_session, user, patch_user_params["roles"])
+                continue
 
-    # Flush the changes to the DB and then
-    # refresh to get the roles updated on
-    # the user object that may have been changed
-    api_context.db_session.flush()
-    api_context.db_session.refresh(user)
+            setattr(user, key, value)
+
+        # Flush the changes to the DB and then
+        # refresh to get the roles updated on
+        # the user object that may have been changed
+        db_session.flush()
+        db_session.refresh(user)
 
     return user
 
 
-def _handle_role_patch(
-    user: User, request_roles: list[RoleParams], api_context: ApiContext
-) -> None:
+def _handle_role_patch(db_session: db.Session, user: User, request_roles: list[RoleParams]) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
     # 1. The roles match -> do nothing
@@ -82,10 +86,10 @@ def _handle_role_patch(
     if user.roles:
         for current_user_role in user.roles:
             if current_user_role.type in roles_to_delete:
-                api_context.db_session.delete(current_user_role)
+                db_session.delete(current_user_role)
 
     # Add any new roles
     for role_type in roles_to_add:
         # TODO: instead, add to user.roles directly without user_id=user.id and let SQLAlchemy handle the foreign key assignment
         user_role = Role(user_id=user.id, type=role_type)
-        api_context.db_session.add(user_role)
+        db_session.add(user_role)
