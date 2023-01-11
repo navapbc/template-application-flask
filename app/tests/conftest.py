@@ -64,7 +64,8 @@ def empty_schema(monkeypatch):
     The monkeypatch setup of the test_db_schema fixture causes this issues
     so copied here with that adjusted
     """
-    return db_utils.test_db_schema(monkeypatch)
+    with db_utils.test_db_schema(monkeypatch) as db_engine:
+        yield db_engine
 
 
 @pytest.fixture
