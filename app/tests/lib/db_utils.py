@@ -8,7 +8,12 @@ logger = logging.get_logger(__name__)
 
 
 @contextlib.contextmanager
-def mock_db(monkeypatch) -> db.Engine:
+def test_db_schema(monkeypatch) -> db.Engine:
+    """
+    Creates a temporary PostgreSQL schema and creates a database engine
+    that connects to that schema. Drops the schema after the context manager
+    exits.
+    """
     schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
     monkeypatch.setenv("POSTGRES_DB", "main-db")

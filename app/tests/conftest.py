@@ -50,13 +50,46 @@ def test_db(monkeypatch_session):
     is dropped after the test completes.
     """
 
-    with db_utils.mock_db(monkeypatch_session) as db_engine:
+    with db_utils.test_db_schema(monkeypatch_session) as db_engine:
         models.metadata.create_all(bind=db_engine)
         yield db_engine
 
 
 @pytest.fixture
+def empty_schema(monkeypatch):
+    """
+    Create a test schema, if it doesn't already exist, and drop it after the
+    test completes.
+
+    The monkeypatch setup of the test_db_schema fixture causes this issues
+    so copied here with that adjusted
+    """
+    return db_utils.test_db_schema(monkeypatch)
+
+
+@pytest.fixture
 def test_db_session(test_db):
+    # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+    connection = test_db.connect()
+    trans = connection.begin()
+    session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
+
+    session.begin_nested()
+
+    @sqlalchemy.event.listens_for(session, "after_transaction_end")
+    def restart_savepoint(session, transaction):
+        if transaction.nested and not transaction._parent.nested:
+            session.begin_nested()
+
+    yield session
+
+    session.close()
+    trans.rollback()
+    connection.close()
+
+
+@pytest.fixture
+def test_db_session_isolated(test_db_isolated):
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     connection = test_db.connect()
     trans = connection.begin()
