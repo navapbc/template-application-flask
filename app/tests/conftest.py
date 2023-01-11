@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker
 import api.app as app_entry
 import api.db
 import api.logging
+from api.db import models
 
 logger = api.logging.get_logger(__name__)
 
@@ -23,6 +24,11 @@ logger = api.logging.get_logger(__name__)
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="session")
 def monkeypatch_session(request):
+    """
+    Create a monkeypatch instance that can be used to
+    monkeypatch global environment, objects, and attributes
+    for the duration the test session.
+    """
     mpatch = _pytest.monkeypatch.MonkeyPatch()
     yield mpatch
     mpatch.undo()
@@ -61,8 +67,8 @@ def db_schema_drop(schema_name):
 @pytest.fixture(scope="session")
 def test_db_schema(monkeypatch_session):
     """
-    Create a test schema, if it doesn't already exist, and drop it after the
-    test completes.
+    Create a PostgreSQL schema to be used for the duration of the test session,
+    if it doesn't already exist, and drop it after the test session completes.
     """
     schema_name = f"test_schema_{uuid.uuid4().int}"
 
@@ -86,17 +92,10 @@ def test_db(test_db_schema):
     is dropped after the test completes.
     """
 
-    # not used directly, but loads models into Base
-    from api.db.models.base import Base
+    db_engine = api.db.create_db_engine()
+    models.metadata.create_all(bind=db_engine)
 
-    engine = api.db.create_db_engine()
-    Base.metadata.create_all(bind=engine)
-
-    db_session = api.db.init()
-    db_session.close()
-    db_session.remove()
-
-    return engine
+    return db_engine
 
 
 @pytest.fixture

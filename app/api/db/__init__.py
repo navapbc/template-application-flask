@@ -1,13 +1,13 @@
 import os
 import urllib.parse
+import contextlib
 from contextlib import contextmanager
 from typing import Any, Generator, Optional
 
-import flask_sqlalchemy
+import sqlalchemy
 import psycopg2
 import sqlalchemy.pool as pool
 from apiflask import APIFlask
-from sqlalchemy import create_engine, MetaData
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import scoped_session, sessionmaker, session
 
@@ -21,53 +21,77 @@ Session = session.Session
 
 logger = api.logging.get_logger(__name__)
 
-# The flask_sqlalchemy.SQLAlchemy instance.
-# _db.session is the scoped_session instance that is automatically scoped to
-# the current request. The type of _db.session `type(_db.session)` is
-# `scoped_session`, which we re-export as `Session``.
-_db: flask_sqlalchemy.SQLAlchemy
+# The scoped_session registry. Calling the registry returns the
+# sqlalchemy.orm.Session object for the current active Flask application context.
+# See https://docs.sqlalchemy.org/en/20/orm/contextual.html
+_get_session: Optional[scoped_session] = None
 
 
-def init2(
+def init_app(
+    db_engine: Engine,
     flask_app: APIFlask,
-    config: Optional[DbConfig] = None,
 ):
-    global _db
+    global _get_session
 
-    db_config: DbConfig = config if config is not None else get_db_config()
+    logger.info("connecting to postgres db")
 
-    flask_app.config["SQLALCHEMY_DATABASE_URI"] = make_connection_uri(db_config)
-    flask_app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-        # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
-        # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#psycopg2-fast-execution-helpers
-        "executemany_mode": "batch",
-        "hide_parameters": db_config.hide_sql_parameter_logs,
-        # TODO: Don't think we need this as we aren't using JSON columns, but keeping for reference
-        # json_serializer=lambda o: json.dumps(o, default=pydantic.json.pydantic_encoder),
-    }
+    conn = db_engine.connect()
 
-    # create the extension
-    _db = flask_sqlalchemy.SQLAlchemy(
-        # Override the default naming of constraints
-        # to use suffixes instead:
-        # https://stackoverflow.com/questions/4107915/postgresql-default-constraint-names/4108266#4108266
-        metadata=MetaData(
-            naming_convention={
-                "ix": "%(column_0_label)s_idx",
-                "uq": "%(table_name)s_%(column_0_name)s_uniq",
-                "ck": "%(table_name)s_`%(constraint_name)s_check`",
-                "fk": "%(table_name)s_%(column_0_name)s_%(referred_table_name)s_fkey",
-                "pk": "%(table_name)s_pkey",
-            }
-        ),
-        session_options={
-            "autocommit": False,
-            "expire_on_commit": False,
+    conn_info = conn.connection.dbapi_connection.info  # type: ignore
+    logger.info(
+        "connected to postgres db",
+        extra={
+            "dbname": conn_info.dbname,
+            "user": conn_info.user,
+            "host": conn_info.host,
+            "port": conn_info.port,
+            "options": conn_info.options,
+            "dsn_parameters": conn_info.dsn_parameters,
+            "protocol_version": conn_info.protocol_version,
+            "server_version": conn_info.server_version,
         },
     )
+    verify_ssl(conn_info)
 
-    # initialize the Flask app with the Flask-SQLAlchemy extension
-    _db.init_app(flask_app)
+    # Explicitly commit sessions — usually with session_scope. Also disable expiry on commit,
+    # as we don't need to be strict on consistency within our routes. Once we've retrieved data
+    # from the database, we shouldn't make any extra requests to the db when grabbing existing
+    # attributes.
+    _get_session = scoped_session(
+        sessionmaker(autocommit=False, expire_on_commit=False, bind=db_engine)
+    )
+
+    # TODO add check_migrations_current to config
+    # if check_migrations_current:
+    #     have_all_migrations_run(engine)
+
+    db_engine.dispose()
+
+    # Register the teardown method to be called at the end of each Flask request.
+    flask_app.teardown_request(_close_session)
+
+
+def _close_session(exception: Optional[BaseException] = None) -> None:
+    """
+    Close the database session at the end of the Flask request.
+    This also removes the current session from the scoped session registry.
+    Future calls to the scoped session registry creates a new Session instance.
+    """
+    try:
+        logger.debug("Closing DB session")
+        if _get_session is not None:
+            # The scoped_session.remove() method first calls Session.close() on
+            # the current Session, which has the effect of releasing any
+            # connection/transactional resources owned by the Session first,
+            # then discarding the Session itself. “Releasing” here means that
+            # connections are returned to their connection pool and any
+            # transactional state is rolled back, ultimately using the
+            # rollback() method of the underlying DBAPI connection.
+            # See https://docs.sqlalchemy.org/en/20/orm/contextual.html
+            _get_session.remove()
+
+    except Exception:
+        logger.exception("Exception while closing DB session")
 
 
 def init(
@@ -125,6 +149,8 @@ def verify_ssl(connection_info: Any) -> None:
         logger.warning("database connection is not using SSL")
 
 
+# TODO rename to create_db since the key interface is that it's something that responds
+# to .connect() method. Doesn't really matter that it's an Engine class instance
 def create_db_engine(config: Optional[DbConfig] = None) -> Engine:
     db_config: DbConfig = config if config is not None else get_db_config()
 
@@ -144,7 +170,7 @@ def create_db_engine(config: Optional[DbConfig] = None) -> Engine:
     # handles the actual connections.
     #
     # (a SQLAlchemy Engine represents a Dialect+Pool)
-    return create_engine(
+    return sqlalchemy.create_engine(
         "postgresql://",
         pool=conn_pool,
         # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
@@ -232,8 +258,10 @@ def make_connection_uri(config: DbConfig) -> str:
 
 
 def get_session() -> Session:
-    # _db.session is a scoped_session. Calling `_db.session` returns the
+    if _get_session is None:
+        raise Exception("Session factory not initialized. Did you call init_app?")
+    # _get_session is a scoped_session registry. Calling the registry returns the
     # current Session i.e. the session for the current Flask request
     # see https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.session
     # and https://docs.sqlalchemy.org/en/20/orm/contextual.html
-    return _db.session()
+    return _get_session()

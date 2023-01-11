@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
 from api.db.models.base import Base, IdMixin, TimestampMixin
+from api.db import models
 
 logger = api.logging.get_logger(__name__)
 
@@ -29,7 +30,7 @@ class User(Base, IdMixin, TimestampMixin):
     is_active: bool = Column(Boolean, nullable=False)
 
     roles: Optional[list["Role"]] = relationship(
-        "Role", back_populates="user", order_by="Role.type"
+        "Role", back_populates="user", order_by="Role.type", cascade="all, delete-orphan"
     )
 
 

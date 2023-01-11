@@ -4,7 +4,6 @@ from typing import Generator, Optional
 
 from apiflask import APIFlask
 from flask import g
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import Unauthorized
 
 import api.db as db
@@ -29,7 +28,9 @@ def create_app(
 
     app = APIFlask(__name__)
 
-    db.init2(app)
+    db_engine = db.create_db_engine()
+
+    db.init_app(db_engine, app)
 
     # Add various configurations, and
     # adjustments to the application

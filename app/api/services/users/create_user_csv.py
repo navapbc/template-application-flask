@@ -25,7 +25,7 @@ USER_CSV_RECORD_HEADERS = UserCsvRecord(
 )
 
 
-def create_user_csv(db_session: db.scoped_session, output_file_path: str) -> None:
+def create_user_csv(db_session: db.Session, output_file_path: str) -> None:
     # Get DB records
     user_records = get_user_records(db_session)
 
@@ -34,7 +34,7 @@ def create_user_csv(db_session: db.scoped_session, output_file_path: str) -> Non
     generate_csv_file(csv_records, output_file_path)
 
 
-def get_user_records(db_session: db.scoped_session) -> list[User]:
+def get_user_records(db_session: db.Session) -> list[User]:
     logger.info("Fetching user records from DB")
     user_records = db_session.query(User).all()
 

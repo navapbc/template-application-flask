@@ -3,8 +3,9 @@ import os
 
 import pytest
 from smart_open import open as smart_open
+from api.db.models.user_models import User
 
-from api.scripts.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
+from api.services.users.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from api.util.file_util import list_files
 from api.util.string_utils import blank_for_null
 from tests.api.db.models.factories import UserFactory
@@ -44,6 +45,9 @@ def validate_csv_records(db_records, csv_records):
 
 def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_s3_bucket):
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
+
+    test_db_session.query(User).delete()
+
     # To make validating these easier in the CSV, make the names consistent
     db_records = [
         UserFactory.create(first_name="A"),
