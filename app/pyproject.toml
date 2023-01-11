@@ -99,10 +99,7 @@ disallow_untyped_defs = false
 filterwarnings = [
   "ignore::DeprecationWarning:botocore.*",
   "ignore::DeprecationWarning:apispec.*",
-  "ignore::DeprecationWarning:certifi.*",
-]
+  "ignore::DeprecationWarning:certifi.*"] # pytest-watch errors if the closing bracket is on it's own line
 
 [tool.coverage.run]
-omit = [
-  "api/db/migrations/*.py",
-]
+omit = ["api/db/migrations/*.py"]
