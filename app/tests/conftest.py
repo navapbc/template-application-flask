@@ -46,11 +46,27 @@ def monkeypatch_module(request):
 @pytest.fixture(scope="session")
 def test_db(monkeypatch_session):
     """
-    Creates a test schema, directly creating all tables with SQLAlchemy. Schema
-    is dropped after the test completes.
+    Creates a test schema, directly creating all tables with SQLAlchemy,
+    and returns a db_engine that can connect to this schema.
+    Schema is dropped after the test suite session completes.
     """
 
     with db_utils.test_db_schema(monkeypatch_session) as db_engine:
+        models.metadata.create_all(bind=db_engine)
+        yield db_engine
+
+
+@pytest.fixture
+def test_db_isolated(monkeypatch):
+    """
+    Creates a test schema, directly creating all tables with SQLAlchemy,
+    and returns a db_engine that can connect to this schema.
+    Schema is dropped after the test completes. This is similar to the
+    test_db fixture except the scope of the schema is the individual test
+    rather the test session.
+    """
+
+    with db_utils.test_db_schema(monkeypatch) as db_engine:
         models.metadata.create_all(bind=db_engine)
         yield db_engine
 
