@@ -8,7 +8,8 @@ logger = logging.get_logger(__name__)
 
 
 @contextlib.contextmanager
-def mock_db(monkeypatch, schema_name: str) -> db.Engine:
+def mock_db(monkeypatch) -> db.Engine:
+    schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
     monkeypatch.setenv("POSTGRES_DB", "main-db")
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")

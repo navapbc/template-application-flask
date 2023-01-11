@@ -50,8 +50,7 @@ def test_db(monkeypatch_session):
     is dropped after the test completes.
     """
 
-    schema_name = f"test_schema_{uuid.uuid4().int}"
-    with db_utils.mock_db(monkeypatch_session, schema_name) as db_engine:
+    with db_utils.mock_db(monkeypatch_session) as db_engine:
         models.metadata.create_all(bind=db_engine)
         yield db_engine
 

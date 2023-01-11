@@ -35,7 +35,7 @@ def test_only_single_head_revision_in_migrations():
 
 
 @pytest.fixture
-def test_db_schema_non_session(monkeypatch):
+def test_db_isolated(monkeypatch):
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
@@ -43,18 +43,17 @@ def test_db_schema_non_session(monkeypatch):
     The monkeypatch setup of the test_db_schema fixture causes this issues
     so copied here with that adjusted
     """
-    schema_name = "test_schema_session_1234"
-    return db_utils.mock_db(monkeypatch, schema_name)
+    return db_utils.mock_db(monkeypatch)
 
 
-def test_db_setup_via_alembic_migration(test_db_schema_non_session, logging_fix, caplog):
+def test_db_setup_via_alembic_migration(test_db_isolated, logging_fix, caplog):
     caplog.set_level(logging.INFO)  # noqa: B1
     command.upgrade(alembic_cfg, "head")
     # Verify the migration ran by checking the logs
     assert "Running upgrade" in caplog.text
 
 
-def test_db_init_with_migrations(test_db_schema_non_session):
+def test_db_init_with_migrations(test_db_isolated):
     # Verify the DB session works after initializing the migrations
     db_session = api.db.init()
 
