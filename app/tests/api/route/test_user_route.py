@@ -143,7 +143,7 @@ test_create_user_bad_request_data = [
 @pytest.mark.parametrize("request_data,expected_response_data", test_create_user_bad_request_data)
 def test_create_user_bad_request(client, api_auth_token, request_data, expected_response_data):
     response = client.post("/v1/user", json=request_data, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = response.get_json()["detail"]["json"]
     assert response_data == expected_response_data
