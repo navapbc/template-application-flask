@@ -65,11 +65,12 @@ def db_schema_drop(schema_name):
 
 
 @pytest.fixture(scope="session")
-def test_db_schema(monkeypatch_session):
+def test_db(monkeypatch_session):
     """
-    Create a PostgreSQL schema to be used for the duration of the test session,
-    if it doesn't already exist, and drop it after the test session completes.
+    Creates a test schema, directly creating all tables with SQLAlchemy. Schema
+    is dropped after the test completes.
     """
+
     schema_name = f"test_schema_{uuid.uuid4().int}"
 
     monkeypatch_session.setenv("DB_SCHEMA", schema_name)
@@ -80,22 +81,12 @@ def test_db_schema(monkeypatch_session):
 
     db_schema_create(schema_name)
     try:
-        yield schema_name
+        db_engine = api.db.create_db_engine()
+        models.metadata.create_all(bind=db_engine)
+
+        yield db_engine
     finally:
         db_schema_drop(schema_name)
-
-
-@pytest.fixture(scope="session")
-def test_db(test_db_schema):
-    """
-    Creates a test schema, directly creating all tables with SQLAlchemy. Schema
-    is dropped after the test completes.
-    """
-
-    db_engine = api.db.create_db_engine()
-    models.metadata.create_all(bind=db_engine)
-
-    return db_engine
 
 
 @pytest.fixture
