@@ -28,11 +28,6 @@ Session = session.Session
 
 logger = api.logging.get_logger(__name__)
 
-# The scoped_session registry. Calling the registry returns the
-# sqlalchemy.orm.Session object for the current active Flask application context.
-# See https://docs.sqlalchemy.org/en/20/orm/contextual.html
-_get_session: Optional[scoped_session] = None
-
 _db_engine: Optional[Engine] = None
 
 
@@ -75,73 +70,6 @@ def get_session() -> Session:
     if _db_engine is None:
         raise Exception("_db_engine not initialized. Did you call init_db?")
     return Session(bind=_db_engine, expire_on_commit=False, autocommit=False)
-
-
-def init_app(
-    db_engine: Engine,
-    flask_app: APIFlask,
-):
-    global _get_session
-
-    logger.info("connecting to postgres db")
-
-    conn = db_engine.connect()
-
-    conn_info = conn.connection.dbapi_connection.info  # type: ignore
-    logger.info(
-        "connected to postgres db",
-        extra={
-            "dbname": conn_info.dbname,
-            "user": conn_info.user,
-            "host": conn_info.host,
-            "port": conn_info.port,
-            "options": conn_info.options,
-            "dsn_parameters": conn_info.dsn_parameters,
-            "protocol_version": conn_info.protocol_version,
-            "server_version": conn_info.server_version,
-        },
-    )
-    verify_ssl(conn_info)
-
-    # Explicitly commit sessions — usually with session_scope. Also disable expiry on commit,
-    # as we don't need to be strict on consistency within our routes. Once we've retrieved data
-    # from the database, we shouldn't make any extra requests to the db when grabbing existing
-    # attributes.
-    _get_session = scoped_session(
-        sessionmaker(autocommit=False, expire_on_commit=False, bind=db_engine)
-    )
-
-    # TODO add check_migrations_current to config
-    # if check_migrations_current:
-    #     have_all_migrations_run(engine)
-
-    db_engine.dispose()
-
-    # Register the teardown method to be called at the end of each Flask request.
-    flask_app.teardown_request(_close_session)
-
-
-def _close_session(exception: Optional[BaseException] = None) -> None:
-    """
-    Close the database session at the end of the Flask request.
-    This also removes the current session from the scoped session registry.
-    Future calls to the scoped session registry creates a new Session instance.
-    """
-    try:
-        logger.debug("Closing DB session")
-        if _get_session is not None:
-            # The scoped_session.remove() method first calls Session.close() on
-            # the current Session, which has the effect of releasing any
-            # connection/transactional resources owned by the Session first,
-            # then discarding the Session itself. “Releasing” here means that
-            # connections are returned to their connection pool and any
-            # transactional state is rolled back, ultimately using the
-            # rollback() method of the underlying DBAPI connection.
-            # See https://docs.sqlalchemy.org/en/20/orm/contextual.html
-            _get_session.remove()
-
-    except Exception:
-        logger.exception("Exception while closing DB session")
 
 
 def init(
