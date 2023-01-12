@@ -94,28 +94,24 @@ def empty_schema(monkeypatch) -> api.db.DB:
 
 @pytest.fixture
 def test_db_session(db: api.db.DB) -> api.db.Session:
-    # TODO refactor to use context managers
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = db.get_connection()
-    trans = connection.begin()
+    with db.get_connection() as connection:
+        trans = connection.begin()
 
-    # Rather than call db.get_session() to create a new session with a new connection,
-    # create a session bound to the existing connection that has a transaction manually start.
-    # This allows the transaction to be rolled back after the test completes.
-    session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
-
-    session.begin_nested()
-
-    @sqlalchemy.event.listens_for(session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
+        # Rather than call db.get_session() to create a new session with a new connection,
+        # create a session bound to the existing connection that has a transaction manually start.
+        # This allows the transaction to be rolled back after the test completes.
+        with api.db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
             session.begin_nested()
 
-    yield session
+            @sqlalchemy.event.listens_for(session, "after_transaction_end")
+            def restart_savepoint(session, transaction):
+                if transaction.nested and not transaction._parent.nested:
+                    session.begin_nested()
 
-    session.close()
-    trans.rollback()
-    connection.close()
+            yield session
+
+        trans.rollback()
 
 
 @pytest.fixture
