@@ -7,6 +7,9 @@ services:
   main-db:
     image: postgres:14-alpine # Docs for options to the postgres server command:
     # https://www.postgresql.org/docs/current/app-postgres.html
+
+    container_name: main-db
+
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     # Load environment variables for local development. 
     env_file: ./app/local.env
@@ -21,6 +24,8 @@ services:
     # not on an image repository.
     build: ./app
     # Expose the application port for local development.
+
+    container_name: main-app
 
     # Load environment variables for local development
     env_file: ./app/local.env
