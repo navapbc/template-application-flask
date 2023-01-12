@@ -16,10 +16,6 @@ class RoleSchema(request_schema.OrderedSchema):
         metadata={"description": "The name of the role"},
     )
 
-    # Output only fields
-    created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
-
     # Note that user_id is not included in the API schema since the role
     # will always be a nested fields of the API user
 
