@@ -80,7 +80,7 @@ def user_get(user_id: str) -> dict:
         return response.ApiResponse(message="Success", data=user).asdict()
 
 
-# TODO move create_csv_script to a flask cli command
+# TODO move create_csv_script to a flask cli command so we don't need script_util.script_context_manager
 # @user_blueprint.cli.command("create_csv")
 # @click.argument("out")
 # def create_csv(out) -> None:
