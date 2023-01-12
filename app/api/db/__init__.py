@@ -41,7 +41,6 @@ import psycopg2
 import sqlalchemy
 import sqlalchemy.pool as pool
 from apiflask import APIFlask
-from sqlalchemy import engine
 from sqlalchemy.orm import session
 
 import api.logging
@@ -51,10 +50,7 @@ FLASK_EXTENSION_KEY = "db"
 
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.
-Connection = engine.Connection
-
-# Re-export the Engine type that is returned by the create_db_engine() method
-Engine = engine.Engine
+Connection = sqlalchemy.engine.Connection
 
 # Re-export the Session type that is returned by the get_session() method
 # to be used for type hints.
@@ -70,7 +66,7 @@ class DB:
     It has methods for getting a new connection or session object.
     """
 
-    _engine: Engine
+    _engine: sqlalchemy.engine.Engine
 
     def __init__(self) -> None:
         self._engine = _create_db_engine()
@@ -173,7 +169,7 @@ def verify_ssl(connection_info: Any) -> None:
 
 # TODO rename to create_db since the key interface is that it's something that responds
 # to .connect() method. Doesn't really matter that it's an Engine class instance
-def _create_db_engine(config: Optional[DbConfig] = None) -> Engine:
+def _create_db_engine(config: Optional[DbConfig] = None) -> sqlalchemy.engine.Engine:
     db_config: DbConfig = config if config is not None else get_db_config()
 
     # We want to be able to control the connection parameters for each
