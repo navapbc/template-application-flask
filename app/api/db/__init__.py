@@ -79,34 +79,33 @@ class DB:
     def get_session(self) -> Session:
         return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
 
+    def test_db_connection(self):
+        logger.info("connecting to postgres db")
+        with self.get_connection() as conn:
+            conn_info = conn.connection.dbapi_connection.info
+
+            logger.info(
+                "connected to postgres db",
+                extra={
+                    "dbname": conn_info.dbname,
+                    "user": conn_info.user,
+                    "host": conn_info.host,
+                    "port": conn_info.port,
+                    "options": conn_info.options,
+                    "dsn_parameters": conn_info.dsn_parameters,
+                    "protocol_version": conn_info.protocol_version,
+                    "server_version": conn_info.server_version,
+                },
+            )
+            verify_ssl(conn_info)
+
+            # TODO add check_migrations_current to config
+            # if check_migrations_current:
+            #     have_all_migrations_run(engine)
+
 
 def init_db():
     return DB()
-
-
-def test_db_connection():
-    logger.info("connecting to postgres db")
-    with get_connection() as conn:
-        conn_info = conn.connection.dbapi_connection.info
-
-        logger.info(
-            "connected to postgres db",
-            extra={
-                "dbname": conn_info.dbname,
-                "user": conn_info.user,
-                "host": conn_info.host,
-                "port": conn_info.port,
-                "options": conn_info.options,
-                "dsn_parameters": conn_info.dsn_parameters,
-                "protocol_version": conn_info.protocol_version,
-                "server_version": conn_info.server_version,
-            },
-        )
-        verify_ssl(conn_info)
-
-        # TODO add check_migrations_current to config
-        # if check_migrations_current:
-        #     have_all_migrations_run(engine)
 
 
 def init(
