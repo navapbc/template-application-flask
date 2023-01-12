@@ -136,7 +136,7 @@ class DB:
             #     have_all_migrations_run(engine)
 
 
-def init_db() -> DB:
+def init() -> DB:
     return DB()
 
 

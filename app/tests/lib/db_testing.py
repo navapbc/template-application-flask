@@ -21,7 +21,7 @@ def create_isolated_db(monkeypatch) -> None:
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")
     monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
     monkeypatch.setenv("ENVIRONMENT", "local")
-    db = api.db.init_db()
+    db = api.db.init()
     with db.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:

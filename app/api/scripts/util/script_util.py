@@ -32,7 +32,7 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # metrics (eg. New Relic) and so on in a way that
     # helps prevent so much boilerplate code.
 
-    db = api.db.init_db()
+    db = api.db.init()
     db.check_db_connection()
     with db.get_session() as db_session:
         script_context = ScriptContext(db_session)
