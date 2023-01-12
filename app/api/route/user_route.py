@@ -3,10 +3,10 @@ from typing import Any
 from apiflask import APIBlueprint
 from flask import current_app
 
+import api.db
 import api.logging as logging
 import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
-from api.db import DB
 from api.db.models.user_models import User
 from api.route import response
 from api.route.schemas import user_schemas
@@ -28,7 +28,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
     """
     logger.info("POST /v1/user")
 
-    db: DB = current_app.extensions["db"]
+    db = api.db.get_db(current_app)
     with db.get_session() as db_session:
         user = user_service.create_user(db_session, user_params)
 
@@ -50,7 +50,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
 def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
-    db: DB = current_app.extensions["db"]
+    db = api.db.get_db(current_app)
     with db.get_session() as db_session:
         user = user_service.patch_user(db_session, user_id, patch_user_params)
 
@@ -68,7 +68,7 @@ def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
 def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
-    db: DB = current_app.extensions["db"]
+    db = api.db.get_db(current_app)
     with db.get_session() as db_session:
         user = user_service.get_user(db_session, user_id)
 
@@ -99,7 +99,7 @@ def user_get(user_id: str) -> dict:
 
 #     #     create_user_csv(script_context.db_session, output_file_path)
 
-#     db: DB = current_app.extensions["db"]
+#     db = api.db.get_db(current_app)
 #     with db.get_session() as db_session:
 #         user_service.create_user_csv(db_session, out)
 

@@ -40,7 +40,7 @@ from typing import Any, Optional
 import psycopg2
 import sqlalchemy
 import sqlalchemy.pool as pool
-from apiflask import APIFlask
+from flask import Flask
 from sqlalchemy.orm import session
 
 import api.logging
@@ -71,7 +71,7 @@ class DB:
     def __init__(self) -> None:
         self._engine = _create_db_engine()
 
-    def init_app(self, app: APIFlask) -> None:
+    def init_app(self, app: Flask) -> None:
         """Initialize the Flask app.
 
         Add the database to the Flask app's extensions so that it can be
@@ -139,7 +139,7 @@ def init_db() -> DB:
     return DB()
 
 
-def get_db(app: APIFlask) -> DB:
+def get_db(app: Flask) -> DB:
     """Get the database connection for the given Flask app.
 
     Use this in request handlers to access the database from the active Flask app.
