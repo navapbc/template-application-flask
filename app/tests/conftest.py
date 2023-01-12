@@ -119,7 +119,7 @@ def test_db_session(db: api.db.DB) -> api.db.Session:
 
 
 @pytest.fixture
-def initialize_factories_session(monkeypatch, test_db_session) -> api.db.Session:
+def factories_session(monkeypatch, test_db_session) -> api.db.Session:
     monkeypatch.setattr(factories, "_db_session", test_db_session)
     logger.info("set factories db_session to %s", test_db_session)
     return test_db_session

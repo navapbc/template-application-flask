@@ -43,7 +43,7 @@ def validate_csv_records(db_records, csv_records):
         )
 
 
-def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_s3_bucket):
+def test_create_user_csv_s3(test_db_session, factories_session, mock_s3_bucket):
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
 
     # To make validating these easier in the CSV, make the names consistent
@@ -65,9 +65,7 @@ def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_
     assert "test.csv" in list_files(f"s3://{mock_s3_bucket}/path/to/")
 
 
-def test_create_user_csv_local(
-    test_db_session, initialize_factories_session, tmp_path, tmp_file_path
-):
+def test_create_user_csv_local(test_db_session, factories_session, tmp_path, tmp_file_path):
     # Same as above test, but verifying the file logic
     # works locally in addition to S3.
     db_records = [

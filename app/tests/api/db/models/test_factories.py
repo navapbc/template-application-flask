@@ -54,12 +54,12 @@ def test_user_factory_build():
 
 def test_factory_create_uninitialized_db_session(test_db_session):
     # DB factory access is disabled from tests unless you add the
-    # 'initialize_factories_session' fixture.
+    # 'factories_session' fixture.
     with pytest.raises(Exception, match="Factory db_session is not initialized."):
         UserFactory.create()
 
 
-def test_user_factory_create(test_db_session, initialize_factories_session):
+def test_user_factory_create(test_db_session, factories_session):
     # Create actually writes a record to the DB when run
     # so we'll check the DB directly as well.
     user = UserFactory.create()
@@ -85,7 +85,7 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     assert len(all_db_records) == 3
 
 
-def test_role_factory_create(test_db_session, initialize_factories_session):
+def test_role_factory_create(test_db_session, factories_session):
     # Verify if you build a Role directly, it gets
     # a user attached to it with that single role
     role = RoleFactory.create()
