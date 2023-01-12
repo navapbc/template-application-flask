@@ -121,6 +121,14 @@ def factories_session(monkeypatch, test_db_session) -> api.db.Session:
     return test_db_session
 
 
+@pytest.fixture
+def isolated_db_factories_session(monkeypatch, isolated_db: api.db.DB) -> api.db.Session:
+    with isolated_db.get_session() as session:
+        monkeypatch.setattr(factories, "_db_session", session)
+        logger.info("set factories db_session to %s", session)
+        yield session
+
+
 ####################
 # Logging
 ####################

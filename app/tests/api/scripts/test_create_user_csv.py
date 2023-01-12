@@ -43,7 +43,7 @@ def validate_csv_records(db_records, csv_records):
         )
 
 
-def test_create_user_csv_s3(test_db_session, factories_session, mock_s3_bucket):
+def test_create_user_csv_s3(isolated_db_factories_session, mock_s3_bucket):
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
 
     # To make validating these easier in the CSV, make the names consistent
@@ -52,20 +52,20 @@ def test_create_user_csv_s3(test_db_session, factories_session, mock_s3_bucket):
         UserFactory.create(first_name="B"),
     ]
 
-    create_user_csv(test_db_session, s3_filepath)
+    create_user_csv(isolated_db_factories_session, s3_filepath)
     csv_rows = read_csv_records(s3_filepath)
     validate_csv_records(db_records, csv_rows)
 
     # If we add another DB record it'll go in the file as well
     db_records.append(UserFactory.create(first_name="C"))
-    create_user_csv(test_db_session, s3_filepath)
+    create_user_csv(isolated_db_factories_session, s3_filepath)
     csv_rows = read_csv_records(s3_filepath)
     validate_csv_records(db_records, csv_rows)
 
     assert "test.csv" in list_files(f"s3://{mock_s3_bucket}/path/to/")
 
 
-def test_create_user_csv_local(test_db_session, factories_session, tmp_path, tmp_file_path):
+def test_create_user_csv_local(isolated_db_factories_session, tmp_path, tmp_file_path):
     # Same as above test, but verifying the file logic
     # works locally in addition to S3.
     db_records = [
@@ -73,7 +73,7 @@ def test_create_user_csv_local(test_db_session, factories_session, tmp_path, tmp
         UserFactory.create(first_name="B"),
     ]
 
-    create_user_csv(test_db_session, tmp_file_path)
+    create_user_csv(isolated_db_factories_session, tmp_file_path)
     csv_rows = read_csv_records(tmp_file_path)
     validate_csv_records(db_records, csv_rows)
 
