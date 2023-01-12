@@ -76,10 +76,10 @@ class DB:
     def get_session(self) -> Session:
         return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
 
-    def test_db_connection(self):
+    def test_db_connection(self) -> None:
         logger.info("connecting to postgres db")
         with self.get_connection() as conn:
-            conn_info = conn.connection.dbapi_connection.info
+            conn_info = conn.connection.dbapi_connection.info  # type: ignore
 
             logger.info(
                 "connected to postgres db",
@@ -101,7 +101,7 @@ class DB:
             #     have_all_migrations_run(engine)
 
 
-def init_db():
+def init_db() -> DB:
     return DB()
 
 

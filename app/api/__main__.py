@@ -24,7 +24,7 @@ def main() -> None:
 
     db = api.db.init_db()
     db.test_db_connection()
-    app = api.app.create_app(db)
+    app = api.app.create_app(db=db)
     environment = app_config.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be
