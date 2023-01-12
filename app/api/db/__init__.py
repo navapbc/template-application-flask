@@ -95,9 +95,10 @@ class DB:
     def get_session(self) -> Session:
         """Return a new session object.
 
+        In general, only one session object should be created per request.
+
         If you want to automatically commit or rollback the session, use
         the session.begin() context manager.
-
         See https://docs.sqlalchemy.org/en/13/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
 
         Example:
