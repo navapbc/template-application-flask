@@ -5,7 +5,7 @@ It is recommended to import this module as `import api.db` rather than
 `from api import db` in order to avoid confusion with instances of `DB`
 which are named `db` by convention.
 
-Usage:
+Example:
     import api.db
 
     db = api.db.init_db()
@@ -19,6 +19,18 @@ Usage:
         session.query(...)
         with session.begin():
             session.add(...)
+
+Alternatively, if you are only importing the module for type hints (and
+to explicitly indicate dependencies), you can do `from api.db import DB`.
+
+Example:
+    from api.db import DB
+
+    @app.route("/health")
+    def health() -> Response:
+        db: DB = app.extensions["db"]
+        with db.get_connection() as conn:
+            conn.execute(...)
 """
 
 import contextlib
