@@ -76,7 +76,7 @@ class DB:
     def get_session(self) -> Session:
         return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
 
-    def test_db_connection(self) -> None:
+    def check_db_connection(self) -> None:
         logger.info("connecting to postgres db")
         with self.get_connection() as conn:
             conn_info = conn.connection.dbapi_connection.info  # type: ignore

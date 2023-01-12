@@ -33,7 +33,7 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
 
     # TODO use built in @flask.cli commands so that we can reuse flask app
     db = api.db.init_db()
-    db.test_db_connection()
+    db.check_db_connection()
     with db.get_session() as db_session:
         script_context = ScriptContext(db_session)
         yield script_context
