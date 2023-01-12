@@ -45,11 +45,9 @@ def patch_user(
 
             setattr(user, key, value)
 
-        # Flush the changes to the DB and then
-        # refresh to get the roles updated on
-        # the user object that may have been changed
-        db_session.flush()
-        db_session.refresh(user)
+    # Refresh to get the roles updated on
+    # the user object that may have been changed
+    db_session.refresh(user)
 
     return user
 
