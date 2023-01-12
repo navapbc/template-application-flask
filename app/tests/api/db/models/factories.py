@@ -45,6 +45,12 @@ def get_db_session() -> api.db.Session:
     return _db_session
 
 
+# The scopefunc ensures that the session gets cleaned up after each test
+# it implicitly calls `remove()` on the session.
+# see https://docs.sqlalchemy.org/en/14/orm/contextual.html
+Session = scoped_session(lambda: get_db_session(), scopefunc=lambda: get_db_session())
+
+
 class Generators:
     Now = factory.LazyFunction(datetime.now)
     UtcNow = factory.LazyFunction(datetime_util.utcnow)
@@ -54,7 +60,7 @@ class Generators:
 class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         abstract = True
-        sqlalchemy_session = scoped_session(get_db_session)
+        sqlalchemy_session = Session
         sqlalchemy_session_persistence = "commit"
 
 
