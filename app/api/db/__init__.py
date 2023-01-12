@@ -47,6 +47,8 @@ from sqlalchemy.orm import session
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
 
+FLASK_EXTENSION_KEY = "db"
+
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.
 Connection = engine.Connection
@@ -62,21 +64,55 @@ logger = api.logging.get_logger(__name__)
 
 
 class DB:
+    """Database connection manager.
+
+    This class is used to manage database connections for the Flask app.
+    It has methods for getting a new connection or session object.
+    """
+
     _engine: Engine
 
     def __init__(self) -> None:
         self._engine = _create_db_engine()
 
     def init_app(self, app: APIFlask) -> None:
-        app.extensions["db"] = self
+        """Initialize the Flask app.
+
+        Add the database to the Flask app's extensions so that it can be
+        accessed by request handlers using the current app context.
+
+        see get_db
+        """
+        app.extensions[FLASK_EXTENSION_KEY] = self
 
     def get_connection(self) -> Connection:
+        """Return a new database connection object.
+
+        Use the connection to execute SQL queries without using the ORM.
+
+        Usage:
+            with db.get_connection() as conn:
+                conn.execute(...)
+        """
         return self._engine.connect()
 
     def get_session(self) -> Session:
+        """Return a new session object.
+
+        If you want to automatically commit or rollback the session, use
+        the session.begin() context manager.
+
+        Example:
+            with db.get_session() as session:
+                with session.begin():
+                    session.add(...)
+                # session is automatically committed here
+                # or rolled back if an exception is raised
+        """
         return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
 
     def check_db_connection(self) -> None:
+        """Check that we can connect to the database and log some info about the connection."""
         logger.info("connecting to postgres db")
         with self.get_connection() as conn:
             conn_info = conn.connection.dbapi_connection.info  # type: ignore
@@ -103,6 +139,22 @@ class DB:
 
 def init_db() -> DB:
     return DB()
+
+
+def get_db(app: APIFlask) -> DB:
+    """Get the database connection for the given Flask app.
+
+    Use this in request handlers to access the database from the active Flask app.
+
+    Example:
+        from flask import current_app, Response
+        import api.db
+
+        @app.route("/health")
+        def health() -> Response:
+            db = api.db.get_db(current_app)
+    """
+    return app.extensions[FLASK_EXTENSION_KEY]
 
 
 def verify_ssl(connection_info: Any) -> None:
