@@ -169,10 +169,8 @@ def logging_fix(monkeypatch):
 
 
 @pytest.fixture
-def app(test_db_session):
-    return app_entry.create_app(
-        check_migrations_current=False, db_session_factory=test_db_session, do_close_db=False
-    )
+def app(test_db):
+    return app_entry.create_app(check_migrations_current=False, do_close_db=False)
 
 
 @pytest.fixture

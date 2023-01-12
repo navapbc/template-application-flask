@@ -34,7 +34,6 @@ def create_app(
     # adjustments to the application
     configure_app(app)
     register_blueprints(app)
-    register_request_handlers(app, db_session_factory, do_close_db)
 
     return app
 
@@ -100,33 +99,6 @@ def configure_app(app: APIFlask) -> None:
 def register_blueprints(app: APIFlask) -> None:
     app.register_blueprint(healthcheck_blueprint)
     app.register_blueprint(user_blueprint)
-
-
-def register_request_handlers(
-    app: APIFlask, db_session_factory: db.scoped_session, do_close_db: bool
-) -> None:
-    pass
-    # @app.before_request
-    # def push_db() -> None:
-    #     # Attach the DB session factory
-    #     # to the global Flask context
-    #     g.db = db_session_factory
-
-    # @app.teardown_request
-    # def close_db(exception: Optional[BaseException] = None) -> None:
-    #     if not do_close_db:
-    #         logger.debug("Not closing DB session")
-    #         return
-
-    #     try:
-    #         logger.debug("Closing DB session")
-    #         db = g.pop("db", None)
-
-    #         if db is not None:
-    #             db.remove()
-
-    #     except Exception:
-    #         logger.exception("Exception while closing DB session")
 
 
 def get_project_root_dir() -> str:
