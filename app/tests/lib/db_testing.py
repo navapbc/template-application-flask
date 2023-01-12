@@ -21,7 +21,10 @@ def create_isolated_db(monkeypatch) -> None:
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")
     monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
     monkeypatch.setenv("ENVIRONMENT", "local")
-    db = api.db.init()
+
+    # To improve test performance, don't check the database connection
+    # when initializing the DB client.
+    db = api.db.init(check_db_connection=False)
     with db.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:

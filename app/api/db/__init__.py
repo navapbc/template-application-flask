@@ -136,8 +136,15 @@ class DBClient:
             #     have_all_migrations_run(engine)
 
 
-def init() -> DBClient:
-    return DBClient()
+def init(*, check_db_connection: bool = True) -> DBClient:
+    db = DBClient()
+
+    # Try connecting to the database immediately upon initialization
+    # so that we can fail fast if the database is not available.
+    # Checking the db connection on db init is disabled in tests.
+    if check_db_connection:
+        db.check_db_connection()
+    return db
 
 
 def get_db(app: Flask) -> DBClient:

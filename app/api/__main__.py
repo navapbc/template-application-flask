@@ -23,7 +23,6 @@ def main() -> None:
     api.logging.init(__package__)
 
     db = api.db.init()
-    db.check_db_connection()
     app = api.app.create_app(db=db)
     environment = app_config.environment
 
