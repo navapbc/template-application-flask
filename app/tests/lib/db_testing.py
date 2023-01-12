@@ -1,3 +1,4 @@
+"""Helper functions for testing database code."""
 import contextlib
 import uuid
 
@@ -22,14 +23,14 @@ def create_isolated_db(monkeypatch) -> None:
     monkeypatch.setenv("ENVIRONMENT", "local")
     db = api.db.init_db()
     with db.get_connection() as conn:
-        create_schema(conn, schema_name)
+        _create_schema(conn, schema_name)
         try:
             yield db
         finally:
-            drop_schema(conn, schema_name)
+            _drop_schema(conn, schema_name)
 
 
-def create_schema(conn: api.db.Connection, schema_name: str):
+def _create_schema(conn: api.db.Connection, schema_name: str):
     """Create a database schema."""
     db_test_user = api.db.get_db_config().username
 
@@ -37,7 +38,7 @@ def create_schema(conn: api.db.Connection, schema_name: str):
     logger.info("create schema %s", schema_name)
 
 
-def drop_schema(conn: api.db.Connection, schema_name: str):
+def _drop_schema(conn: api.db.Connection, schema_name: str):
     """Drop a database schema."""
     conn.execute(f"DROP SCHEMA {schema_name} CASCADE;")
     logger.info("drop schema %s", schema_name)
