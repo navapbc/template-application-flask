@@ -11,7 +11,7 @@ import api.db
 import api.logging
 import tests.api.db.models.factories as factories
 from api.db import models
-from tests.lib import mock_db
+from tests.lib import db_testing
 
 logger = api.logging.get_logger(__name__)
 
@@ -52,7 +52,7 @@ def db(monkeypatch_session) -> api.db.DB:
     after the test suite session completes.
     """
 
-    with mock_db.create_isolated_db(monkeypatch_session) as db:
+    with db_testing.create_isolated_db(monkeypatch_session) as db:
         models.metadata.create_all(bind=db.get_connection())
         yield db
 
@@ -71,7 +71,7 @@ def isolated_db(monkeypatch) -> api.db.DB:
     individual test rather the test session.
     """
 
-    with mock_db.create_isolated_db(monkeypatch) as db:
+    with db_testing.create_isolated_db(monkeypatch) as db:
         models.metadata.create_all(bind=db.get_connection())
         yield db
 
@@ -85,7 +85,7 @@ def empty_schema(monkeypatch) -> api.db.DB:
     This is similar to the db fixture but does not create any tables in the
     schema. This is used by migration tests.
     """
-    with mock_db.create_isolated_db(monkeypatch) as db:
+    with db_testing.create_isolated_db(monkeypatch) as db:
         yield db
 
 
