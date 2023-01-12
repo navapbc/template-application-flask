@@ -108,47 +108,6 @@ def init_db():
     return DB()
 
 
-def init(
-    config: Optional[DbConfig] = None,
-    check_migrations_current: bool = False,
-) -> scoped_session:
-    logger.info("connecting to postgres db")
-
-    engine = _create_db_engine(config)
-    conn = engine.connect()
-
-    conn_info = conn.connection.dbapi_connection.info  # type: ignore
-    logger.info(
-        "connected to postgres db",
-        extra={
-            "dbname": conn_info.dbname,
-            "user": conn_info.user,
-            "host": conn_info.host,
-            "port": conn_info.port,
-            "options": conn_info.options,
-            "dsn_parameters": conn_info.dsn_parameters,
-            "protocol_version": conn_info.protocol_version,
-            "server_version": conn_info.server_version,
-        },
-    )
-    verify_ssl(conn_info)
-
-    # Explicitly commit sessions — usually with session_scope. Also disable expiry on commit,
-    # as we don't need to be strict on consistency within our routes. Once we've retrieved data
-    # from the database, we shouldn't make any extra requests to the db when grabbing existing
-    # attributes.
-    session_factory = scoped_session(
-        sessionmaker(autocommit=False, expire_on_commit=False, bind=engine)
-    )
-
-    if check_migrations_current:
-        have_all_migrations_run(engine)
-
-    engine.dispose()
-
-    return session_factory
-
-
 def verify_ssl(connection_info: Any) -> None:
     """Verify that the database connection is encrypted and log a warning if not."""
     if connection_info.ssl_in_use:

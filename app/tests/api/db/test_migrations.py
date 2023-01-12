@@ -42,7 +42,7 @@ def test_db_setup_via_alembic_migration(empty_schema, logging_fix, caplog):
 
 def test_db_init_with_migrations(empty_schema):
     # Verify the DB session works after initializing the migrations
-    db_session = api.db.init()
+    db_session = empty_schema.get_session()
 
     db_session.close()
     db_session.remove()
