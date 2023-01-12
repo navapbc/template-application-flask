@@ -1,12 +1,10 @@
 import logging  # noqa: B1
 
-import pytest
 from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError
 
-import api.db
 from api.db.migrations.run import alembic_cfg
 
 

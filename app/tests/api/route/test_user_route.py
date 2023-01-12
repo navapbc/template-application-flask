@@ -4,7 +4,6 @@ from datetime import date
 import faker
 import pytest
 
-from api.db.models.user_models import User
 from tests.api.util.parametrize_utils import powerset
 
 fake = faker.Faker()

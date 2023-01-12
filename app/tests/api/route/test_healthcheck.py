@@ -1,5 +1,4 @@
 import api.db
-import api.app as app
 
 
 def test_get_healthcheck_200(client):

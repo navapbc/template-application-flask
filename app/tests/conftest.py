@@ -1,20 +1,17 @@
 import logging.config  # noqa: B1
-import os
-import uuid
 
 import _pytest.monkeypatch
 import boto3
 import moto
 import pytest
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
 
 import api.app as app_entry
 import api.db
 import api.logging
+import tests.api.db.models.factories as factories
 from api.db import models
 from tests.lib import mock_db
-import tests.api.db.models.factories as factories
 
 logger = api.logging.get_logger(__name__)
 

@@ -4,13 +4,11 @@ These factories are used to generate test data for the tests. They are
 used both for generating in memory objects and for generating objects
 that are persisted to the database.
 
-The factories are based on the `factory_boy` library. See 
+The factories are based on the `factory_boy` library. See
 https://factoryboy.readthedocs.io/en/latest/ for more information.
 """
-import os
-from typing import Optional
-import unittest.mock
 from datetime import datetime
+from typing import Optional
 
 import factory
 import factory.fuzzy

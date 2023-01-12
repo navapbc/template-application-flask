@@ -3,7 +3,6 @@ import os
 
 import pytest
 from smart_open import open as smart_open
-from api.db.models.user_models import User
 
 from api.services.users.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from api.util.file_util import list_files

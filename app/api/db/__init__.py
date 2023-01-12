@@ -33,22 +33,19 @@ Example:
             conn.execute(...)
 """
 
-import contextlib
 import os
 import urllib.parse
-from contextlib import contextmanager
-from typing import Any, Generator, Optional
+from typing import Any, Optional
 
 import psycopg2
 import sqlalchemy
 import sqlalchemy.pool as pool
 from apiflask import APIFlask
 from sqlalchemy import engine
-from sqlalchemy.orm import scoped_session, session, sessionmaker
+from sqlalchemy.orm import session
 
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
-from api.db.migrations.run import have_all_migrations_run
 
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.

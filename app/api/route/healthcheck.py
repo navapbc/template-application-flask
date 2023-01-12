@@ -1,7 +1,7 @@
 from typing import Tuple
 
-from flask import current_app
 from apiflask import APIBlueprint
+from flask import current_app
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 

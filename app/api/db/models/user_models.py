@@ -9,7 +9,6 @@ from sqlalchemy.orm import Mapped, relationship
 
 import api.logging
 from api.db.models.base import Base, IdMixin, TimestampMixin
-from api.db import models
 
 logger = api.logging.get_logger(__name__)
 
