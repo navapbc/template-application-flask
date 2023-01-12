@@ -16,19 +16,10 @@ logger = api.logging.get_logger(__name__)
 
 
 def create_app(*, db: api.db.DB) -> APIFlask:
-
-    # Initialize the db
-    # if db_session_factory is None:
-    #     db_session_factory = db.init(check_migrations_current=check_migrations_current)
-
     app = APIFlask(__name__)
     db.init_app(app)
-
-    # Add various configurations, and
-    # adjustments to the application
     configure_app(app)
     register_blueprints(app)
-
     return app
 
 
