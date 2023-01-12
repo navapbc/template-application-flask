@@ -44,7 +44,7 @@ def monkeypatch_module(request):
 
 
 @pytest.fixture(scope="session")
-def test_db(monkeypatch_session):
+def db(monkeypatch_session):
     """
     Creates a test schema, directly creating all tables with SQLAlchemy,
     and returns a db_engine that can connect to this schema.
@@ -62,7 +62,7 @@ def test_db_isolated(monkeypatch):
     Creates a test schema, directly creating all tables with SQLAlchemy,
     and returns a db_engine that can connect to this schema.
     Schema is dropped after the test completes. This is similar to the
-    test_db fixture except the scope of the schema is the individual test
+    db fixture except the scope of the schema is the individual test
     rather the test session.
     """
 
@@ -85,13 +85,13 @@ def empty_schema(monkeypatch):
 
 
 @pytest.fixture
-def test_db_session(test_db):
+def test_db_session(db):
     # TODO refactor to use context managers
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = test_db.get_connection()
+    connection = db.get_connection()
     trans = connection.begin()
 
-    # Rather than call test_db.get_session() to create a new session with a new connection,
+    # Rather than call db.get_session() to create a new session with a new connection,
     # create a session bound to the existing connection that has a transaction manually start.
     # This allows the transaction to be rolled back after the test completes.
     session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
@@ -173,8 +173,8 @@ def logging_fix(monkeypatch):
 
 
 @pytest.fixture
-def app(test_db):
-    return app_entry.create_app(db=test_db)
+def app(db):
+    return app_entry.create_app(db=db)
 
 
 @pytest.fixture
