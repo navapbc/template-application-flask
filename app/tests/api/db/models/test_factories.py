@@ -55,7 +55,7 @@ def test_user_factory_build():
 def test_factory_create_uninitialized_db_session(test_db_session):
     # DB factory access is disabled from tests unless you add the
     # 'initialize_factories_session' fixture.
-    with pytest.raises(Exception, match="DB_FACTORIES_DISABLE_DB_ACCESS is set"):
+    with pytest.raises(Exception, match="Factory db_session is not initialized."):
         UserFactory.create()
 
 

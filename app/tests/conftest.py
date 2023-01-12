@@ -14,6 +14,7 @@ import api.db
 import api.logging
 from api.db import models
 from tests.lib import mock_db
+import tests.api.db.models.factories as factories
 
 logger = api.logging.get_logger(__name__)
 
@@ -44,7 +45,7 @@ def monkeypatch_module(request):
 
 
 @pytest.fixture(scope="session")
-def db(monkeypatch_session):
+def db(monkeypatch_session) -> api.db.DB:
     """
     Creates an isolated database for the test session.
 
@@ -60,7 +61,7 @@ def db(monkeypatch_session):
 
 
 @pytest.fixture(scope="function")
-def isolated_db(monkeypatch):
+def isolated_db(monkeypatch) -> api.db.DB:
     """
     Creates an isolated database for the test function.
 
@@ -79,7 +80,7 @@ def isolated_db(monkeypatch):
 
 
 @pytest.fixture
-def empty_schema(monkeypatch):
+def empty_schema(monkeypatch) -> api.db.DB:
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
@@ -92,7 +93,7 @@ def empty_schema(monkeypatch):
 
 
 @pytest.fixture
-def test_db_session(db):
+def test_db_session(db: api.db.DB) -> api.db.Session:
     # TODO refactor to use context managers
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     connection = db.get_connection()
@@ -118,7 +119,7 @@ def test_db_session(db):
 
 
 @pytest.fixture
-def test_db_session_isolated(test_db_isolated):
+def test_db_session_isolated(test_db_isolated) -> api.db.Session:
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     connection = api.db.get_connection()
     trans = connection.begin()
@@ -138,25 +139,11 @@ def test_db_session_isolated(test_db_isolated):
     connection.close()
 
 
-@pytest.fixture(autouse=True, scope="session")
-def set_no_db_factories_alert():
-    """By default, ensure factories do not attempt to access the database.
-
-    The tests that need generated models to actually hit the database can pull
-    in the `initialize_factories_session` fixture to their test case to enable
-    factory writes to the database.
-    """
-    os.environ["DB_FACTORIES_DISABLE_DB_ACCESS"] = "1"
-
-
 @pytest.fixture
-def initialize_factories_session(monkeypatch, test_db_session):
-    monkeypatch.delenv("DB_FACTORIES_DISABLE_DB_ACCESS")
-
-    import tests.api.db.models.factories as factories
-
+def initialize_factories_session(monkeypatch, test_db_session) -> api.db.Session:
+    monkeypatch.setattr(factories, "_db_session", test_db_session)
     logger.info("set factories db_session to %s", test_db_session)
-    factories.db_session = test_db_session
+    return test_db_session
 
 
 ####################

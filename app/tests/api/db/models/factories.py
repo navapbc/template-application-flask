@@ -8,50 +8,41 @@ The factories are based on the `factory_boy` library. See
 https://factoryboy.readthedocs.io/en/latest/ for more information.
 """
 import os
+from typing import Optional
 import unittest.mock
 from datetime import datetime
 
 import factory
 import factory.fuzzy
 import faker
+from sqlalchemy.orm import scoped_session
 
-import api.db as db
+import api.db
 import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
 
-db_session = None
+_db_session: Optional[api.db.Session] = None
 
 fake = faker.Faker()
 
 
-def get_db_session() -> db.scoped_session:
-    global db_session
-
-    if os.getenv("DB_FACTORIES_DISABLE_DB_ACCESS", "0") == "1":
-        alert_db_session = unittest.mock.MagicMock()
-        alert_db_session.add.side_effect = Exception(
-            """DB_FACTORIES_DISABLE_DB_ACCESS is set, refusing database action.
+def get_db_session() -> api.db.Session:
+    # _db_session is only set in the pytest fixture `initialize_factories_session`
+    # so that tests do not unintentionally write to the database.
+    if _db_session is None:
+        raise Exception(
+            """Factory db_session is not initialized.
 
             If your tests don't need to cover database behavior, consider
             calling the `build()` method instead of `create()` on the factory to
             not persist the generated model.
 
             If running tests that actually need data in the DB, pull in the
-            `initialize_factories_session` fixture.
-
-            If running factories outside of the tests and you see this, unset
-            the DB_FACTORIES_DISABLE_DB_ACCESS env var.
+            `initialize_factories_session` fixture to initialize the db_session.
             """
         )
-        return alert_db_session
 
-    if db_session is None:
-        db_session = db.init()
-
-    return db_session
-
-
-Session = db.scoped_session(lambda: get_db_session(), scopefunc=lambda: get_db_session())  # type: ignore
+    return _db_session
 
 
 class Generators:
@@ -63,7 +54,7 @@ class Generators:
 class BaseFactory(factory.alchemy.SQLAlchemyModelFactory):
     class Meta:
         abstract = True
-        sqlalchemy_session = Session
+        sqlalchemy_session = scoped_session(get_db_session)
         sqlalchemy_session_persistence = "commit"
 
 
