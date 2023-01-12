@@ -46,9 +46,12 @@ def monkeypatch_module(request):
 @pytest.fixture(scope="session")
 def db(monkeypatch_session):
     """
-    Creates a test schema, directly creating all tables with SQLAlchemy,
-    and returns a db_engine that can connect to this schema.
-    Schema is dropped after the test suite session completes.
+    Creates an isolated database for the test session.
+
+    Creates a new empty PostgreSQL schema, creates all tables in the new schema
+    using SQLAlchemy, then returns a api.db.DB instance that can be used to
+    get connections or sessions to this database schema. The schema is dropped
+    after the test suite session completes.
     """
 
     with mock_db.create_isolated_db(monkeypatch_session) as db:
@@ -56,14 +59,18 @@ def db(monkeypatch_session):
         yield db
 
 
-@pytest.fixture
-def test_db_isolated(monkeypatch):
+@pytest.fixture(scope="function")
+def isolated_db(monkeypatch):
     """
-    Creates a test schema, directly creating all tables with SQLAlchemy,
-    and returns a db_engine that can connect to this schema.
-    Schema is dropped after the test completes. This is similar to the
-    db fixture except the scope of the schema is the individual test
-    rather the test session.
+    Creates an isolated database for the test function.
+
+    Creates a new empty PostgreSQL schema, creates all tables in the new schema
+    using SQLAlchemy, then returns a api.db.DB instance that can be used to
+    get connections or sessions to this database schema. The schema is dropped
+    after the test function completes.
+
+    This is similar to the db fixture except the scope of the schema is the
+    individual test rather the test session.
     """
 
     with mock_db.create_isolated_db(monkeypatch) as db:
@@ -77,8 +84,8 @@ def empty_schema(monkeypatch):
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
 
-    The monkeypatch setup of the test_db_schema fixture causes this issues
-    so copied here with that adjusted
+    This is similar to the db fixture but does not create any tables in the
+    schema. This is used by migration tests.
     """
     with mock_db.create_isolated_db(monkeypatch) as db:
         yield db
