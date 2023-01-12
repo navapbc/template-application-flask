@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator
 
-import api.db as db
+import api.db
 import api.logging
 from api.util.local import load_local_env_vars
 
@@ -11,7 +11,7 @@ logger = api.logging.get_logger(__name__)
 
 @dataclass
 class ScriptContext:
-    db_session: db.scoped_session
+    db_session: api.db.Session
 
 
 # TODO remove
@@ -31,10 +31,10 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # metrics (eg. New Relic) and so on in a way that
     # helps prevent so much boilerplate code.
 
-    logger.info("Connecting to DB")
-    with db.session_scope(db.init(), close=True) as db_session:
+    # TODO use built in @flask.cli commands so that we can reuse flask app
+    db = api.db.init_db()
+    db.test_db_connection()
+    with db.get_session() as db_session:
         script_context = ScriptContext(db_session)
-
         yield script_context
-
     logger.info("Script complete")

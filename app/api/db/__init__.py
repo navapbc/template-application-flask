@@ -176,27 +176,6 @@ def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:
     )
 
 
-# TODO remove
-@contextmanager
-def session_scope(
-    session: scoped_session, close: bool = False
-) -> Generator[scoped_session, None, None]:
-    """Provide a transactional scope around a series of operations.
-
-    See https://docs.sqlalchemy.org/en/13/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
-    """
-
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        if close:
-            session.close()
-
-
 def make_connection_uri(config: DbConfig) -> str:
     """Construct PostgreSQL connection URI
 

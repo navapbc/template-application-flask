@@ -27,26 +27,3 @@ class ApiContext:
          `logger.info("msg", extra=api_context.get_log_extra())`
         """
         return {"user_id": self.current_user.id if self.current_user else None}
-
-
-@contextmanager
-def api_context_manager(is_user_expected: bool = True) -> Generator[ApiContext, None, None]:
-    """
-    API context manager for working with
-    requests and processing them to the DB.
-
-    Sets up the DB session, current user,
-    and grabs the request body.
-    """
-    with app.db_session() as db_session:
-        # Attach the request body if present
-        if request.is_json:
-            body = request.json
-        else:
-            body = {}
-
-        # Current user is attached in api_key_auth.py
-        # during authentication
-        current_user = app.current_user(is_user_expected)
-
-        yield ApiContext(body, current_user, db_session)
