@@ -150,7 +150,7 @@ def test_create_user_bad_request(client, api_auth_token, request_data, expected_
 
 def test_patch_user(client, api_auth_token, created_user):
     user_id = created_user["id"]
-    patch_request = {"first_name": "Newname"}
+    patch_request = {"first_name": fake.first_name()}
     patch_response = client.patch(
         f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
