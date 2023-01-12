@@ -28,13 +28,9 @@ def health() -> Tuple[dict, int]:
 
     db: DB = current_app.extensions["db"]
     try:
-        result = db.get_session().execute(text("SELECT 1 AS healthy")).first()
-        if not result or result[0] != 1:
-            raise Exception("Connection to DB failure")
-
+        with db.get_session() as session:
+            session.execute(text("SELECT 1 AS healthy")).first()
         return response.ApiResponse(message="Service healthy").asdict(), 200
-
     except Exception:
         logger.exception("Connection to DB failure")
-
         return response.ApiResponse(message="Service unavailable").asdict(), ServiceUnavailable.code
