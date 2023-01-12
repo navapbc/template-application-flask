@@ -88,8 +88,12 @@ def empty_schema(monkeypatch):
 def test_db_session(test_db):
     # TODO refactor to use context managers
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = api.db.get_connection()
+    connection = test_db.get_connection()
     trans = connection.begin()
+
+    # Rather than call test_db.get_session() to create a new session with a new connection,
+    # create a session bound to the existing connection that has a transaction manually start.
+    # This allows the transaction to be rolled back after the test completes.
     session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
 
     session.begin_nested()
