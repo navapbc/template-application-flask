@@ -40,6 +40,30 @@ def init_db():
     global _db_engine
     _db_engine = create_db_engine()
 
+    logger.info("connecting to postgres db")
+
+    with get_connection() as conn:
+        conn_info = conn.connection.dbapi_connection.info
+
+        logger.info(
+            "connected to postgres db",
+            extra={
+                "dbname": conn_info.dbname,
+                "user": conn_info.user,
+                "host": conn_info.host,
+                "port": conn_info.port,
+                "options": conn_info.options,
+                "dsn_parameters": conn_info.dsn_parameters,
+                "protocol_version": conn_info.protocol_version,
+                "server_version": conn_info.server_version,
+            },
+        )
+        verify_ssl(conn_info)
+
+        # TODO add check_migrations_current to config
+        # if check_migrations_current:
+        #     have_all_migrations_run(engine)
+
 
 def get_connection() -> engine.Connection:
     if _db_engine is None:
