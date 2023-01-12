@@ -1,11 +1,12 @@
 from typing import Tuple
 
+from flask import current_app
 from apiflask import APIBlueprint
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.logging
-from api import db
+from api.db import DB
 from api.route import response
 from api.route.schemas import request_schema
 
@@ -25,6 +26,7 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
+    db: DB = current_app.extensions["db"]
     try:
         result = db.get_session().execute(text("SELECT 1 AS healthy")).first()
         if not result or result[0] != 1:

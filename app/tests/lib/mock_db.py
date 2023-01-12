@@ -1,14 +1,14 @@
 import contextlib
 import uuid
 
-from api import db
+import api.db
 from api import logging
 
 logger = logging.get_logger(__name__)
 
 
 @contextlib.contextmanager
-def init_mock_db(monkeypatch) -> None:
+def create_isolated_db(monkeypatch) -> None:
     """
     Creates a temporary PostgreSQL schema and creates a database engine
     that connects to that schema. Drops the schema after the context manager
@@ -20,24 +20,24 @@ def init_mock_db(monkeypatch) -> None:
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")
     monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
     monkeypatch.setenv("ENVIRONMENT", "local")
-    db.init_db()
+    db = api.db.init_db()
     with db.get_connection() as conn:
         create_schema(conn, schema_name)
         try:
-            yield
+            yield db
         finally:
             drop_schema(conn, schema_name)
 
 
-def create_schema(conn: db.Connection, schema_name: str):
+def create_schema(conn: api.db.Connection, schema_name: str):
     """Create a database schema."""
-    db_test_user = db.get_db_config().username
+    db_test_user = api.db.get_db_config().username
 
     conn.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
     logger.info("create schema %s", schema_name)
 
 
-def drop_schema(conn: db.Connection, schema_name: str):
+def drop_schema(conn: api.db.Connection, schema_name: str):
     """Drop a database schema."""
     conn.execute(f"DROP SCHEMA {schema_name} CASCADE;")
     logger.info("drop schema %s", schema_name)

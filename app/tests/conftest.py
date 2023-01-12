@@ -51,9 +51,9 @@ def test_db(monkeypatch_session):
     Schema is dropped after the test suite session completes.
     """
 
-    with mock_db.init_mock_db(monkeypatch_session):
-        models.metadata.create_all(bind=api.db.get_connection())
-        yield
+    with mock_db.create_isolated_db(monkeypatch_session) as db:
+        models.metadata.create_all(bind=db.get_connection())
+        yield db
 
 
 @pytest.fixture
@@ -66,9 +66,9 @@ def test_db_isolated(monkeypatch):
     rather the test session.
     """
 
-    with mock_db.init_mock_db(monkeypatch):
-        models.metadata.create_all(bind=api.db.get_connection())
-        yield
+    with mock_db.create_isolated_db(monkeypatch) as db:
+        models.metadata.create_all(bind=db.get_connection())
+        yield db
 
 
 @pytest.fixture
@@ -80,8 +80,8 @@ def empty_schema(monkeypatch):
     The monkeypatch setup of the test_db_schema fixture causes this issues
     so copied here with that adjusted
     """
-    with mock_db.init_mock_db(monkeypatch):
-        yield
+    with mock_db.create_isolated_db(monkeypatch) as db:
+        yield db
 
 
 @pytest.fixture
@@ -170,7 +170,7 @@ def logging_fix(monkeypatch):
 
 @pytest.fixture
 def app(test_db):
-    return app_entry.create_app(check_migrations_current=False, do_close_db=False)
+    return app_entry.create_app(db=test_db)
 
 
 @pytest.fixture

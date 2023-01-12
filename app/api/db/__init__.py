@@ -1,3 +1,26 @@
+"""
+Database module.
+
+It is recommended to import this module as `import api.db` rather than
+`from api import db` in order to avoid confusion with instances of `DB`
+which are named `db` by convention.
+
+Usage:
+    import api.db
+
+    db = api.db.init_db()
+
+    # non-ORM style usage
+    with db.get_connection() as conn:
+        conn.execute(...)
+
+    # ORM style usage
+    with db.get_session() as session:
+        session.query(...)
+        with session.begin():
+            session.add(...)
+"""
+
 import contextlib
 import os
 import urllib.parse
@@ -28,19 +51,29 @@ Session = session.Session
 
 logger = api.logging.get_logger(__name__)
 
-_db_engine: Optional[Engine] = None
+
+class DB:
+    _engine: Engine
+
+    def __init__(self) -> None:
+        self._engine = _create_db_engine()
+
+    def init_app(self, app: APIFlask) -> None:
+        app.extensions["db"] = self
+
+    def get_connection(self) -> Connection:
+        return self._engine.connect()
+
+    def get_session(self) -> Session:
+        return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
 
 
 def init_db():
-    global _db_engine
+    return DB()
 
-    if _db_engine is not None:
-        return
 
-    _db_engine = create_db_engine()
-
+def test_db_connection():
     logger.info("connecting to postgres db")
-
     with get_connection() as conn:
         conn_info = conn.connection.dbapi_connection.info
 
@@ -64,25 +97,13 @@ def init_db():
         #     have_all_migrations_run(engine)
 
 
-def get_connection() -> engine.Connection:
-    if _db_engine is None:
-        raise Exception("_db_engine is not initialized. Did you call init_db?")
-    return _db_engine.connect()
-
-
-def get_session() -> Session:
-    if _db_engine is None:
-        raise Exception("_db_engine not initialized. Did you call init_db?")
-    return Session(bind=_db_engine, expire_on_commit=False, autocommit=False)
-
-
 def init(
     config: Optional[DbConfig] = None,
     check_migrations_current: bool = False,
 ) -> scoped_session:
     logger.info("connecting to postgres db")
 
-    engine = create_db_engine(config)
+    engine = _create_db_engine(config)
     conn = engine.connect()
 
     conn_info = conn.connection.dbapi_connection.info  # type: ignore
@@ -133,7 +154,7 @@ def verify_ssl(connection_info: Any) -> None:
 
 # TODO rename to create_db since the key interface is that it's something that responds
 # to .connect() method. Doesn't really matter that it's an Engine class instance
-def create_db_engine(config: Optional[DbConfig] = None) -> Engine:
+def _create_db_engine(config: Optional[DbConfig] = None) -> Engine:
     db_config: DbConfig = config if config is not None else get_db_config()
 
     # We want to be able to control the connection parameters for each

@@ -6,7 +6,7 @@ from apiflask import APIFlask
 from flask import g
 from werkzeug.exceptions import Unauthorized
 
-import api.db as db
+import api.db
 import api.logging
 from api.auth.api_key_auth import User
 from api.route.healthcheck import healthcheck_blueprint
@@ -16,19 +16,14 @@ from api.route.user_route import user_blueprint
 logger = api.logging.get_logger(__name__)
 
 
-def create_app(
-    check_migrations_current: bool = True,
-    db_session_factory: Optional[db.scoped_session] = None,
-    do_close_db: bool = True,
-) -> APIFlask:
+def create_app(*, db: api.db.DB) -> APIFlask:
 
     # Initialize the db
     # if db_session_factory is None:
     #     db_session_factory = db.init(check_migrations_current=check_migrations_current)
 
     app = APIFlask(__name__)
-
-    db.init_db()
+    db.init_app(app)
 
     # Add various configurations, and
     # adjustments to the application
@@ -36,30 +31,6 @@ def create_app(
     register_blueprints(app)
 
     return app
-
-
-def db_session_raw() -> db.scoped_session:
-    """Get a plain SQLAlchemy Session."""
-    session: db.scoped_session = g.get("db")
-    if session is None:
-        raise Exception("No database session available in application context")
-
-    return session
-
-
-# TODO remove
-@contextmanager
-def db_session(close: bool = False) -> Generator[db.scoped_session, None, None]:
-    """Get a SQLAlchemy Session wrapped in some transactional management.
-
-    This commits session when done, rolls back transaction on exceptions,
-    optionally closing the session (which disconnects any entities in the
-    session, so be sure closing is what you want).
-    """
-
-    session = db_session_raw()
-    with db.session_scope(session, close) as session_scoped:
-        yield session_scoped
 
 
 def current_user(is_user_expected: bool = True) -> Optional[User]:
