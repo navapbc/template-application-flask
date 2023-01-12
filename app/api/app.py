@@ -48,6 +48,7 @@ def db_session_raw() -> db.scoped_session:
     return session
 
 
+# TODO remove
 @contextmanager
 def db_session(close: bool = False) -> Generator[db.scoped_session, None, None]:
     """Get a SQLAlchemy Session wrapped in some transactional management.

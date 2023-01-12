@@ -181,6 +181,7 @@ def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:
     )
 
 
+# TODO remove
 @contextmanager
 def session_scope(
     session: scoped_session, close: bool = False

@@ -14,6 +14,7 @@ class ScriptContext:
     db_session: db.scoped_session
 
 
+# TODO remove
 @contextmanager
 def script_context_manager() -> Generator[ScriptContext, None, None]:
     """
