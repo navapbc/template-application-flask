@@ -98,6 +98,8 @@ class DB:
         If you want to automatically commit or rollback the session, use
         the session.begin() context manager.
 
+        See https://docs.sqlalchemy.org/en/13/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
+
         Example:
             with db.get_session() as session:
                 with session.begin():
