@@ -59,7 +59,7 @@ Session = session.Session
 logger = api.logging.get_logger(__name__)
 
 
-class DB:
+class DBClient:
     """Database connection manager.
 
     This class is used to manage database connections for the Flask app.
@@ -136,11 +136,11 @@ class DB:
             #     have_all_migrations_run(engine)
 
 
-def init() -> DB:
-    return DB()
+def init() -> DBClient:
+    return DBClient()
 
 
-def get_db(app: Flask) -> DB:
+def get_db(app: Flask) -> DBClient:
     """Get the database connection for the given Flask app.
 
     Use this in request handlers to access the database from the active Flask app.

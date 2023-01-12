@@ -42,7 +42,7 @@ def monkeypatch_module(request):
 
 
 @pytest.fixture(scope="session")
-def db(monkeypatch_session) -> api.db.DB:
+def db(monkeypatch_session) -> api.db.DBClient:
     """
     Creates an isolated database for the test session.
 
@@ -58,7 +58,7 @@ def db(monkeypatch_session) -> api.db.DB:
 
 
 @pytest.fixture(scope="function")
-def isolated_db(monkeypatch) -> api.db.DB:
+def isolated_db(monkeypatch) -> api.db.DBClient:
     """
     Creates an isolated database for the test function.
 
@@ -77,7 +77,7 @@ def isolated_db(monkeypatch) -> api.db.DB:
 
 
 @pytest.fixture
-def empty_schema(monkeypatch) -> api.db.DB:
+def empty_schema(monkeypatch) -> api.db.DBClient:
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
@@ -90,7 +90,7 @@ def empty_schema(monkeypatch) -> api.db.DB:
 
 
 @pytest.fixture
-def test_db_session(db: api.db.DB) -> api.db.Session:
+def test_db_session(db: api.db.DBClient) -> api.db.Session:
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
     with db.get_connection() as connection:
         trans = connection.begin()
@@ -119,7 +119,7 @@ def factories_session(monkeypatch, test_db_session) -> api.db.Session:
 
 
 @pytest.fixture
-def isolated_db_factories_session(monkeypatch, isolated_db: api.db.DB) -> api.db.Session:
+def isolated_db_factories_session(monkeypatch, isolated_db: api.db.DBClient) -> api.db.Session:
     with isolated_db.get_session() as session:
         monkeypatch.setattr(factories, "_db_session", session)
         logger.info("set factories db_session to %s", session)

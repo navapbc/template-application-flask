@@ -15,7 +15,7 @@ from api.route.user_route import user_blueprint
 logger = api.logging.get_logger(__name__)
 
 
-def create_app(*, db: api.db.DB) -> APIFlask:
+def create_app(*, db: api.db.DBClient) -> APIFlask:
     app = APIFlask(__name__)
     db.init_app(app)
     configure_app(app)
