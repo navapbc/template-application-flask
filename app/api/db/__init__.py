@@ -33,6 +33,10 @@ _db_engine: Optional[Engine] = None
 
 def init_db():
     global _db_engine
+
+    if _db_engine is not None:
+        return
+
     _db_engine = create_db_engine()
 
     logger.info("connecting to postgres db")

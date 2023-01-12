@@ -13,7 +13,7 @@ import api.app as app_entry
 import api.db
 import api.logging
 from api.db import models
-from tests.lib import db_utils
+from tests.lib import mock_db
 
 logger = api.logging.get_logger(__name__)
 
@@ -51,9 +51,9 @@ def test_db(monkeypatch_session):
     Schema is dropped after the test suite session completes.
     """
 
-    with db_utils.test_db_schema(monkeypatch_session) as db_engine:
-        models.metadata.create_all(bind=db_engine)
-        yield db_engine
+    with mock_db.init_mock_db(monkeypatch_session):
+        models.metadata.create_all(bind=api.db.get_connection())
+        yield
 
 
 @pytest.fixture
@@ -66,9 +66,9 @@ def test_db_isolated(monkeypatch):
     rather the test session.
     """
 
-    with db_utils.test_db_schema(monkeypatch) as db_engine:
-        models.metadata.create_all(bind=db_engine)
-        yield db_engine
+    with mock_db.init_mock_db(monkeypatch):
+        models.metadata.create_all(bind=api.db.get_connection())
+        yield
 
 
 @pytest.fixture
@@ -80,14 +80,15 @@ def empty_schema(monkeypatch):
     The monkeypatch setup of the test_db_schema fixture causes this issues
     so copied here with that adjusted
     """
-    with db_utils.test_db_schema(monkeypatch) as db_engine:
-        yield db_engine
+    with mock_db.init_mock_db(monkeypatch):
+        yield
 
 
 @pytest.fixture
 def test_db_session(test_db):
+    # TODO refactor to use context managers
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = test_db.connect()
+    connection = api.db.get_connection()
     trans = connection.begin()
     session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
 
@@ -108,7 +109,7 @@ def test_db_session(test_db):
 @pytest.fixture
 def test_db_session_isolated(test_db_isolated):
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = test_db.connect()
+    connection = api.db.get_connection()
     trans = connection.begin()
     session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
 
