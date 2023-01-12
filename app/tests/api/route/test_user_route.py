@@ -211,7 +211,7 @@ test_unauthorized_data = [
 
 
 @pytest.mark.parametrize("method,url,body", test_unauthorized_data)
-def test_unauthorized(client, method, url, body):
+def test_unauthorized(client, method, url, body, api_auth_token):
     expected_message = (
         "The server could not verify that you are authorized to access the URL requested"
     )
