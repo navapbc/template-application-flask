@@ -1,7 +1,7 @@
 import apiflask
 from sqlalchemy import orm
 
-from api import db
+from api.db import Session
 from api.db.models.user_models import User
 
 
@@ -9,7 +9,7 @@ from api.db.models.user_models import User
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def get_user(db_session: db.Session, user_id: str) -> User:
+def get_user(db_session: Session, user_id: str) -> User:
     # TODO: move this to service and/or persistence layer
     result = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 

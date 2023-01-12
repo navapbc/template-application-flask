@@ -1,7 +1,7 @@
 from datetime import date
 from typing import TypedDict
 
-from api import db
+from api.db import Session
 from api.db.models import user_models
 from api.db.models.user_models import Role, User
 
@@ -24,7 +24,7 @@ class CreateUserParams(TypedDict):
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def create_user(db_session: db.Session, user_params: CreateUserParams) -> User:
+def create_user(db_session: Session, user_params: CreateUserParams) -> User:
     with db_session.begin():
         # TODO: move this code to service and/or persistence layer
         user = User(

@@ -4,7 +4,7 @@ from typing import TypedDict
 import apiflask
 from sqlalchemy import orm
 
-from api import db
+from api.db import Session
 from api.db.models.user_models import Role, User
 from api.services.users.create_user import RoleParams
 
@@ -24,7 +24,7 @@ class PatchUserParams(TypedDict, total=False):
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
 def patch_user(
-    db_session: db.Session,
+    db_session: Session,
     user_id: str,
     patch_user_params: PatchUserParams,
 ) -> User:
@@ -54,7 +54,7 @@ def patch_user(
     return user
 
 
-def _handle_role_patch(db_session: db.Session, user: User, request_roles: list[RoleParams]) -> None:
+def _handle_role_patch(db_session: Session, user: User, request_roles: list[RoleParams]) -> None:
     # Because roles are a list, we need to handle them slightly different.
     # There are two scenarios possible:
     # 1. The roles match -> do nothing
