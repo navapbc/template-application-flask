@@ -46,8 +46,6 @@ def validate_csv_records(db_records, csv_records):
 def test_create_user_csv_s3(test_db_session, initialize_factories_session, mock_s3_bucket):
     s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
 
-    test_db_session.query(User).delete()
-
     # To make validating these easier in the CSV, make the names consistent
     db_records = [
         UserFactory.create(first_name="A"),
