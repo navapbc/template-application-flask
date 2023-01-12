@@ -1,3 +1,4 @@
+# TODO move create_csv_script to a flask cli command so we don't need script_util.script_context_manager
 import csv
 import os
 from dataclasses import asdict, dataclass

@@ -1,3 +1,4 @@
+# TODO use built in @flask.cli commands so that we can reuse flask app and no longer need this file
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator
@@ -31,7 +32,6 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # metrics (eg. New Relic) and so on in a way that
     # helps prevent so much boilerplate code.
 
-    # TODO use built in @flask.cli commands so that we can reuse flask app
     db = api.db.init_db()
     db.check_db_connection()
     with db.get_session() as db_session:
