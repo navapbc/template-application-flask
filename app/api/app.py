@@ -28,9 +28,7 @@ def create_app(
 
     app = APIFlask(__name__)
 
-    db_engine = db.create_db_engine()
-
-    db.init_app(db_engine, app)
+    db.init_db()
 
     # Add various configurations, and
     # adjustments to the application

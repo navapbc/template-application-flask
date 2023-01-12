@@ -15,6 +15,10 @@ import api.logging
 from api.db.db_config import DbConfig, get_db_config
 from api.db.migrations.run import have_all_migrations_run
 
+# Re-export the Connection type that is returned by the get_connection() method
+# to be used for type hints.
+Connection = engine.Connection
+
 # Re-export the Engine type that is returned by the create_db_engine() method
 Engine = engine.Engine
 
@@ -28,6 +32,25 @@ logger = api.logging.get_logger(__name__)
 # sqlalchemy.orm.Session object for the current active Flask application context.
 # See https://docs.sqlalchemy.org/en/20/orm/contextual.html
 _get_session: Optional[scoped_session] = None
+
+_db_engine: Optional[Engine] = None
+
+
+def init_db():
+    global _db_engine
+    _db_engine = create_db_engine()
+
+
+def get_connection() -> engine.Connection:
+    if _db_engine is None:
+        raise Exception("_db_engine is not initialized. Did you call init_db?")
+    return _db_engine.connect()
+
+
+def get_session() -> Session:
+    if _db_engine is None:
+        raise Exception("_db_engine not initialized. Did you call init_db?")
+    return Session(bind=_db_engine, expire_on_commit=False, autocommit=False)
 
 
 def init_app(
@@ -258,13 +281,3 @@ def make_connection_uri(config: DbConfig) -> str:
     uri = f"postgresql://{netloc}/{db_name}?options=-csearch_path={schema}"
 
     return uri
-
-
-def get_session() -> Session:
-    if _get_session is None:
-        raise Exception("Session factory not initialized. Did you call init_app?")
-    # _get_session is a scoped_session registry. Calling the registry returns the
-    # current Session i.e. the session for the current Flask request
-    # see https://flask-sqlalchemy.palletsprojects.com/en/3.0.x/api/#flask_sqlalchemy.SQLAlchemy.session
-    # and https://docs.sqlalchemy.org/en/20/orm/contextual.html
-    return _get_session()
