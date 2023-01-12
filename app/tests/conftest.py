@@ -119,27 +119,6 @@ def test_db_session(db: api.db.DB) -> api.db.Session:
 
 
 @pytest.fixture
-def test_db_session_isolated(test_db_isolated) -> api.db.Session:
-    # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = api.db.get_connection()
-    trans = connection.begin()
-    session = api.db.Session(bind=connection, autocommit=False, expire_on_commit=False)
-
-    session.begin_nested()
-
-    @sqlalchemy.event.listens_for(session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
-            session.begin_nested()
-
-    yield session
-
-    session.close()
-    trans.rollback()
-    connection.close()
-
-
-@pytest.fixture
 def initialize_factories_session(monkeypatch, test_db_session) -> api.db.Session:
     monkeypatch.setattr(factories, "_db_session", test_db_session)
     logger.info("set factories db_session to %s", test_db_session)
