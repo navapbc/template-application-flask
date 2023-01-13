@@ -1,4 +1,5 @@
 from datetime import date
+from operator import attrgetter
 from typing import TypedDict
 
 import apiflask
@@ -44,51 +45,29 @@ def patch_user(
 
         setattr(user, key, value)
 
-    # Flush the changes to the DB and then
-    # refresh to get the roles updated on
-    # the user object that may have been changed
-    db_session.flush()
-    db_session.refresh(user)
-
     return user
 
 
 def _handle_role_patch(db_session: db.Session, user: User, request_roles: list[RoleParams]) -> None:
-    # Because roles are a list, we need to handle them slightly different.
-    # There are two scenarios possible:
-    # 1. The roles match -> do nothing
-    # 2. The roles don't match -> add/remove from the DB roles to make them match
-    #
-    # Matching is based purely off the role description at the moment
-    # In a more thorough system, it might make sense to make a patch endpoint
-    # that explicitly adds or removes a single role for a user at a time.
 
-    # We'll work with just the role description strings to avoid
-    # comparing nested objects and values. As roles are unique in the
-    # DB per user, any deduplicating this does is fine.
-    if user.roles is not None:
-        current_role_types = set([role.type for role in user.roles])
-    else:
-        current_role_types = set()
-
+    current_role_types = set([role.type for role in user.roles])
     request_role_types = set([role["type"] for role in request_roles])
 
-    # If they match, do nothing
-    if set(current_role_types) == set(request_role_types):
-        return
+    # First delete any roles that are no longer in the request and remove the role
+    # from the user.roles array
+    roles_to_delete = [role for role in user.roles if role.type not in request_role_types]
 
-    # Figure out which roles need to be deleted and added
-    roles_to_delete = current_role_types - request_role_types
-    roles_to_add = request_role_types - current_role_types
+    roles_to_add = [
+        Role(user_id=user.id, type=role_type)
+        for role_type in request_role_types
+        if role_type not in current_role_types
+    ]
 
-    # Go through existing roles and delete the ones that are no longer needed
-    if user.roles:
-        for current_user_role in user.roles:
-            if current_user_role.type in roles_to_delete:
-                db_session.delete(current_user_role)
+    for role in roles_to_delete:
+        user.roles.remove(role)
+        db_session.delete(role)
 
-    # Add any new roles
-    for role_type in roles_to_add:
-        # TODO: instead, add to user.roles directly without user_id=user.id and let SQLAlchemy handle the foreign key assignment
-        user_role = Role(user_id=user.id, type=role_type)
-        db_session.add(user_role)
+    for role in roles_to_add:
+        user.roles.append(role)
+
+    user.roles.sort(key=attrgetter("type"))
