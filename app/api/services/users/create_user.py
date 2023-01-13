@@ -25,15 +25,14 @@ class CreateUserParams(TypedDict):
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
 def create_user(db_session: Session, user_params: CreateUserParams) -> User:
-    with db_session.begin():
-        # TODO: move this code to service and/or persistence layer
-        user = User(
-            # Convert nested object parameters to ORM objects then unpack the dictionary
-            # of parameters as keyword arguments
-            **{
-                **user_params,
-                "roles": [Role(type=role["type"]) for role in user_params["roles"]],
-            }
-        )
-        db_session.add(user)
+    # TODO: move this code to service and/or persistence layer
+    user = User(
+        # Convert nested object parameters to ORM objects then unpack the dictionary
+        # of parameters as keyword arguments
+        **{
+            **user_params,
+            "roles": [Role(type=role["type"]) for role in user_params["roles"]],
+        }
+    )
+    db_session.add(user)
     return user
