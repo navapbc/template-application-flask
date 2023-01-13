@@ -29,7 +29,7 @@ def health() -> Tuple[dict, int]:
     db = api.db.get_db(current_app)
     try:
         with db.get_connection() as conn:
-            conn.execute(text("SELECT 1 AS healthy")).first()
+            assert conn.scalar(text("SELECT 1 AS healthy")) == 1
         return response.ApiResponse(message="Service healthy").asdict(), 200
     except Exception:
         logger.exception("Connection to DB failure")
