@@ -27,12 +27,13 @@ class CreateUserParams(TypedDict):
 def create_user(db_session: Session, user_params: CreateUserParams) -> User:
     # TODO: move this code to service and/or persistence layer
     user = User(
-        # Convert nested object parameters to ORM objects then unpack the dictionary
-        # of parameters as keyword arguments
-        **{
-            **user_params,
-            "roles": [Role(type=role["type"]) for role in user_params["roles"]],
-        }
+        first_name=user_params["first_name"],
+        middle_name=user_params["middle_name"],
+        last_name=user_params["last_name"],
+        phone_number=user_params["phone_number"],
+        date_of_birth=user_params["date_of_birth"],
+        is_active=user_params["is_active"],
+        roles=[Role(type=role["type"]) for role in user_params["roles"]],
     )
     db_session.add(user)
     return user
