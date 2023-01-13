@@ -53,8 +53,6 @@ def _handle_role_patch(db_session: Session, user: User, request_roles: list[Role
     current_role_types = set([role.type for role in user.roles])
     request_role_types = set([role["type"] for role in request_roles])
 
-    # First delete any roles that are no longer in the request and remove the role
-    # from the user.roles array
     roles_to_delete = [role for role in user.roles if role.type not in request_role_types]
 
     roles_to_add = [
@@ -63,11 +61,15 @@ def _handle_role_patch(db_session: Session, user: User, request_roles: list[Role
         if role_type not in current_role_types
     ]
 
+    # First delete any roles that are no longer in the request and remove the role
+    # from the user.roles array
     for role in roles_to_delete:
         user.roles.remove(role)
         db_session.delete(role)
 
+    # Then add any roles that are in the request but not in the user.roles array
     for role in roles_to_add:
         user.roles.append(role)
 
+    # Finally keep the roles in a deterministic sorted order
     user.roles.sort(key=attrgetter("type"))

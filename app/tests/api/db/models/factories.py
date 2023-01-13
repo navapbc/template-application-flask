@@ -25,7 +25,7 @@ fake = faker.Faker()
 
 
 def get_db_session() -> api.db.Session:
-    # _db_session is only set in the pytest fixture `factories_session`
+    # _db_session is only set in the pytest fixture `factories_db_session`
     # so that tests do not unintentionally write to the database.
     if _db_session is None:
         raise Exception(
@@ -36,7 +36,7 @@ def get_db_session() -> api.db.Session:
             not persist the generated model.
 
             If running tests that actually need data in the DB, pull in the
-            `factories_session` fixture to initialize the db_session.
+            `factories_db_session` fixture to initialize the db_session.
             """
         )
 
