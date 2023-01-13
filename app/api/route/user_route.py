@@ -30,15 +30,14 @@ def user_post(user_params: users.CreateUserParams) -> dict:
 
     db = api.db.get_db(current_app)
     with db.get_session() as db_session:
-        with db_session.begin():
-            user = user_service.create_user(db_session, user_params)
+        user = user_service.create_user(db_session, user_params)
 
-            logger.info(
-                "Successfully inserted user",
-                extra=get_user_log_params(user),
-            )
+        logger.info(
+            "Successfully inserted user",
+            extra=get_user_log_params(user),
+        )
 
-            return response.ApiResponse(message="Success", data=user).asdict()
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 @user_blueprint.patch("/v1/user/<uuid:user_id>")
@@ -53,15 +52,14 @@ def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
 
     db = api.db.get_db(current_app)
     with db.get_session() as db_session:
-        with db_session.begin():
-            user = user_service.patch_user(db_session, user_id, patch_user_params)
+        user = user_service.patch_user(db_session, user_id, patch_user_params)
 
-            logger.info(
-                "Successfully patched user",
-                extra=get_user_log_params(user),
-            )
+        logger.info(
+            "Successfully patched user",
+            extra=get_user_log_params(user),
+        )
 
-            return response.ApiResponse(message="Success", data=user).asdict()
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 @user_blueprint.get("/v1/user/<uuid:user_id>")
@@ -72,15 +70,14 @@ def user_get(user_id: str) -> dict:
 
     db = api.db.get_db(current_app)
     with db.get_session() as db_session:
-        with db_session.begin():
-            user = user_service.get_user(db_session, user_id)
+        user = user_service.get_user(db_session, user_id)
 
-            logger.info(
-                "Successfully fetched user",
-                extra=get_user_log_params(user),
-            )
+        logger.info(
+            "Successfully fetched user",
+            extra=get_user_log_params(user),
+        )
 
-            return response.ApiResponse(message="Success", data=user).asdict()
+        return response.ApiResponse(message="Success", data=user).asdict()
 
 
 def get_user_log_params(user: User) -> dict[str, Any]:

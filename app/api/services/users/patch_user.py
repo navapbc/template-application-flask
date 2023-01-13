@@ -5,7 +5,7 @@ from typing import TypedDict
 import apiflask
 from sqlalchemy import orm
 
-from api import db
+from api.db import Session
 from api.db.models.user_models import Role, User
 from api.services.users.create_user import RoleParams
 
@@ -25,30 +25,30 @@ class PatchUserParams(TypedDict, total=False):
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
 def patch_user(
-    db_session: db.Session,
+    db_session: Session,
     user_id: str,
     patch_user_params: PatchUserParams,
 ) -> User:
 
-    # TODO: move this to service and/or persistence layer
-    user = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+    with db_session.begin():
+        # TODO: move this to service and/or persistence layer
+        user = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
-    if user is None:
-        # TODO move HTTP related logic out of service layer to controller layer and just return None from here
-        # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
-        raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
+        if user is None:
+            # TODO move HTTP related logic out of service layer to controller layer and just return None from here
+            # https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053754975
+            raise apiflask.HTTPError(404, message=f"Could not find user with ID {user_id}")
 
-    for key, value in patch_user_params.items():
-        if key == "roles":
-            _handle_role_patch(db_session, user, patch_user_params["roles"])
-            continue
+        for key, value in patch_user_params.items():
+            if key == "roles":
+                _handle_role_patch(db_session, user, patch_user_params["roles"])
+                continue
 
-        setattr(user, key, value)
-
+            setattr(user, key, value)
     return user
 
 
-def _handle_role_patch(db_session: db.Session, user: User, request_roles: list[RoleParams]) -> None:
+def _handle_role_patch(db_session: Session, user: User, request_roles: list[RoleParams]) -> None:
 
     current_role_types = set([role.type for role in user.roles])
     request_role_types = set([role["type"] for role in request_roles])
