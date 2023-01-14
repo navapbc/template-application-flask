@@ -28,8 +28,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
     """
     logger.info("POST /v1/user")
 
-    db_client = db.get_db(current_app)
-    with db_client.get_session() as db_session:
+    with db.get_db(current_app).get_session() as db_session:
         user = user_service.create_user(db_session, user_params)
 
         logger.info(
@@ -50,8 +49,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
 def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
-    db_client = db.get_db(current_app)
-    with db_client.get_session() as db_session:
+    with db.get_db(current_app).get_session() as db_session:
         user = user_service.patch_user(db_session, user_id, patch_user_params)
 
         logger.info(
@@ -68,8 +66,7 @@ def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
 def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
-    db_client = db.get_db(current_app)
-    with db_client.get_session() as db_session:
+    with db.get_db(current_app).get_session() as db_session:
         user = user_service.get_user(db_session, user_id)
 
         logger.info(

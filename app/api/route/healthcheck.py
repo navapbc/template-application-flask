@@ -26,9 +26,8 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
-    db_client = db.get_db(current_app)
     try:
-        with db_client.get_connection() as conn:
+        with db.get_db(current_app).get_connection() as conn:
             assert conn.scalar(text("SELECT 1 AS healthy")) == 1
         return response.ApiResponse(message="Service healthy").asdict(), 200
     except Exception:

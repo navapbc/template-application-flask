@@ -1,36 +1,20 @@
 """
 Database module.
 
-It is recommended to import this module as `import api.db as db` rather than
-`from api import db` in order to avoid confusion with instances of `DBClient`
-which are named `db` by convention.
-
-Example:
+Usage:
     import api.db as db
 
     db_client = db.init_db()
 
     # non-ORM style usage
-    with db.get_connection() as conn:
+    with db_client.get_connection() as conn:
         conn.execute(...)
 
     # ORM style usage
-    with db.get_session() as session:
+    with db_client.get_session() as session:
         session.query(...)
         with session.begin():
             session.add(...)
-
-Alternatively, if you are only importing the module for type hints (and
-to explicitly indicate dependencies), you can do `from api.db import DB`.
-
-Example:
-    from api.db import DB
-
-    @app.route("/health")
-    def health() -> Response:
-        db: DB = app.extensions["db"]
-        with db.get_connection() as conn:
-            conn.execute(...)
 """
 
 import os
