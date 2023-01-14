@@ -5,8 +5,8 @@
 #
 # https://docs.python.org/3/library/__main__.html
 
+import api.adapters.db as db
 import api.app
-import api.db as db
 import api.logging
 import api.logging.audit
 from api.app_config import AppConfig

@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator
 
-import api.db as db
+import api.adapters.db as db
 import api.logging
 from api.util.local import load_local_env_vars
 

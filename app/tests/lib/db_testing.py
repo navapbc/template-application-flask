@@ -2,8 +2,9 @@
 import contextlib
 import uuid
 
-import api.db as db
+import api.adapters.db as db
 from api import logging
+from api.adapters.db.config import get_db_config
 
 logger = logging.get_logger(__name__)
 
@@ -35,7 +36,7 @@ def create_isolated_db(monkeypatch) -> None:
 
 def _create_schema(conn: db.Connection, schema_name: str):
     """Create a database schema."""
-    db_test_user = db.get_db_config().username
+    db_test_user = get_db_config().username
 
     conn.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
     logger.info("create schema %s", schema_name)
