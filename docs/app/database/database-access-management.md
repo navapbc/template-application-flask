@@ -94,9 +94,4 @@ A database session refers to the period of time during which a user is connected
 ## References
 
 * [SQLAlchemy FAQ: When do I construct a \`Session\`, when do I commit it, and when do I close it?](https://docs.sqlalchemy.org/en/14/orm/session_basics.html#session-faq-whentocreate)
-
-[](https://docs.sqlalchemy.org/en/14/orm/session_basics.html#expiring-refreshing)
-
-[](https://docs.sqlalchemy.org/en/14/faq/sessions.html#faq-session-identity)
-
-[](https://docs.sqlalchemy.org/en/14/orm/session_basics.html#session-faq-whentocreate)
+* [Refreshing / Expiring the Session](https://docs.sqlalchemy.org/en/14/orm/session_state_management.html#refreshing-expiring)
