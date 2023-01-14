@@ -1,3 +1,4 @@
+import bisect
 from datetime import date
 from operator import attrgetter
 from typing import TypedDict
@@ -67,9 +68,7 @@ def _handle_role_patch(db_session: Session, user: User, request_roles: list[Role
         user.roles.remove(role)
         db_session.delete(role)
 
-    # Then add any roles that are in the request but not in the user.roles array
+    # Then add any roles that are in the request but not in the user.roles array,
+    # keeping the roles array sorted by role type
     for role in roles_to_add:
-        user.roles.append(role)
-
-    # Finally keep the roles in a deterministic sorted order
-    user.roles.sort(key=attrgetter("type"))
+        bisect.insort(user.roles, role, key=attrgetter("type"))
