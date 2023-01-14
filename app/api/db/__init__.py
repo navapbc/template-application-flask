@@ -46,7 +46,7 @@ from sqlalchemy.orm import session
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
 
-FLASK_EXTENSION_KEY = "db"
+_FLASK_EXTENSION_KEY = "db"
 
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.
@@ -79,7 +79,7 @@ class DBClient:
 
         see get_db
         """
-        app.extensions[FLASK_EXTENSION_KEY] = self
+        app.extensions[_FLASK_EXTENSION_KEY] = self
 
     def get_connection(self) -> Connection:
         """Return a new database connection object.
@@ -160,7 +160,7 @@ def get_db(app: Flask) -> DBClient:
         def health() -> Response:
             db = api.db.get_db(current_app)
     """
-    return app.extensions[FLASK_EXTENSION_KEY]
+    return app.extensions[_FLASK_EXTENSION_KEY]
 
 
 def verify_ssl(connection_info: Any) -> None:
