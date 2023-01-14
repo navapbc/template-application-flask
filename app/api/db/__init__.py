@@ -1,14 +1,14 @@
 """
 Database module.
 
-It is recommended to import this module as `import api.db` rather than
-`from api import db` in order to avoid confusion with instances of `DB`
+It is recommended to import this module as `import api.db as db` rather than
+`from api import db` in order to avoid confusion with instances of `DBClient`
 which are named `db` by convention.
 
 Example:
-    import api.db
+    import api.db as db
 
-    db = api.db.init_db()
+    db_client = db.init_db()
 
     # non-ORM style usage
     with db.get_connection() as conn:
@@ -154,11 +154,11 @@ def get_db(app: Flask) -> DBClient:
 
     Example:
         from flask import current_app, Response
-        import api.db
+        import api.db as db
 
         @app.route("/health")
         def health() -> Response:
-            db = api.db.get_db(current_app)
+            db_client = db.get_db(current_app)
     """
     return app.extensions[_FLASK_EXTENSION_KEY]
 

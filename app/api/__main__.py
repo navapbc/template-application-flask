@@ -6,7 +6,7 @@
 # https://docs.python.org/3/library/__main__.html
 
 import api.app
-import api.db
+import api.db as db
 import api.logging
 import api.logging.audit
 from api.app_config import AppConfig
@@ -22,8 +22,8 @@ def main() -> None:
     api.logging.audit.init_security_logging()
     api.logging.init(__package__)
 
-    db = api.db.init()
-    app = api.app.create_app(db=db)
+    db_client = db.init()
+    app = api.app.create_app(db_client=db_client)
     environment = app_config.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be

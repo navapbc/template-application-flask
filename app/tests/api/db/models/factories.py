@@ -15,16 +15,16 @@ import factory.fuzzy
 import faker
 from sqlalchemy.orm import scoped_session
 
-import api.db
+import api.db as db
 import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
 
-_db_session: Optional[api.db.Session] = None
+_db_session: Optional[db.Session] = None
 
 fake = faker.Faker()
 
 
-def get_db_session() -> api.db.Session:
+def get_db_session() -> db.Session:
     # _db_session is only set in the pytest fixture `factories_db_session`
     # so that tests do not unintentionally write to the database.
     if _db_session is None:

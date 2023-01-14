@@ -16,15 +16,15 @@ For example, **do this**
 ### right way ###
 
 from flask import current_app
-import api.db
+import api.db as db
 
-def some_service_func(session: api.db.Session)
+def some_service_func(session: db.Session)
     with db_session.begin(): # start transaction
         session.query(FooBar).update({"x": 5})
 
 @app.post("/some-service")
 def some_service_post():
-    db = api.db.get_db(current_app)
+    db_client = db.get_db(current_app)
     with db.get_session() as db_session: # create session
         some_service_func(db_session)
 ```
@@ -35,10 +35,10 @@ and **don't do this**
 ### wrong way ###
 
 from flask import current_app
-import api.db
+import api.db as db
 
 def some_service_func()
-    db = api.db.get_db(current_app)
+    db_client = db.get_db(current_app)
     with db.get_session() as db_session:
         with db_session.begin():
             session.query(FooBar).update({"x": 5})
@@ -57,7 +57,7 @@ Make sure to understand the concept of transactions and the [ACID properties of 
 To start a new transaction, use `session.begin()`. For example
 
 ```python
-def service_method(session: api.db.Session):
+def service_method(session: db.Session):
     with session.begin(): # start database transaction
         session.query(...)
         session.add(...)
@@ -71,7 +71,7 @@ For example, **don't do this**:
 ```python
 # incorrect
 
-def withdraw(session: api.db.Session, account_id, amount):
+def withdraw(session: db.Session, account_id, amount):
     with session.begin():
         bank_account = session.query(BankAccount).get(account_id)
     with session.begin():

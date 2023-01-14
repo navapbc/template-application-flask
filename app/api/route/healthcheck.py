@@ -5,7 +5,7 @@ from flask import current_app
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
-import api.db
+import api.db as db
 import api.logging
 from api.route import response
 from api.route.schemas import request_schema
@@ -26,9 +26,9 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
-    db = api.db.get_db(current_app)
+    db_client = db.get_db(current_app)
     try:
-        with db.get_connection() as conn:
+        with db_client.get_connection() as conn:
             assert conn.scalar(text("SELECT 1 AS healthy")) == 1
         return response.ApiResponse(message="Service healthy").asdict(), 200
     except Exception:

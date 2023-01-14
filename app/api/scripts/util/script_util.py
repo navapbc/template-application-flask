@@ -3,7 +3,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator
 
-import api.db
+import api.db as db
 import api.logging
 from api.util.local import load_local_env_vars
 
@@ -12,7 +12,7 @@ logger = api.logging.get_logger(__name__)
 
 @dataclass
 class ScriptContext:
-    db_session: api.db.Session
+    db_session: db.Session
 
 
 # TODO remove
@@ -32,9 +32,9 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # metrics (eg. New Relic) and so on in a way that
     # helps prevent so much boilerplate code.
 
-    db = api.db.init()
-    db.check_db_connection()
-    with db.get_session() as db_session:
+    db_client = db.init()
+    db_client.check_db_connection()
+    with db_client.get_session() as db_session:
         script_context = ScriptContext(db_session)
         yield script_context
     logger.info("Script complete")

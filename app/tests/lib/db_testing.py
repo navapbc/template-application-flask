@@ -2,7 +2,7 @@
 import contextlib
 import uuid
 
-import api.db
+import api.db as db
 from api import logging
 
 logger = logging.get_logger(__name__)
@@ -24,24 +24,24 @@ def create_isolated_db(monkeypatch) -> None:
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
-    db = api.db.init(check_db_connection=False)
-    with db.get_connection() as conn:
+    db_client = db.init(check_db_connection=False)
+    with db_client.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:
-            yield db
+            yield db_client
         finally:
             _drop_schema(conn, schema_name)
 
 
-def _create_schema(conn: api.db.Connection, schema_name: str):
+def _create_schema(conn: db.Connection, schema_name: str):
     """Create a database schema."""
-    db_test_user = api.db.get_db_config().username
+    db_test_user = db.get_db_config().username
 
     conn.execute(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
     logger.info("create schema %s", schema_name)
 
 
-def _drop_schema(conn: api.db.Connection, schema_name: str):
+def _drop_schema(conn: db.Connection, schema_name: str):
     """Drop a database schema."""
     conn.execute(f"DROP SCHEMA {schema_name} CASCADE;")
     logger.info("drop schema %s", schema_name)

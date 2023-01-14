@@ -7,7 +7,7 @@ import pytest
 import sqlalchemy
 
 import api.app as app_entry
-import api.db
+import api.db as db
 import api.logging
 import tests.api.db.models.factories as factories
 from api.db import models
@@ -42,28 +42,28 @@ def monkeypatch_module(request):
 
 
 @pytest.fixture(scope="session")
-def db(monkeypatch_session) -> api.db.DBClient:
+def db_client(monkeypatch_session) -> db.DBClient:
     """
     Creates an isolated database for the test session.
 
     Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a api.db.DB instance that can be used to
+    using SQLAlchemy, then returns a db.DB instance that can be used to
     get connections or sessions to this database schema. The schema is dropped
     after the test suite session completes.
     """
 
-    with db_testing.create_isolated_db(monkeypatch_session) as db:
-        models.metadata.create_all(bind=db.get_connection())
-        yield db
+    with db_testing.create_isolated_db(monkeypatch_session) as db_client:
+        models.metadata.create_all(bind=db_client.get_connection())
+        yield db_client
 
 
 @pytest.fixture(scope="function")
-def isolated_db(monkeypatch) -> api.db.DBClient:
+def isolated_db(monkeypatch) -> db.DBClient:
     """
     Creates an isolated database for the test function.
 
     Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a api.db.DB instance that can be used to
+    using SQLAlchemy, then returns a db.DB instance that can be used to
     get connections or sessions to this database schema. The schema is dropped
     after the test function completes.
 
@@ -77,7 +77,7 @@ def isolated_db(monkeypatch) -> api.db.DBClient:
 
 
 @pytest.fixture
-def empty_schema(monkeypatch) -> api.db.DBClient:
+def empty_schema(monkeypatch) -> db.DBClient:
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
@@ -90,15 +90,15 @@ def empty_schema(monkeypatch) -> api.db.DBClient:
 
 
 @pytest.fixture
-def test_db_session(db: api.db.DBClient) -> api.db.Session:
+def test_db_session(db_client: db.DBClient) -> db.Session:
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    with db.get_connection() as connection:
+    with db_client.get_connection() as connection:
         trans = connection.begin()
 
         # Rather than call db.get_session() to create a new session with a new connection,
         # create a session bound to the existing connection that has a transaction manually start.
         # This allows the transaction to be rolled back after the test completes.
-        with api.db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
+        with db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
             session.begin_nested()
 
             @sqlalchemy.event.listens_for(session, "after_transaction_end")
@@ -112,14 +112,14 @@ def test_db_session(db: api.db.DBClient) -> api.db.Session:
 
 
 @pytest.fixture
-def factories_db_session(monkeypatch, test_db_session) -> api.db.Session:
+def factories_db_session(monkeypatch, test_db_session) -> db.Session:
     monkeypatch.setattr(factories, "_db_session", test_db_session)
     logger.info("set factories db_session to %s", test_db_session)
     return test_db_session
 
 
 @pytest.fixture
-def isolated_db_factories_session(monkeypatch, isolated_db: api.db.DBClient) -> api.db.Session:
+def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.Session:
     with isolated_db.get_session() as session:
         monkeypatch.setattr(factories, "_db_session", session)
         logger.info("set factories db_session to %s", session)
@@ -147,8 +147,8 @@ def logging_fix(monkeypatch):
 
 
 @pytest.fixture
-def app(db):
-    return app_entry.create_app(db=db)
+def app(db_client):
+    return app_entry.create_app(db_client=db_client)
 
 
 @pytest.fixture
