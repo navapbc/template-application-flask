@@ -28,9 +28,7 @@ class User(Base, IdMixin, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: Optional[list["Role"]] = relationship(
-        "Role", back_populates="user", order_by="Role.type"
-    )
+    roles: list["Role"] = relationship("Role", back_populates="user", order_by="Role.type")
 
 
 class Role(Base, TimestampMixin):

@@ -1,10 +1,8 @@
 import uuid
-from datetime import date
 
 import faker
 import pytest
 
-from api.db.models.user_models import User
 from tests.api.util.parametrize_utils import powerset
 
 fake = faker.Faker()
@@ -31,29 +29,6 @@ def base_request():
 def created_user(client, api_auth_token, base_request):
     response = client.post("/v1/user", json=base_request, headers={"X-Auth": api_auth_token})
     return response.get_json()["data"]
-
-
-def validate_param_match(key, request, response, db_record):
-    if isinstance(response, list):
-        # If comparing a list parameter, fetch all of the
-        # values as a set so order won't matter.
-        req_val = set([term[key] for term in request]) if request else None
-        response_val = set([term[key] for term in response]) if response else None
-        db_val = set([getattr(term, key) for term in db_record]) if db_record else None
-
-    else:
-        req_val = request[key] if request else None
-        response_val = response[key] if response else None
-        db_val = getattr(db_record, key) if db_record else None
-
-    if isinstance(db_val, date):
-        db_val = db_val.isoformat()
-
-    if request is not None:
-        assert response_val == req_val
-        assert req_val == db_val
-
-    assert response_val == db_val
 
 
 test_create_and_get_user_data = [
@@ -141,18 +116,12 @@ test_create_user_bad_request_data = [
 
 
 @pytest.mark.parametrize("request_data,expected_response_data", test_create_user_bad_request_data)
-def test_create_user_bad_request(
-    client, api_auth_token, test_db_session, request_data, expected_response_data
-):
+def test_create_user_bad_request(client, api_auth_token, request_data, expected_response_data):
     response = client.post("/v1/user", json=request_data, headers={"X-Auth": api_auth_token})
-    assert response.status_code == 400
+    assert response.status_code == 422
 
     response_data = response.get_json()["detail"]["json"]
     assert response_data == expected_response_data
-
-    # Nothing added to DB
-    results = test_db_session.query(User).all()
-    assert len(results) == 0
 
 
 def test_patch_user(client, api_auth_token, created_user):
@@ -217,7 +186,7 @@ test_unauthorized_data = [
 
 
 @pytest.mark.parametrize("method,url,body", test_unauthorized_data)
-def test_unauthorized(client, method, url, body):
+def test_unauthorized(client, method, url, body, api_auth_token):
     expected_message = (
         "The server could not verify that you are authorized to access the URL requested"
     )

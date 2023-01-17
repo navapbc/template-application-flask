@@ -1,14 +1,11 @@
 import logging  # noqa: B1
 
-import pytest
 from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError
 
-import api.db
 from api.db.migrations.run import alembic_cfg
-from tests.conftest import db_schema_create, db_schema_drop
 
 
 def test_only_single_head_revision_in_migrations():
@@ -34,40 +31,14 @@ def test_only_single_head_revision_in_migrations():
         )
 
 
-@pytest.fixture
-def test_db_schema_non_session(monkeypatch):
-    """
-    Create a test schema, if it doesn't already exist, and drop it after the
-    test completes.
-
-    The monkeypatch setup of the test_db_schema fixture causes this issues
-    so copied here with that adjusted
-    """
-    schema_name = "test_schema_session_1234"
-
-    monkeypatch.setenv("DB_SCHEMA", schema_name)
-    monkeypatch.setenv("POSTGRES_DB", "main-db")
-    monkeypatch.setenv("POSTGRES_USER", "local_db_user")
-    monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
-    monkeypatch.setenv("ENVIRONMENT", "local")
-
-    db_schema_create(schema_name)
-    try:
-        yield schema_name
-    finally:
-        db_schema_drop(schema_name)
-
-
-def test_db_setup_via_alembic_migration(test_db_schema_non_session, logging_fix, caplog):
+def test_db_setup_via_alembic_migration(empty_schema, logging_fix, caplog):
     caplog.set_level(logging.INFO)  # noqa: B1
     command.upgrade(alembic_cfg, "head")
     # Verify the migration ran by checking the logs
     assert "Running upgrade" in caplog.text
 
 
-def test_db_init_with_migrations(test_db_schema_non_session):
+def test_db_init_with_migrations(empty_schema):
     # Verify the DB session works after initializing the migrations
-    db_session = api.db.init()
-
+    db_session = empty_schema.get_session()
     db_session.close()
-    db_session.remove()

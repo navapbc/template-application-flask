@@ -1,3 +1,4 @@
+# TODO use built in @flask.cli commands so that we can reuse flask app and no longer need this file
 from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Generator
@@ -11,9 +12,10 @@ logger = api.logging.get_logger(__name__)
 
 @dataclass
 class ScriptContext:
-    db_session: db.scoped_session
+    db_session: db.Session
 
 
+# TODO remove
 @contextmanager
 def script_context_manager() -> Generator[ScriptContext, None, None]:
     """
@@ -30,10 +32,9 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     # metrics (eg. New Relic) and so on in a way that
     # helps prevent so much boilerplate code.
 
-    logger.info("Connecting to DB")
-    with db.session_scope(db.init(), close=True) as db_session:
+    db_client = db.init()
+    db_client.check_db_connection()
+    with db_client.get_session() as db_session:
         script_context = ScriptContext(db_session)
-
         yield script_context
-
     logger.info("Script complete")

@@ -1,60 +1,150 @@
+"""
+Database module.
+
+Usage:
+    import api.db as db
+
+    db_client = db.init_db()
+
+    # non-ORM style usage
+    with db_client.get_connection() as conn:
+        conn.execute(...)
+
+    # ORM style usage
+    with db_client.get_session() as session:
+        session.query(...)
+        with session.begin():
+            session.add(...)
+"""
+
 import os
 import urllib.parse
-from contextlib import contextmanager
-from typing import Any, Generator, Optional
+from typing import Any, Optional
 
 import psycopg2
+import sqlalchemy
 import sqlalchemy.pool as pool
-from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
-from sqlalchemy.orm import scoped_session, sessionmaker
+from flask import Flask
+from sqlalchemy.orm import session
 
 import api.logging
 from api.db.db_config import DbConfig, get_db_config
-from api.db.migrations.run import have_all_migrations_run
+
+_FLASK_EXTENSION_KEY = "db"
+
+# Re-export the Connection type that is returned by the get_connection() method
+# to be used for type hints.
+Connection = sqlalchemy.engine.Connection
+
+# Re-export the Session type that is returned by the get_session() method
+# to be used for type hints.
+Session = session.Session
 
 logger = api.logging.get_logger(__name__)
 
 
-def init(
-    config: Optional[DbConfig] = None,
-    check_migrations_current: bool = False,
-) -> scoped_session:
-    logger.info("connecting to postgres db")
+class DBClient:
+    """Database connection manager.
 
-    engine = create_db_engine(config)
-    conn = engine.connect()
+    This class is used to manage database connections for the Flask app.
+    It has methods for getting a new connection or session object.
+    """
 
-    conn_info = conn.connection.dbapi_connection.info  # type: ignore
-    logger.info(
-        "connected to postgres db",
-        extra={
-            "dbname": conn_info.dbname,
-            "user": conn_info.user,
-            "host": conn_info.host,
-            "port": conn_info.port,
-            "options": conn_info.options,
-            "dsn_parameters": conn_info.dsn_parameters,
-            "protocol_version": conn_info.protocol_version,
-            "server_version": conn_info.server_version,
-        },
-    )
-    verify_ssl(conn_info)
+    _engine: sqlalchemy.engine.Engine
 
-    # Explicitly commit sessions — usually with session_scope. Also disable expiry on commit,
-    # as we don't need to be strict on consistency within our routes. Once we've retrieved data
-    # from the database, we shouldn't make any extra requests to the db when grabbing existing
-    # attributes.
-    session_factory = scoped_session(
-        sessionmaker(autocommit=False, expire_on_commit=False, bind=engine)
-    )
+    def __init__(self) -> None:
+        self._engine = _create_db_engine()
 
-    if check_migrations_current:
-        have_all_migrations_run(engine)
+    def init_app(self, app: Flask) -> None:
+        """Initialize the Flask app.
 
-    engine.dispose()
+        Add the database to the Flask app's extensions so that it can be
+        accessed by request handlers using the current app context.
 
-    return session_factory
+        see get_db
+        """
+        app.extensions[_FLASK_EXTENSION_KEY] = self
+
+    def get_connection(self) -> Connection:
+        """Return a new database connection object.
+
+        Use the connection to execute SQL queries without using the ORM.
+
+        Usage:
+            with db.get_connection() as conn:
+                conn.execute(...)
+        """
+        return self._engine.connect()
+
+    def get_session(self) -> Session:
+        """Return a new session object.
+
+        In general, only one session object should be created per request.
+
+        If you want to automatically commit or rollback the session, use
+        the session.begin() context manager.
+        See https://docs.sqlalchemy.org/en/13/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
+
+        Example:
+            with db.get_session() as session:
+                with session.begin():
+                    session.add(...)
+                # session is automatically committed here
+                # or rolled back if an exception is raised
+        """
+        return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
+
+    def check_db_connection(self) -> None:
+        """Check that we can connect to the database and log some info about the connection."""
+        logger.info("connecting to postgres db")
+        with self.get_connection() as conn:
+            conn_info = conn.connection.dbapi_connection.info  # type: ignore
+
+            logger.info(
+                "connected to postgres db",
+                extra={
+                    "dbname": conn_info.dbname,
+                    "user": conn_info.user,
+                    "host": conn_info.host,
+                    "port": conn_info.port,
+                    "options": conn_info.options,
+                    "dsn_parameters": conn_info.dsn_parameters,
+                    "protocol_version": conn_info.protocol_version,
+                    "server_version": conn_info.server_version,
+                },
+            )
+            verify_ssl(conn_info)
+
+            # TODO add check_migrations_current to config
+            # if check_migrations_current:
+            #     have_all_migrations_run(engine)
+
+
+def init(*, check_db_connection: bool = True) -> DBClient:
+    db = DBClient()
+
+    # Try connecting to the database immediately upon initialization
+    # so that we can fail fast if the database is not available.
+    # Checking the db connection on db init is disabled in tests.
+    if check_db_connection:
+        db.check_db_connection()
+    return db
+
+
+def get_db(app: Flask) -> DBClient:
+    """Get the database connection for the given Flask app.
+
+    Use this in request handlers to access the database from the active Flask app.
+
+    Example:
+        from flask import current_app, Response
+        import api.db as db
+
+        @app.route("/health")
+        def health() -> Response:
+            db_client = db.get_db(current_app)
+    """
+    return app.extensions[_FLASK_EXTENSION_KEY]
 
 
 def verify_ssl(connection_info: Any) -> None:
@@ -71,7 +161,9 @@ def verify_ssl(connection_info: Any) -> None:
         logger.warning("database connection is not using SSL")
 
 
-def create_db_engine(config: Optional[DbConfig] = None) -> Engine:
+# TODO rename to create_db since the key interface is that it's something that responds
+# to .connect() method. Doesn't really matter that it's an Engine class instance
+def _create_db_engine(config: Optional[DbConfig] = None) -> sqlalchemy.engine.Engine:
     db_config: DbConfig = config if config is not None else get_db_config()
 
     # We want to be able to control the connection parameters for each
@@ -90,7 +182,7 @@ def create_db_engine(config: Optional[DbConfig] = None) -> Engine:
     # handles the actual connections.
     #
     # (a SQLAlchemy Engine represents a Dialect+Pool)
-    return create_engine(
+    return sqlalchemy.create_engine(
         "postgresql://",
         pool=conn_pool,
         # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
@@ -121,26 +213,6 @@ def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:
         connect_timeout=3,
         **connect_args,
     )
-
-
-@contextmanager
-def session_scope(
-    session: scoped_session, close: bool = False
-) -> Generator[scoped_session, None, None]:
-    """Provide a transactional scope around a series of operations.
-
-    See https://docs.sqlalchemy.org/en/13/orm/session_basics.html#when-do-i-construct-a-session-when-do-i-commit-it-and-when-do-i-close-it
-    """
-
-    try:
-        yield session
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
-    finally:
-        if close:
-            session.close()
 
 
 def make_connection_uri(config: DbConfig) -> str:

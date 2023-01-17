@@ -1,17 +1,17 @@
 import apiflask
 from sqlalchemy import orm
 
+from api.db import Session
 from api.db.models.user_models import User
-from api.route.api_context import ApiContext
 
 
 # TODO: separate controller and service concerns
 # https://github.com/navapbc/template-application-flask/issues/49#issue-1505008251
 # TODO: Use classes / objects as inputs to service methods
 # https://github.com/navapbc/template-application-flask/issues/52
-def get_user(user_id: str, api_context: ApiContext) -> User:
+def get_user(db_session: Session, user_id: str) -> User:
     # TODO: move this to service and/or persistence layer
-    result = api_context.db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+    result = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
 
     if result is None:
         # TODO move HTTP related logic out of service layer to controller layer and just return None from here

@@ -1,17 +1,17 @@
 import logging.config  # noqa: B1
-import os
-import uuid
 
 import _pytest.monkeypatch
 import boto3
 import moto
 import pytest
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
 
 import api.app as app_entry
-import api.db
+import api.db as db
 import api.logging
+import tests.api.db.models.factories as factories
+from api.db import models
+from tests.lib import db_testing
 
 logger = api.logging.get_logger(__name__)
 
@@ -23,6 +23,11 @@ logger = api.logging.get_logger(__name__)
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="session")
 def monkeypatch_session(request):
+    """
+    Create a monkeypatch instance that can be used to
+    monkeypatch global environment, objects, and attributes
+    for the duration the test session.
+    """
     mpatch = _pytest.monkeypatch.MonkeyPatch()
     yield mpatch
     mpatch.undo()
@@ -36,111 +41,89 @@ def monkeypatch_module(request):
     mpatch.undo()
 
 
-def exec_sql_admin(sql):
-    db_admin_config = api.db.get_db_config()
-    engine = api.db.create_db_engine(db_admin_config)
-    with engine.connect() as connection:
-        connection.execute(sql)
-
-
-def db_schema_create(schema_name):
-    """Create a database schema."""
-    db_config = api.db.get_db_config()
-    db_test_user = db_config.username
-
-    exec_sql_admin(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
-    logger.info("create schema %s", schema_name)
-
-
-def db_schema_drop(schema_name):
-    """Drop a database schema."""
-    exec_sql_admin(f"DROP SCHEMA {schema_name} CASCADE;")
-    logger.info("drop schema %s", schema_name)
-
-
 @pytest.fixture(scope="session")
-def test_db_schema(monkeypatch_session):
+def db_client(monkeypatch_session) -> db.DBClient:
+    """
+    Creates an isolated database for the test session.
+
+    Creates a new empty PostgreSQL schema, creates all tables in the new schema
+    using SQLAlchemy, then returns a db.DB instance that can be used to
+    get connections or sessions to this database schema. The schema is dropped
+    after the test suite session completes.
+    """
+
+    with db_testing.create_isolated_db(monkeypatch_session) as db_client:
+        models.metadata.create_all(bind=db_client.get_connection())
+        yield db_client
+
+
+@pytest.fixture(scope="function")
+def isolated_db(monkeypatch) -> db.DBClient:
+    """
+    Creates an isolated database for the test function.
+
+    Creates a new empty PostgreSQL schema, creates all tables in the new schema
+    using SQLAlchemy, then returns a db.DB instance that can be used to
+    get connections or sessions to this database schema. The schema is dropped
+    after the test function completes.
+
+    This is similar to the db fixture except the scope of the schema is the
+    individual test rather the test session.
+    """
+
+    with db_testing.create_isolated_db(monkeypatch) as db:
+        models.metadata.create_all(bind=db.get_connection())
+        yield db
+
+
+@pytest.fixture
+def empty_schema(monkeypatch) -> db.DBClient:
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
+
+    This is similar to the db fixture but does not create any tables in the
+    schema. This is used by migration tests.
     """
-    schema_name = f"test_schema_{uuid.uuid4().int}"
-
-    monkeypatch_session.setenv("DB_SCHEMA", schema_name)
-    monkeypatch_session.setenv("POSTGRES_DB", "main-db")
-    monkeypatch_session.setenv("POSTGRES_USER", "local_db_user")
-    monkeypatch_session.setenv("POSTGRES_PASSWORD", "secret123")
-    monkeypatch_session.setenv("ENVIRONMENT", "local")
-
-    db_schema_create(schema_name)
-    try:
-        yield schema_name
-    finally:
-        db_schema_drop(schema_name)
-
-
-@pytest.fixture(scope="session")
-def test_db(test_db_schema):
-    """
-    Creates a test schema, directly creating all tables with SQLAlchemy. Schema
-    is dropped after the test completes.
-    """
-
-    # not used directly, but loads models into Base
-    from api.db.models.base import Base
-
-    engine = api.db.create_db_engine()
-    Base.metadata.create_all(bind=engine)
-
-    db_session = api.db.init()
-    db_session.close()
-    db_session.remove()
-
-    return engine
+    with db_testing.create_isolated_db(monkeypatch) as db:
+        yield db
 
 
 @pytest.fixture
-def test_db_session(test_db):
+def test_db_session(db_client: db.DBClient) -> db.Session:
     # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    connection = test_db.connect()
-    trans = connection.begin()
-    session = api.db.scoped_session(
-        sessionmaker(bind=connection, autocommit=False, expire_on_commit=False)
-    )
+    with db_client.get_connection() as connection:
+        trans = connection.begin()
 
-    session.begin_nested()
-
-    @sqlalchemy.event.listens_for(session, "after_transaction_end")
-    def restart_savepoint(session, transaction):
-        if transaction.nested and not transaction._parent.nested:
+        # Rather than call db.get_session() to create a new session with a new connection,
+        # create a session bound to the existing connection that has a transaction manually start.
+        # This allows the transaction to be rolled back after the test completes.
+        with db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
             session.begin_nested()
 
-    yield session
+            @sqlalchemy.event.listens_for(session, "after_transaction_end")
+            def restart_savepoint(session, transaction):
+                if transaction.nested and not transaction._parent.nested:
+                    session.begin_nested()
 
-    session.close()
-    trans.rollback()
-    connection.close()
+            yield session
 
-
-@pytest.fixture(autouse=True, scope="session")
-def set_no_db_factories_alert():
-    """By default, ensure factories do not attempt to access the database.
-
-    The tests that need generated models to actually hit the database can pull
-    in the `initialize_factories_session` fixture to their test case to enable
-    factory writes to the database.
-    """
-    os.environ["DB_FACTORIES_DISABLE_DB_ACCESS"] = "1"
+        trans.rollback()
 
 
 @pytest.fixture
-def initialize_factories_session(monkeypatch, test_db_session):
-    monkeypatch.delenv("DB_FACTORIES_DISABLE_DB_ACCESS")
-
-    import tests.api.db.models.factories as factories
-
+def factories_db_session(monkeypatch, test_db_session) -> db.Session:
+    monkeypatch.setattr(factories, "_db_session", test_db_session)
     logger.info("set factories db_session to %s", test_db_session)
-    factories.db_session = test_db_session
+    return test_db_session
+
+
+@pytest.fixture
+def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.Session:
+    with isolated_db.get_session() as session:
+        monkeypatch.setattr(factories, "_db_session", session)
+        logger.info("set factories db_session to %s", session)
+        yield session
 
 
 ####################
@@ -164,10 +147,8 @@ def logging_fix(monkeypatch):
 
 
 @pytest.fixture
-def app(test_db_session):
-    return app_entry.create_app(
-        check_migrations_current=False, db_session_factory=test_db_session, do_close_db=False
-    )
+def app(db_client):
+    return app_entry.create_app(db_client=db_client)
 
 
 @pytest.fixture

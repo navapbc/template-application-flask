@@ -52,27 +52,27 @@ def test_user_factory_build():
     validate_user_record(user, user_params)
 
 
-def test_factory_create_uninitialized_db_session(test_db_session):
+def test_factory_create_uninitialized_db_session():
     # DB factory access is disabled from tests unless you add the
-    # 'initialize_factories_session' fixture.
-    with pytest.raises(Exception, match="DB_FACTORIES_DISABLE_DB_ACCESS is set"):
+    # 'factories_db_session' fixture.
+    with pytest.raises(Exception, match="Factory db_session is not initialized."):
         UserFactory.create()
 
 
-def test_user_factory_create(test_db_session, initialize_factories_session):
+def test_user_factory_create(factories_db_session):
     # Create actually writes a record to the DB when run
     # so we'll check the DB directly as well.
     user = UserFactory.create()
     validate_user_record(user)
 
-    db_record = test_db_session.query(User).filter(User.id == user.id).one_or_none()
+    db_record = factories_db_session.query(User).filter(User.id == user.id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, user.for_json())
 
     user = UserFactory.create(**user_params)
     validate_user_record(user, user_params)
 
-    db_record = test_db_session.query(User).filter(User.id == user.id).one_or_none()
+    db_record = factories_db_session.query(User).filter(User.id == user.id).one_or_none()
     # Make certain the DB record matches the factory one.
     validate_user_record(db_record, db_record.for_json())
 
@@ -81,11 +81,11 @@ def test_user_factory_create(test_db_session, initialize_factories_session):
     user = UserFactory.create(**null_params)
     validate_user_record(user, null_params)
 
-    all_db_records = test_db_session.query(User).all()
+    all_db_records = factories_db_session.query(User).all()
     assert len(all_db_records) == 3
 
 
-def test_role_factory_create(test_db_session, initialize_factories_session):
+def test_role_factory_create(factories_db_session):
     # Verify if you build a Role directly, it gets
     # a user attached to it with that single role
     role = RoleFactory.create()
