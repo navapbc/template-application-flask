@@ -1,23 +1,42 @@
 """
-This module functionality to extend Flask with a database client.
+This module has functionality to extend Flask with a database client.
 
-Usage:
-    # initialization in Flask's create_app()
+To initialize this flask extension, call init_app() with an instance
+of a Flask app and an instance of a DBClient.
 
+Example:
     import api.adapters.db as db
     import api.adapters.db.flask_db as flask_db
 
+    db_client = db.init()
     app = APIFlask(__name__)
     flask_db.init_app(db_client, app)
 
-    # in a request handler
+Then, in a request handler, use the with_db_session decorator to get a
+database session for the duration of the request.
 
+Example:
+    import api.adapters.db as db
+    import api.adapters.db.flask_db as flask_db
+
+    @app.route("/health")
+    @flask_db.with_db_session
+    def health(db_session: db.Session):
+        with db_session.begin():
+            ...
+
+
+Alternatively, if you want to get the database client directly, use the get_db
+function.
+
+Example:
     from flask import current_app
     import api.adapters.db.flask_db as flask_db
 
     @app.route("/health")
     def health():
         db_client = flask_db.get_db(current_app)
+        # db_client.get_connection() or db_client.get_session()
 """
 from functools import wraps
 from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
