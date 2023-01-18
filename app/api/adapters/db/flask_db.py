@@ -13,7 +13,7 @@ Example:
     flask_db.init_app(db_client, app)
 
 Then, in a request handler, use the with_db_session decorator to get a
-database session for the duration of the request.
+new database session that lasts for the duration of the request.
 
 Example:
     import api.adapters.db as db
