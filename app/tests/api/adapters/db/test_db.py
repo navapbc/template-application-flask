@@ -1,12 +1,10 @@
 import logging  # noqa: B1
 
-from api.db import (
-    DbConfig,
-    get_connection_parameters,
-    get_db_config,
-    make_connection_uri,
-    verify_ssl,
-)
+from sqlalchemy import text
+
+import api.adapters.db as db
+from api.adapters.db.client import get_connection_parameters, make_connection_uri, verify_ssl
+from api.adapters.db.config import DbConfig, get_db_config
 
 
 class DummyConnectionInfo:
@@ -84,3 +82,21 @@ def test_get_connection_parameters(monkeypatch):
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,
     )
+
+
+def test_db_connection():
+    db_client = db.init(check_db_connection=False)
+    with db_client.get_connection() as conn:
+        assert conn.scalar(text("SELECT 1")) == 1
+
+
+def test_check_db_connection(caplog):
+    db.init(check_db_connection=True)
+    assert "database connection is not using SSL" in caplog.messages
+
+
+def test_get_session():
+    db_client = db.init(check_db_connection=False)
+    with db_client.get_session() as session:
+        with session.begin():
+            assert session.scalar(text("SELECT 1")) == 1

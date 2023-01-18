@@ -14,8 +14,9 @@ from api.util.local import load_local_env_vars  # noqa: E402 isort:skip
 
 load_local_env_vars()
 
-import api.db as db  # noqa: E402 isort:skip
-from api.db.models.base import Base  # noqa: E402 isort:skip
+from api.adapters.db.client import make_connection_uri  # noqa: E402 isort:skip
+from api.adapters.db.config import get_db_config  # noqa: E402 isort:skip
+from api.db.models import metadata  # noqa: E402 isort:skip
 import api.logging  # noqa: E402 isort:skip
 
 # this is the Alembic Config object, which provides
@@ -26,7 +27,7 @@ config = context.config
 api.logging.init("migrations")
 
 if not config.get_main_option("sqlalchemy.url"):
-    uri = db.make_connection_uri(db.get_db_config())
+    uri = make_connection_uri(get_db_config())
 
     # Escape percentage signs in the URI.
     # https://alembic.sqlalchemy.org/en/latest/api/config.html#alembic.config.Config.set_main_option
@@ -36,7 +37,7 @@ if not config.get_main_option("sqlalchemy.url"):
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

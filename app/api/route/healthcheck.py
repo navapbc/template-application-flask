@@ -5,7 +5,7 @@ from flask import current_app
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
-import api.db as db
+import api.adapters.db.flask_db as flask_db
 import api.logging
 from api.route import response
 from api.route.schemas import request_schema
@@ -27,7 +27,7 @@ def health() -> Tuple[dict, int]:
     logger.info("GET /v1/health")
 
     try:
-        with db.get_db(current_app).get_connection() as conn:
+        with flask_db.get_db(current_app).get_connection() as conn:
             assert conn.scalar(text("SELECT 1 AS healthy")) == 1
         return response.ApiResponse(message="Service healthy").asdict(), 200
     except Exception:

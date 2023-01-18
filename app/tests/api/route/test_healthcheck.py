@@ -1,4 +1,4 @@
-import api.db as db
+import api.adapters.db as db
 
 
 def test_get_healthcheck_200(client):

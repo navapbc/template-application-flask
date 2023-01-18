@@ -1,7 +1,7 @@
 import apiflask
 from sqlalchemy import orm
 
-from api.db import Session
+from api.adapters.db import Session
 from api.db.models.user_models import User
 
 

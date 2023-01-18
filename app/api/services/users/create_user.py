@@ -1,7 +1,7 @@
 from datetime import date
 from typing import TypedDict
 
-from api.db import Session
+from api.adapters.db import Session
 from api.db.models import user_models
 from api.db.models.user_models import Role, User
 
