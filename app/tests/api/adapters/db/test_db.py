@@ -5,13 +5,6 @@ from sqlalchemy import text
 import api.db as db
 from api.adapters.db.client import get_connection_parameters, make_connection_uri, verify_ssl
 from api.adapters.db.config import DbConfig, get_db_config
-from api.db import (
-    DbConfig,
-    get_connection_parameters,
-    get_db_config,
-    make_connection_uri,
-    verify_ssl,
-)
 
 
 class DummyConnectionInfo:
