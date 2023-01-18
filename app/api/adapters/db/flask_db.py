@@ -85,8 +85,7 @@ def with_db_session(f: Callable[Concatenate[db.Session, P], T]) -> Callable[P, T
 
     This decorator will create a new session object and pass it to the function
     as the first positional argument. A transaction is not started automatically.
-    If you want to start to a transaction automatically, you can use
-    with_db_session_transaction.
+    To start a transaction use db_session.begin()
 
     Usage:
         @with_db_session
