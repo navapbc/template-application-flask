@@ -19,8 +19,12 @@ Usage:
     def health():
         db_client = flask_db.get_db(current_app)
 """
-from flask import Flask
+from functools import wraps
+from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 
+from flask import Flask, current_app
+
+import api.adapters.db as db
 from api.adapters.db.client import DBClient
 
 _FLASK_EXTENSION_KEY = "db"
@@ -51,3 +55,33 @@ def get_db(app: Flask) -> DBClient:
             db_client = flask_db.get_db(current_app)
     """
     return app.extensions[_FLASK_EXTENSION_KEY]
+
+
+P = ParamSpec("P")
+T = TypeVar("T")
+
+
+def with_db_session(f: Callable[Concatenate[db.Session, P], T]) -> Callable[P, T]:
+    """Decorator for functions that need a database session.
+
+    This decorator will create a new session object and pass it to the function
+    as the first positional argument. A transaction is not started automatically.
+    If you want to start to a transaction automatically, you can use
+    with_db_session_transaction.
+
+    Usage:
+        @with_db_session
+        def foo(db_session: db.Session):
+            ...
+
+        @with_db_session
+        def bar(db_session: db.Session, x, y):
+            ...
+    """
+
+    @wraps(f)
+    def wrapper(*args: Any, **kwargs: Any) -> T:
+        with get_db(current_app).get_session() as session:
+            return f(session, *args, **kwargs)
+
+    return wrapper
