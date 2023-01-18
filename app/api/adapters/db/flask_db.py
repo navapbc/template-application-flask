@@ -1,3 +1,24 @@
+"""
+This module functionality to extend Flask with a database client.
+
+Usage:
+    # initialization in Flask's create_app()
+
+    import api.adapters.db as db
+    import api.adapters.db.flask_db as flask_db
+
+    app = APIFlask(__name__)
+    flask_db.init_app(db_client, app)
+
+    # in a request handler
+
+    from flask import current_app
+    import api.adapters.db.flask_db as flask_db
+
+    @app.route("/health")
+    def health():
+        db_client = flask_db.get_db(current_app)
+"""
 from flask import Flask
 
 from api.adapters.db.client import DBClient
@@ -22,11 +43,11 @@ def get_db(app: Flask) -> DBClient:
     Use this in request handlers to access the database from the active Flask app.
 
     Example:
-        from flask import current_app, Response
-        import api.adapters.db as db
+        from flask import current_app
+        import api.adapters.db.flask_db as flask_db
 
         @app.route("/health")
-        def health() -> Response:
-            db_client = db.get_db(current_app)
+        def health():
+            db_client = flask_db.get_db(current_app)
     """
     return app.extensions[_FLASK_EXTENSION_KEY]
