@@ -1,5 +1,6 @@
 import logging  # noqa: B1
 
+import pytest
 from sqlalchemy import text
 
 import api.adapters.db as db
@@ -69,7 +70,15 @@ def test_make_connection_uri():
     )
 
 
-def test_get_connection_parameters(monkeypatch):
+def test_get_connection_parameters_require_environment(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("ENVIRONMENT")
+    db_config = get_db_config()
+    with pytest.raises(Exception, match="ENVIRONMENT is not set"):
+        get_connection_parameters(db_config)
+
+
+def test_get_connection_parameters(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("ENVIRONMENT", "production")
     db_config = get_db_config()
     conn_params = get_connection_parameters(db_config)
 
@@ -81,6 +90,7 @@ def test_get_connection_parameters(monkeypatch):
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,
+        sslmode="require",
     )
 
 
