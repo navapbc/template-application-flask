@@ -1,5 +1,5 @@
-from itertools import product
 import logging  # noqa: B1
+from itertools import product
 
 import pytest
 from sqlalchemy import text
