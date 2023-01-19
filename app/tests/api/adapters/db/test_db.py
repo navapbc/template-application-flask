@@ -1,3 +1,4 @@
+from itertools import product
 import logging  # noqa: B1
 
 import pytest
@@ -40,33 +41,37 @@ def test_verify_ssl_not_in_use(caplog):
     assert caplog.records[0].levelname == "WARNING"
 
 
-def test_make_connection_uri():
+@pytest.mark.parametrize(
+    "username_password_port,expected",
+    zip(
+        # Test all combinations of username, password, and port
+        product(["testuser", ""], ["testpass", None], ["5432", ""]),
+        [
+            "postgresql://testuser:testpass@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://testuser:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://testuser@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://testuser@localhost/dbname?options=-csearch_path=public",
+            "postgresql://:testpass@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://localhost/dbname?options=-csearch_path=public",
+        ],
+    ),
+)
+def test_make_connection_uri(username_password_port, expected):
+    username, password, port = username_password_port
     assert (
         make_connection_uri(
             DbConfig(
                 host="localhost",
                 name="dbname",
-                username="foo",
-                password="bar",
+                username=username,
+                password=password,
                 db_schema="public",
-                port="5432",
+                port=port,
             )
         )
-        == "postgresql://foo:bar@localhost:5432/dbname?options=-csearch_path=public"
-    )
-
-    assert (
-        make_connection_uri(
-            DbConfig(
-                host="localhost",
-                name="dbname",
-                username="foo",
-                password=None,
-                db_schema="public",
-                port="5432",
-            )
-        )
-        == "postgresql://foo@localhost:5432/dbname?options=-csearch_path=public"
+        == expected
     )
 
 
