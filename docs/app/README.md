@@ -31,7 +31,7 @@ root
 │   └── setup.cfg           Python config for tools that don't support pyproject.toml yet
 │   └── Dockerfile          Docker build file for project
 │
-└── docker-compose.yml  Config file for docker-compose tool, used for local development
+└── docker-compose.yml  Config file for Docker Compose (V2) tool, used for local development
 ```
 
 ## Information
@@ -51,6 +51,8 @@ See the [Makefile](./app/Makefile) for a full list of commands you can run.
 
 ## Docker and Native Development
 
+***NB.*** This template uses [Docker Compose V2](https://www.docker.com/blog/announcing-compose-v2-general-availability/) (viz. `docker compose` instead of `docker-compose`).
+
 Several components like tests, linting, and scripts can be run either inside of the Docker container, or outside on your native machine.
 Running in Docker is the default, but on some machines like the M1 Mac, running natively may be desirable for performance reasons.
 
@@ -67,9 +69,9 @@ Running in the native/local approach may require additional packages to be insta
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](./app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](./docker-compose.yml) file, and loaded [by a script](./app/api/util/local.py) automatically when running most other components outside the container.
+Environment variables for local development are stored in the [local.env](./app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose.yml](./docker-compose.yml) file, and loaded [by a script](./app/api/util/local.py) automatically when running most other components outside the container.
 
-Any environment variables specified directly in the [docker-compose](./docker-compose.yml) file will take precedent over those specified in the [local.env](./app/local.env) file.
+Any environment variables specified directly in the [docker-compose.yml](./docker-compose.yml) file will take precedent over those specified in the [local.env](./app/local.env) file.
 
 ## Authentication
 

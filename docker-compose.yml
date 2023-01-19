@@ -32,7 +32,7 @@ services:
     # NOTE: These values take precedence if the same value is specified in the env_file.
     environment:
       # The env_file defines DB_HOST=localhost for accessing a non-dockerized database. 
-      # In the docker-compose, we tell the app to use the dockerized database service 
+      # In docker-compose.yml, we tell the app to use the dockerized database service 
       - DB_HOST=main-db
     ports:
       - 8080:8080

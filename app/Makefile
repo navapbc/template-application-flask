@@ -30,7 +30,7 @@ endif
 ifeq "$(PY_RUN_APPROACH)" "local"
 PY_RUN_CMD := poetry run
 else
-PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
+PY_RUN_CMD := docker compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
 ##################################################
@@ -38,22 +38,22 @@ endif
 ##################################################
 
 build:
-	docker-compose build
+	docker compose build
 
 start:
-	docker-compose up --detach
+	docker compose up --detach
 
 run-logs: start
-	docker-compose logs --follow --no-color $(APP_NAME)
+	docker compose logs --follow --no-color $(APP_NAME)
 
 
 init: build init-db
 
 clean-volumes: ## Remove project docker volumes (which includes the DB state)
-	docker-compose down --volumes
+	docker compose down --volumes
 
 stop:
-	docker-compose down
+	docker compose down
 
 check: format-check lint test
 
@@ -75,7 +75,7 @@ openapi-spec: ## Generate OpenAPI spec
 init-db: start-db sleep-5 db-upgrade
 
 start-db:
-	docker-compose up --detach main-db
+	docker compose up --detach main-db
 
 ## Destroy current DB, setup new one
 db-recreate: clean-docker-volumes init-db
