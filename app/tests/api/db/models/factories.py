@@ -15,7 +15,7 @@ import factory.fuzzy
 import faker
 from sqlalchemy.orm import scoped_session
 
-import api.db as db
+import api.adapters.db as db
 import api.db.models.user_models as user_models
 import api.util.datetime_util as datetime_util
 

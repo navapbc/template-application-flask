@@ -6,7 +6,7 @@ from typing import TypedDict
 import apiflask
 from sqlalchemy import orm
 
-from api.db import Session
+from api.adapters.db import Session
 from api.db.models.user_models import Role, User
 from api.services.users.create_user import RoleParams
 

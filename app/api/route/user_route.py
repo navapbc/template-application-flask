@@ -3,7 +3,7 @@ from typing import Any
 from apiflask import APIBlueprint
 from flask import current_app
 
-import api.db as db
+import api.adapters.db.flask_db as flask_db
 import api.logging as logging
 import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
@@ -28,7 +28,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
     """
     logger.info("POST /v1/user")
 
-    with db.get_db(current_app).get_session() as db_session:
+    with flask_db.get_db(current_app).get_session() as db_session:
         user = user_service.create_user(db_session, user_params)
 
         logger.info(
@@ -49,7 +49,7 @@ def user_post(user_params: users.CreateUserParams) -> dict:
 def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
     logger.info("PATCH /v1/user/:user_id")
 
-    with db.get_db(current_app).get_session() as db_session:
+    with flask_db.get_db(current_app).get_session() as db_session:
         user = user_service.patch_user(db_session, user_id, patch_user_params)
 
         logger.info(
@@ -66,7 +66,7 @@ def user_patch(user_id: str, patch_user_params: users.PatchUserParams) -> dict:
 def user_get(user_id: str) -> dict:
     logger.info("GET /v1/user/:user_id")
 
-    with db.get_db(current_app).get_session() as db_session:
+    with flask_db.get_db(current_app).get_session() as db_session:
         user = user_service.get_user(db_session, user_id)
 
         logger.info(
