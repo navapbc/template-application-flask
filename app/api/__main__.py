@@ -6,9 +6,9 @@
 # https://docs.python.org/3/library/__main__.html
 
 import api.adapters.db as db
-import api.app
 import api.adapters.logging
 import api.adapters.logging.audit
+import api.app
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 

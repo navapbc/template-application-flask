@@ -7,8 +7,8 @@ import pytest
 import sqlalchemy
 
 import api.adapters.db as db
-import api.app as app_entry
 import api.adapters.logging
+import api.app as app_entry
 import tests.api.db.models.factories as factories
 from api.db import models
 from tests.lib import db_testing
