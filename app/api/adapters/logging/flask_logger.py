@@ -55,5 +55,5 @@ def _get_request_context_attributes(request: flask.Request) -> dict:
         "request.id": request.headers.get("x-amzn-requestid", ""),
         "request.method": request.method,
         "request.path": request.path,
-        "request.url_rule": request.url_rule,
+        "request.url_rule": str(request.url_rule),
     }
