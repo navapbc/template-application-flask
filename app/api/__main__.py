@@ -6,13 +6,13 @@
 # https://docs.python.org/3/library/__main__.html
 
 import api.adapters.db as db
-import api.adapters.logging
+import api.adapters.logging as logging
 import api.adapters.logging.audit
 import api.app
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
-logger = api.adapters.logging.get_logger(__package__)
+logger = logging.get_logger(__package__)
 
 
 def main() -> None:
@@ -20,10 +20,10 @@ def main() -> None:
     app_config = AppConfig()
 
     api.adapters.logging.audit.init_security_logging()
-    api.adapters.logging.init(__package__)
+    app_logger = logging.init(__package__)
 
     db_client = db.init()
-    app = api.app.create_app(db_client=db_client)
+    app = api.app.create_app(db_client=db_client, app_logger=app_logger)
     environment = app_config.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be

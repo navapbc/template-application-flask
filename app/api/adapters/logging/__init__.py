@@ -8,6 +8,7 @@ from typing import Any, cast
 
 import api.adapters.logging.config as config
 
+Logger = logging.Logger
 LogRecord = logging.LogRecord
 
 
@@ -46,6 +47,7 @@ def init(program_name: str) -> None:
         },
     )
     logger.info("invoked as: %s", " ".join(original_argv))
+    return get_logger(program_name)
 
 
 def get_logger(name: str) -> logging.Logger:
