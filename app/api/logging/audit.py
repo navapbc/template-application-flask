@@ -35,6 +35,7 @@ IGNORE_AUDIT_EVENTS = {
     "object.__setattr__",
     "os.listdir",
     "os.scandir",
+    "os.walk",
     "socket.__new__",
     "sys._current_frames",
     "sys._getframe",
