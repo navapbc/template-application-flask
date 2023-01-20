@@ -7,12 +7,11 @@ import api.adapters.logging.flask_logger as flask_logger
 
 
 @pytest.fixture
-def logger(caplog):
+def logger():
     logger = logging.get_logger("test")
     logger.setLevel(logging.logging.DEBUG)
     logger.addHandler(logging.logging.StreamHandler(sys.stdout))
-    yield logger
-    caplog.clear()
+    return logger
 
 
 @pytest.fixture
