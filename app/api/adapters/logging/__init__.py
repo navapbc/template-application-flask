@@ -8,6 +8,8 @@ from typing import Any, cast
 
 import api.adapters.logging.config as config
 
+LogRecord = logging.LogRecord
+
 
 def init(program_name: str) -> None:
     # Determine which log formatter to use
