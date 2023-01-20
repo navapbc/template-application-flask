@@ -24,8 +24,6 @@ healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
 @healthcheck_blueprint.output(HealthcheckSchema)
 @healthcheck_blueprint.doc(responses=[200, ServiceUnavailable.code])
 def health() -> Tuple[dict, int]:
-    logger.info("GET /v1/health")
-
     try:
         with flask_db.get_db(current_app).get_connection() as conn:
             assert conn.scalar(text("SELECT 1 AS healthy")) == 1

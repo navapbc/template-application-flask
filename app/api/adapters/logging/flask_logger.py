@@ -4,8 +4,6 @@ import flask
 
 import api.adapters.logging as logging
 
-logger = logging.get_logger(__name__)
-
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     # Need to add filter to the handlers rather than to the logger itself, since
@@ -15,7 +13,17 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     for handler in app_logger.handlers:
         handler.addFilter(add_app_context_attributes_to_log_record)
         handler.addFilter(add_request_context_attributes_to_log_record)
-    app_logger.info("initialized app logger with app context and request context filters")
+
+    app.before_request(lambda: log_route(app_logger))
+
+    app_logger.info("initialized flask logger")
+
+
+def log_route(logger: logging.Logger) -> None:
+    assert flask.request is not None
+    request = flask.request
+    if request.url_rule:
+        logger.info(f"{request.method} {request.url_rule}")
 
 
 def add_app_context_attributes_to_log_record(record: logging.LogRecord) -> bool:

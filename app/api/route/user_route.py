@@ -27,8 +27,6 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
     """
     POST /v1/user
     """
-    logger.info("POST /v1/user")
-
     user = user_service.create_user(db_session, user_params)
 
     logger.info(
@@ -51,8 +49,6 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
 def user_patch(
     db_session: db.Session, user_id: str, patch_user_params: users.PatchUserParams
 ) -> dict:
-    logger.info("PATCH /v1/user/:user_id")
-
     user = user_service.patch_user(db_session, user_id, patch_user_params)
 
     logger.info(
@@ -68,8 +64,6 @@ def user_patch(
 @user_blueprint.auth_required(api_key_auth)
 @flask_db.with_db_session
 def user_get(db_session: db.Session, user_id: str) -> dict:
-    logger.info("GET /v1/user/:user_id")
-
     user = user_service.get_user(db_session, user_id)
 
     logger.info(
