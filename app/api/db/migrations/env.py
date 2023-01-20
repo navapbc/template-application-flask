@@ -24,7 +24,8 @@ import api.adapters.logging  # noqa: E402 isort:skip
 config = context.config
 
 # Initialize logging
-api.adapters.logging.init("migrations")
+app_logger = api.adapters.logging.init("migrations")
+app_logger.info("Running migrations")
 
 if not config.get_main_option("sqlalchemy.url"):
     uri = make_connection_uri(get_db_config())

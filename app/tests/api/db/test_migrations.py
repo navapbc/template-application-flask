@@ -1,5 +1,6 @@
 import logging  # noqa: B1
 
+import pytest
 from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
@@ -31,7 +32,7 @@ def test_only_single_head_revision_in_migrations():
         )
 
 
-def test_db_setup_via_alembic_migration(empty_schema, logging_fix, caplog):
+def test_db_setup_via_alembic_migration(empty_schema, caplog: pytest.LogCaptureFixture):
     caplog.set_level(logging.INFO)  # noqa: B1
     command.upgrade(alembic_cfg, "head")
     # Verify the migration ran by checking the logs

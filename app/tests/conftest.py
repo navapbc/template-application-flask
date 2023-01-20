@@ -1,5 +1,3 @@
-import logging.config  # noqa: B1
-
 import _pytest.monkeypatch
 import boto3
 import moto
@@ -7,13 +5,13 @@ import pytest
 import sqlalchemy
 
 import api.adapters.db as db
-import api.adapters.logging
+import api.adapters.logging as logging
 import api.app as app_entry
 import tests.api.db.models.factories as factories
 from api.db import models
 from tests.lib import db_testing
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.get_logger(__name__)
 
 ####################
 # Test DB session
@@ -126,19 +124,9 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
         yield session
 
 
-####################
-# Logging
-####################
-
-
 @pytest.fixture
-def logging_fix(monkeypatch):
-    """Disable the application custom logging setup
-
-    Needed if the code under test calls api.util.logging.init() so that
-    tests using the caplog fixture don't break.
-    """
-    monkeypatch.setattr(logging.config, "dictConfig", lambda config: None)  # noqa: B1
+def test_logger():
+    return logging.init(__package__)
 
 
 ####################
@@ -147,8 +135,8 @@ def logging_fix(monkeypatch):
 
 
 @pytest.fixture
-def app(db_client):
-    return app_entry.create_app(db_client=db_client)
+def app(db_client, test_logger):
+    return app_entry.create_app(db_client=db_client, app_logger=test_logger)
 
 
 @pytest.fixture
