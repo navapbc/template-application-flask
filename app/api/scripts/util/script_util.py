@@ -4,10 +4,10 @@ from dataclasses import dataclass
 from typing import Generator
 
 import api.adapters.db as db
-import api.logging
+import api.adapters.logging
 from api.util.local import load_local_env_vars
 
-logger = api.logging.get_logger(__name__)
+logger = api.adapters.logging.get_logger(__name__)
 
 
 @dataclass
@@ -25,7 +25,7 @@ def script_context_manager() -> Generator[ScriptContext, None, None]:
     logging, and local environment variables (if local).
     """
     load_local_env_vars()
-    api.logging.init(__package__)
+    api.adapters.logging.init(__package__)
 
     # TODO - Note this is really basic, but
     # it could a good place to fetch CLI args, initialize

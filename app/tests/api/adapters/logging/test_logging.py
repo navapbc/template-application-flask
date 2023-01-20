@@ -8,8 +8,8 @@ import pytest
 from _pytest.logging import LogCaptureHandler
 from flask import g
 
-import api.logging
-from api.logging.log_formatters import JsonFormatter
+import api.adapters.logging
+from api.adapters.logging.log_formatters import JsonFormatter
 
 
 @pytest.fixture(autouse=True)
@@ -88,14 +88,14 @@ def test_logging_init(caplog, monkeypatch):
     # Unset formatters so caplog works correctly
     monkeypatch.setattr(logging.config, "dictConfig", lambda config: None)
 
-    api.logging.init("test_logging_method")
+    api.adapters.logging.init("test_logging_method")
 
     # The init method logs twice, verify both log messages are present in the expected format
     assert len(caplog.record_tuples) >= 2
     start_entry = caplog.record_tuples[0]
     invoked_as_entry = caplog.record_tuples[1]
-    assert start_entry[0] == "api.logging"
-    assert invoked_as_entry[0] == "api.logging"
+    assert start_entry[0] == "api.adapters.logging"
+    assert invoked_as_entry[0] == "api.adapters.logging"
     assert start_entry[1] == logging.INFO
     assert invoked_as_entry[1] == logging.INFO
     assert start_entry[2].startswith("start test_logging_method:")
@@ -107,8 +107,8 @@ def test_logging_init(caplog, monkeypatch):
 
 
 def test_log_message_with_exception():
-    api.logging.init("test_logging_method")
-    logger = api.logging.get_logger("api.logging.test_logging")
+    api.adapters.logging.init("test_logging_method")
+    logger = api.adapters.logging.get_logger("api.adapters.logging.test_logging")
 
     with catch_logs(level=logging.INFO, logger=logger) as handler:
 
@@ -131,8 +131,8 @@ def test_log_message_with_exception():
 
 
 def test_log_message_during_request(app, test_db_session):
-    api.logging.init("test_logging_method")
-    logger = api.logging.get_logger("api.logging.test_logging")
+    api.adapters.logging.init("test_logging_method")
+    logger = api.adapters.logging.get_logger("api.adapters.logging.test_logging")
 
     with catch_logs(level=logging.INFO, logger=logger) as handler, app.test_request_context(
         "/fake-endpoint?name=Bob"

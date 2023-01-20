@@ -17,14 +17,14 @@ load_local_env_vars()
 from api.adapters.db.client import make_connection_uri  # noqa: E402 isort:skip
 from api.adapters.db.config import get_db_config  # noqa: E402 isort:skip
 from api.db.models import metadata  # noqa: E402 isort:skip
-import api.logging  # noqa: E402 isort:skip
+import api.adapters.logging  # noqa: E402 isort:skip
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
 # Initialize logging
-api.logging.init("migrations")
+api.adapters.logging.init("migrations")
 
 if not config.get_main_option("sqlalchemy.url"):
     uri = make_connection_uri(get_db_config())

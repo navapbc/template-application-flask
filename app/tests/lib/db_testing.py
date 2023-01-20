@@ -3,7 +3,7 @@ import contextlib
 import uuid
 
 import api.adapters.db as db
-from api import logging
+import api.adapters.logging as logging
 from api.adapters.db.config import get_db_config
 
 logger = logging.get_logger(__name__)

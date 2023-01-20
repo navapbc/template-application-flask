@@ -11,9 +11,9 @@ from alembic.config import Config
 from alembic.operations.ops import MigrationScript
 from alembic.runtime import migration
 
-import api.logging
+import api.adapters.logging
 
-logger = api.logging.get_logger(__name__)
+logger = api.adapters.logging.get_logger(__name__)
 alembic_cfg = Config(os.path.join(os.path.dirname(__file__), "./alembic.ini"))
 
 # Override the script_location to be absolute based on this file's directory.

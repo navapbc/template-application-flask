@@ -6,7 +6,7 @@ import pwd
 import sys
 from typing import Any, cast
 
-from api.logging.log_formatters import HumanReadableFormatter, JsonFormatter
+from api.adapters.logging.log_formatters import HumanReadableFormatter, JsonFormatter
 
 
 def get_logging_config(log_format: str) -> dict[str, Any]:

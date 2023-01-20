@@ -2,9 +2,9 @@ import json
 import logging
 from datetime import datetime
 
-import api.logging.decodelog as decodelog
+import api.adapters.logging.decodelog as decodelog
 import api.util.string_utils as string_utils
-from api.logging.log_attributes import get_logging_context_attributes
+from api.adapters.logging.log_attributes import get_logging_context_attributes
 
 # Attributes of LogRecord to exclude from the JSON formatted lines. An exclusion list approach is
 # used so that all "extra" attributes can be included in a line.

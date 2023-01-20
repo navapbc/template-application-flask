@@ -6,12 +6,12 @@ from dataclasses import asdict, dataclass
 from smart_open import open as smart_open
 
 import api.adapters.db as db
-import api.logging
+import api.adapters.logging
 from api.db.models.user_models import User
 from api.scripts.util.script_util import script_context_manager
 from api.util.datetime_util import utcnow
 
-logger = api.logging.get_logger(__name__)
+logger = api.adapters.logging.get_logger(__name__)
 
 
 @dataclass

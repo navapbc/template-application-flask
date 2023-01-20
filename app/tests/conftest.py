@@ -8,12 +8,12 @@ import sqlalchemy
 
 import api.adapters.db as db
 import api.app as app_entry
-import api.logging
+import api.adapters.logging
 import tests.api.db.models.factories as factories
 from api.db import models
 from tests.lib import db_testing
 
-logger = api.logging.get_logger(__name__)
+logger = api.adapters.logging.get_logger(__name__)
 
 ####################
 # Test DB session

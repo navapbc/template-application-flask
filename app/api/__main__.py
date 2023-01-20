@@ -7,20 +7,20 @@
 
 import api.adapters.db as db
 import api.app
-import api.logging
-import api.logging.audit
+import api.adapters.logging
+import api.adapters.logging.audit
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
-logger = api.logging.get_logger(__package__)
+logger = api.adapters.logging.get_logger(__package__)
 
 
 def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
-    api.logging.audit.init_security_logging()
-    api.logging.init(__package__)
+    api.adapters.logging.audit.init_security_logging()
+    api.adapters.logging.init(__package__)
 
     db_client = db.init()
     app = api.app.create_app(db_client=db_client)
