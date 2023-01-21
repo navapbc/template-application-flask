@@ -1,3 +1,25 @@
+"""Module for initializing logging configuration for the application.
+
+There are two formatters for the log messages: human-readable and JSON.
+The formatter that is used is determined by the environment variable
+LOG_FORMAT. If the environment variable is not set, the JSON formatter
+is used by default. See api.logging.formatters for more information.
+
+Usage:
+    import api.logging
+
+    api.logging.init("program name")
+
+Once the module has been initialized, the standard logging module can be
+used to log messages:
+
+Example:
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.info("message")
+"""
+
 import logging
 import os
 import platform
