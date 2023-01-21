@@ -56,7 +56,7 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     app_logger.info("initialized flask logger")
 
 
-def add_extra_log_data_for_current_request(data: dict[str, str]) -> None:
+def add_extra_data_to_current_request_logs(data: dict[str, str]) -> None:
     """Add data to every log record for the current request."""
     assert flask.has_request_context(), "Must be in a request context"
 

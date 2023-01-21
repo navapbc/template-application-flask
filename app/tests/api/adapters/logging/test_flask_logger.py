@@ -73,7 +73,7 @@ def test_request_context_extra_attributes(
 
     @app.get("/pet/<name>")
     def pet(name):
-        flask_logger.add_extra_log_data_for_current_request({"pet.name": name})
+        flask_logger.add_extra_data_to_current_request_logs({"pet.name": name})
         logging.getLogger("test.pet").info(f"petting {name}")
         return "ok"
 
