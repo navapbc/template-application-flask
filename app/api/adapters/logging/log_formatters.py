@@ -26,15 +26,7 @@ class JsonFormatter(logging.Formatter):
     """A logging formatter which formats each line as JSON."""
 
     def format(self, record: logging.LogRecord) -> str:
-        super(JsonFormatter, self).format(record)
-
-        output = {
-            key: string_utils.mask_pii_for_key(key, value)
-            for key, value in record.__dict__.items()
-            if key not in EXCLUDE_ATTRIBUTES and value is not None
-        }
-
-        return json.dumps(output, separators=(",", ":"))
+        return json.dumps(record.__dict__, separators=(",", ":"))
 
 
 class HumanReadableFormatter(logging.Formatter):
