@@ -71,6 +71,24 @@ def test_request_context_extra_attributes(
     # Assert that extra attributes related to the app context are present in all log records
     expected_extra = {"app.name": "test_app_name"}
 
+    @app.get("/pet/<name>")
+    def pet(name):
+        flask_logger.add_extra_log_data_for_current_request({"pet.name": name})
+        logging.getLogger("test.pet").info(f"petting {name}")
+        return "ok"
+
+    app.test_client().get("/pet/kitty")
+
+    last_record = caplog.records[-1]
+    _assert_dict_contains(last_record.__dict__, {"pet.name": "kitty"})
+
+
+def test_add_extra_log_data_for_current_request(
+    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
+):
+    # Assert that extra attributes related to the app context are present in all log records
+    expected_extra = {"app.name": "test_app_name"}
+
     app.test_client().get("/hello/jane")
 
     assert len(caplog.records) == 2
@@ -82,4 +100,4 @@ def _assert_dict_contains(d: dict, expected: dict) -> None:
     """Assert that d contains all the key-value pairs in expected.
     Do this by checking to see if adding `expected` to `d` leaves `d` unchanged.
     """
-    assert d | expected == d
+    assert d == d | expected
