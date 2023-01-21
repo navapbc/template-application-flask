@@ -25,9 +25,11 @@ import flask
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     """Initialize the Flask app logger.
 
-    Adds the app context attributes to the log record.
-    Adds the request context attributes to the log record.
-    Logs every non-404 request.
+    Adds Flask app context attributes and Flask request context attributes
+    to every log record using log filters.
+    See https://docs.python.org/3/howto/logging-cookbook.html#using-filters-to-impart-contextual-information
+
+    Also configures the app to log every non-404 request using the given logger.
 
     Usage:
         import api.logging.flask_logger as flask_logger
@@ -37,7 +39,7 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
 
         flask_logger.init_app(logger, app)
     """
-    # Need to add filters to the handlers rather than to the logger itself, since
+    # Need to add filters to each of the handlers rather than to the logger itself, since
     # messages are passed directly to the ancestor loggers’ handlers bypassing any filters
     # set on the ancestors.
     # See https://docs.python.org/3/library/logging.html#logging.Logger.propagate
@@ -45,6 +47,8 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         handler.addFilter(_add_app_context_attributes_to_log_record)
         handler.addFilter(_add_request_context_attributes_to_log_record)
 
+    # Use the app_logger to log every non-404 request before each request
+    # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
     app.before_request(lambda: _log_route(app_logger))
 
     app_logger.info("initialized flask logger")
