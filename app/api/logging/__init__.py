@@ -5,6 +5,9 @@ The formatter that is used is determined by the environment variable
 LOG_FORMAT. If the environment variable is not set, the JSON formatter
 is used by default. See api.logging.formatters for more information.
 
+The logger also adds a PII mask filter to the root logger. See
+api.logging.pii for more information.
+
 Usage:
     import api.logging
 
@@ -34,9 +37,6 @@ _original_argv = tuple(sys.argv)
 
 
 def init(program_name: str) -> None:
-    # Determine which log formatter to use
-    # based on the environment variable specified
-    # Defaults to JSON
     config.configure_logging()
 
     log_program_info(program_name)
