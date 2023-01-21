@@ -1,3 +1,12 @@
+"""Log formatters for the API.
+
+This module defines two formatters, JsonFormatter for machine-readable logs to
+be used in production, and HumanReadableFormatter for human readable logs to
+be used used during development.
+
+See https://docs.python.org/3/library/logging.html#formatter-objects
+"""
+
 import json
 import logging
 from datetime import datetime
