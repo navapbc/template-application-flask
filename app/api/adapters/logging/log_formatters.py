@@ -35,8 +35,6 @@ class HumanReadableFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        super(HumanReadableFormatter, self).format(record)
-
         extra = record.__dict__
 
         return decodelog.format_line(
