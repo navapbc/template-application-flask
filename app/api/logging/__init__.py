@@ -1,5 +1,4 @@
 import logging
-import logging.config
 import os
 import platform
 import pwd
@@ -9,8 +8,8 @@ from typing import Any, cast
 import api.logging.log_formatters as log_formatters
 import api.logging.pii as pii
 
-Logger = logging.Logger
-LogRecord = logging.LogRecord
+logger = logging.getLogger(__name__)
+original_argv = tuple(sys.argv)
 
 
 def init(program_name: str) -> None:
@@ -54,7 +53,6 @@ def init(program_name: str) -> None:
         },
     )
     logger.info("invoked as: %s", " ".join(original_argv))
-    return get_logger(program_name)
 
 
 def get_formatter() -> logging.Formatter:
@@ -64,12 +62,3 @@ def get_formatter() -> logging.Formatter:
     if log_format == "human-readable":
         return log_formatters.HumanReadableFormatter()
     return log_formatters.JsonFormatter()
-
-
-def get_logger(name: str) -> logging.Logger:
-    """Return a logger with the specified name."""
-    return logging.getLogger(name)
-
-
-logger = get_logger(__name__)
-original_argv = tuple(sys.argv)

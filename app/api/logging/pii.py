@@ -19,13 +19,13 @@ EXCLUDE_ATTRIBUTES = {
 }
 
 
-def mask_pii(record: logging.LogRecord):
+def mask_pii(record: logging.LogRecord) -> bool:
     record.__dict__ |= {
         key: _mask_pii_for_key(key, value)
         for key, value in record.__dict__.items()
         if key not in EXCLUDE_ATTRIBUTES and value is not None
     }
-    return record
+    return True
 
 
 # Regular expression to match a tax identifier (SSN), 9 digits with optional dashes.
@@ -55,7 +55,7 @@ ALLOW_NO_MASK = {
 }
 
 
-def _mask_pii_for_key(key: str, value: Optional[Any]) -> Any:
+def _mask_pii_for_key(key: str, value: Optional[Any]) -> Optional[Any]:
     """
     Mask the given value if it has the pattern of a tax identifier
     unless its key is one of the allowed values to avoid masking
@@ -66,7 +66,7 @@ def _mask_pii_for_key(key: str, value: Optional[Any]) -> Any:
     return _mask_pii(value)
 
 
-def _mask_pii(value: Optional[Any]) -> str:
+def _mask_pii(value: Optional[Any]) -> Optional[Any]:
     if TIN_RE.match(str(value)):
         return TIN_RE.sub("*********", str(value))
     return value

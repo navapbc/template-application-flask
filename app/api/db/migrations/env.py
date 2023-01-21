@@ -1,3 +1,4 @@
+import logging
 import sys
 from typing import Any
 
@@ -23,9 +24,10 @@ import api.logging  # noqa: E402 isort:skip
 # access to the values within the .ini file in use.
 config = context.config
 
+logger = logging.getLogger("migrations")
+
 # Initialize logging
-app_logger = api.logging.init("migrations")
-app_logger.info("Running migrations")
+api.logging.init("migrations")
 
 if not config.get_main_option("sqlalchemy.url"):
     uri = make_connection_uri(get_db_config())

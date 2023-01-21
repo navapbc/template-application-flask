@@ -9,7 +9,8 @@ import api.logging
 @pytest.fixture
 def init_logger(caplog):
     caplog.set_level(logging.DEBUG)
-    logger: logging.Logger = api.logging.init("test_logging")
+    api.logging.init("test_logging")
+    logger = logging.getLogger("test_logging")
     yield
     logger.root.handlers.clear()
 

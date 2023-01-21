@@ -4,9 +4,9 @@ import flask
 
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
-    # Need to add filter to the handlers rather than to the logger itself, since
-    # messages are passed directly to the ancestor loggers’ handlers -
-    # neither the level nor filters of the ancestor loggers in question are considered.
+    # Need to add filters to the handlers rather than to the logger itself, since
+    # messages are passed directly to the ancestor loggers’ handlers bypassing any filters
+    # set on the ancestors.
     # See https://docs.python.org/3/library/logging.html#logging.Logger.propagate
     for handler in app_logger.handlers:
         handler.addFilter(_add_app_context_attributes_to_log_record)
@@ -26,22 +26,22 @@ def _log_route(logger: logging.Logger) -> None:
 
 def _add_app_context_attributes_to_log_record(record: logging.LogRecord) -> bool:
     if not flask.has_app_context():
-        return record
+        return True
 
     assert flask.current_app is not None
     record.__dict__ |= _get_app_context_attributes(flask.current_app)
 
-    return record
+    return True
 
 
 def _add_request_context_attributes_to_log_record(record: logging.LogRecord) -> bool:
     if not flask.has_request_context():
-        return record
+        return True
 
     assert flask.request is not None
     record.__dict__ |= _get_request_context_attributes(flask.request)
 
-    return record
+    return True
 
 
 def _get_app_context_attributes(app: flask.Flask) -> dict:

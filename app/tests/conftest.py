@@ -128,7 +128,8 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 
 @pytest.fixture
 def test_logger():
-    return api.logging.init(__package__)
+    api.logging.init(__package__)
+    return logging.getLogger(__package__)
 
 
 ####################
