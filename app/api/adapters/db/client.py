@@ -16,7 +16,7 @@ import sqlalchemy
 import sqlalchemy.pool as pool
 from sqlalchemy.orm import session
 
-import api.adapters.logging
+import logging
 from api.adapters.db.config import DbConfig, get_db_config
 
 # Re-export the Connection type that is returned by the get_connection() method
@@ -27,7 +27,7 @@ Connection = sqlalchemy.engine.Connection
 # to be used for type hints.
 Session = session.Session
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class DBClient:

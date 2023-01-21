@@ -2,7 +2,7 @@ from contextvars import ContextVar
 import pprint
 import flask
 
-import api.adapters.logging as logging
+import logging
 
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:

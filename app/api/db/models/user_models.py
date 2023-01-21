@@ -7,10 +7,10 @@ from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, relationship
 
-import api.adapters.logging
+import logging
 from api.db.models.base import Base, IdMixin, TimestampMixin
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class RoleType(str, enum.Enum):

@@ -6,9 +6,9 @@ from typing import Any
 import flask
 from apiflask import HTTPTokenAuth, abort
 
-import api.adapters.logging
+import logging
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Initialize the authorization context
 # this needs to be attached to your

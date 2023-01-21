@@ -3,10 +3,10 @@ import contextlib
 import uuid
 
 import api.adapters.db as db
-import api.adapters.logging as logging
+import logging
 from api.adapters.db.config import get_db_config
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager

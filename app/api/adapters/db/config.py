@@ -2,10 +2,10 @@ from typing import Optional
 
 from pydantic import Field
 
-import api.adapters.logging
+import logging
 from api.util.env_config import PydanticBaseEnvConfig
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class DbConfig(PydanticBaseEnvConfig):

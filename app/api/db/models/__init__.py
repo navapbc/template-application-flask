@@ -1,8 +1,8 @@
-import api.adapters.logging
+import logging
 
 from . import base, user_models
 
-logger = api.adapters.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Re-export metadata
 # This is used by tests to create the test database.

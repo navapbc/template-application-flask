@@ -5,22 +5,24 @@
 #
 # https://docs.python.org/3/library/__main__.html
 
+import logging
+
 import api.adapters.db as db
-import api.adapters.logging as logging
-import api.adapters.logging.audit
 import api.app
+import api.logging
+import api.logging.audit
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
-logger = logging.get_logger(__package__)
+logger = logging.getLogger(__package__)
 
 
 def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
-    api.adapters.logging.audit.init_security_logging()
-    app_logger = logging.init(__package__)
+    api.logging.audit.init_security_logging()
+    app_logger = api.logging.init(__package__)
 
     db_client = db.init()
     app = api.app.create_app(db_client=db_client, app_logger=app_logger)

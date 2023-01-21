@@ -2,15 +2,15 @@ import pytest
 import sys
 from flask import Flask
 
-import api.adapters.logging as logging
-import api.adapters.logging.flask_logger as flask_logger
+import logging
+import api.logging.flask_logger as flask_logger
 
 
 @pytest.fixture
 def logger():
-    logger = logging.get_logger("test")
-    logger.setLevel(logging.logging.DEBUG)
-    logger.addHandler(logging.logging.StreamHandler(sys.stdout))
+    logger = logging.getLogger("test")
+    logger.setLevel(logging.DEBUG)
+    logger.addHandler(logging.StreamHandler(sys.stdout))
     return logger
 
 
@@ -20,7 +20,7 @@ def app(logger):
 
     @app.get("/hello/<name>")
     def hello(name):
-        logging.get_logger("test.hello").info(f"hello, {name}!")
+        logging.getLogger("test.hello").info(f"hello, {name}!")
         return "ok"
 
     flask_logger.init_app(logger, app)

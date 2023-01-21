@@ -1,25 +1,15 @@
-import json
-from logging import INFO, DEBUG
+import logging
 import re
 
 import pytest
 
-import api.adapters.logging as logging
-from api.adapters.logging.log_formatters import JsonFormatter
+import api.logging
 
 
 @pytest.fixture
 def init_logger(caplog):
-    caplog.set_level(DEBUG)
-    logger: logging.Logger = logging.init("test_logging")
-    yield
-    logger.root.handlers.clear()
-
-
-@pytest.fixture
-def init_json_logger(monkeypatch, caplog: pytest.LogCaptureFixture):
-    caplog.set_level(DEBUG)
-    logger: logging.Logger = logging.init("test_logging")
+    caplog.set_level(logging.DEBUG)
+    logger: logging.Logger = api.logging.init("test_logging")
     yield
     logger.root.handlers.clear()
 
@@ -35,7 +25,7 @@ def test_init(init_logger, caplog: pytest.LogCaptureFixture):
 
 
 def test_log_exception(init_logger, caplog):
-    logger = logging.get_logger(__name__)
+    logger = logging.getLogger(__name__)
 
     try:
         raise Exception("example exception")
@@ -56,7 +46,7 @@ def test_log_exception(init_logger, caplog):
 
 
 def test_mask_pii(init_logger, caplog: pytest.LogCaptureFixture):
-    logger = logging.get_logger(__name__)
+    logger = logging.getLogger(__name__)
 
     logger.info("pii", extra={"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"})
 

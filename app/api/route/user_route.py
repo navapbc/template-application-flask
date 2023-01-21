@@ -4,7 +4,7 @@ from apiflask import APIBlueprint
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
-import api.adapters.logging as logging
+import logging
 import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
@@ -12,7 +12,7 @@ from api.route import response
 from api.route.schemas import user_schemas
 from api.services import users
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 user_blueprint = APIBlueprint("user", __name__, tag="User")

@@ -1,10 +1,10 @@
 #
-# Tests for api.adapters.logging.audit.
+# Tests for api.logging.audit.
 #
 
 import logging
 
-from api.adapters.logging import audit
+import api.logging.audit as audit
 
 
 def test_audit_hook(caplog):

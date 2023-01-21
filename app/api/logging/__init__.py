@@ -6,8 +6,8 @@ import pwd
 import sys
 from typing import Any, cast
 
-import api.adapters.logging.log_formatters as log_formatters
-import api.adapters.logging.pii as pii
+import api.logging.log_formatters as log_formatters
+import api.logging.pii as pii
 
 Logger = logging.Logger
 LogRecord = logging.LogRecord

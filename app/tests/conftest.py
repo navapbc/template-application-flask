@@ -1,3 +1,5 @@
+import logging
+
 import _pytest.monkeypatch
 import boto3
 import moto
@@ -5,13 +7,13 @@ import pytest
 import sqlalchemy
 
 import api.adapters.db as db
-import api.adapters.logging as logging
 import api.app as app_entry
+import api.logging
 import tests.api.db.models.factories as factories
 from api.db import models
 from tests.lib import db_testing
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 ####################
 # Test DB session
@@ -126,7 +128,7 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 
 @pytest.fixture
 def test_logger():
-    return logging.init(__package__)
+    return api.logging.init(__package__)
 
 
 ####################
