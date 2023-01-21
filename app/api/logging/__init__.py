@@ -5,7 +5,7 @@ import pwd
 import sys
 from typing import Any, cast
 
-import api.logging.log_formatters as log_formatters
+import api.logging.formatters as formatters
 import api.logging.pii as pii
 
 logger = logging.getLogger(__name__)
@@ -60,5 +60,5 @@ def get_formatter() -> logging.Formatter:
     log_format = os.getenv("LOG_FORMAT", "json")
 
     if log_format == "human-readable":
-        return log_formatters.HumanReadableFormatter()
-    return log_formatters.JsonFormatter()
+        return formatters.HumanReadableFormatter()
+    return formatters.JsonFormatter()
