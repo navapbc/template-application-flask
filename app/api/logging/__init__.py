@@ -5,31 +5,22 @@ import pwd
 import sys
 from typing import Any, cast
 
-import api.logging.formatters as formatters
-import api.logging.pii as pii
+import api.logging.config as config
 
 logger = logging.getLogger(__name__)
-original_argv = tuple(sys.argv)
+_original_argv = tuple(sys.argv)
 
 
 def init(program_name: str) -> None:
     # Determine which log formatter to use
     # based on the environment variable specified
     # Defaults to JSON
-    consoleHandler = logging.StreamHandler(sys.stdout)
-    formatter = get_formatter()
-    consoleHandler.setFormatter(formatter)
-    consoleHandler.addFilter(pii.mask_pii)
-    logging.root.addHandler(consoleHandler)
-    logging.getLogger("alembic").setLevel(logging.INFO)
-    logging.getLogger("werkzeug").setLevel(logging.WARN)
-    logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
-    logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+    config.configure_logging()
 
     log_program_info(program_name)
 
 
-def log_program_info(program_name: str):
+def log_program_info(program_name: str) -> None:
     logger.info(
         "start %s: %s %s %s, hostname %s, pid %i, user %i(%s)",
         program_name,
@@ -56,15 +47,4 @@ def log_program_info(program_name: str):
             ),
         },
     )
-    logger.info("invoked as: %s", " ".join(original_argv))
-
-
-def get_formatter() -> logging.Formatter:
-    """Return the formatter used by the root logger."""
-    log_format = os.getenv("LOG_FORMAT", "json")
-
-    print("get_formatter")
-    print(log_format)
-    if log_format == "human-readable":
-        return formatters.HumanReadableFormatter()
-    return formatters.JsonFormatter()
+    logger.info("invoked as: %s", " ".join(_original_argv))
