@@ -59,6 +59,8 @@ def get_formatter() -> logging.Formatter:
     """Return the formatter used by the root logger."""
     log_format = os.getenv("LOG_FORMAT", "json")
 
+    print("get_formatter")
+    print(log_format)
     if log_format == "human-readable":
         return formatters.HumanReadableFormatter()
     return formatters.JsonFormatter()

@@ -4,18 +4,36 @@ import re
 import pytest
 
 import api.logging
+import api.logging.formatters as formatters
 
 
-@pytest.fixture
-def init_logger(caplog):
+@pytest.fixture(scope="function")
+def init_logger(
+    request: pytest.FixtureRequest,
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+):
     caplog.set_level(logging.DEBUG)
+
+    log_format = request.param if hasattr(request, "param") else "human-readable"
+
+    monkeypatch.setenv("LOG_FORMAT", log_format)
+
     api.logging.init("test_logging")
-    logger = logging.getLogger("test_logging")
     yield
-    logger.root.handlers.clear()
+
+    logging.root.handlers.clear()
 
 
-def test_init(init_logger, caplog: pytest.LogCaptureFixture):
+@pytest.mark.parametrize(
+    "init_logger,expected_formatter",
+    [
+        ("human-readable", formatters.HumanReadableFormatter),
+        ("json", formatters.JsonFormatter),
+    ],
+    indirect=["init_logger"],
+)
+def test_init(init_logger, expected_formatter, caplog: pytest.LogCaptureFixture):
     records = caplog.get_records("setup")
     assert len(records) == 2
     assert re.match(
@@ -23,6 +41,9 @@ def test_init(init_logger, caplog: pytest.LogCaptureFixture):
         records[0].message,
     )
     assert re.match(r"^invoked as:", records[1].message)
+
+    formatter_types = [type(handler.formatter) for handler in logging.root.handlers]
+    assert expected_formatter in formatter_types
 
 
 def test_log_exception(init_logger, caplog):
