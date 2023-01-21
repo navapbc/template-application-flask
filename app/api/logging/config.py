@@ -13,6 +13,15 @@ def configure_logging() -> None:
     Adds a PII mask filter to the root logger.
     Also configures log levels third party packages.
     """
+
+    # Loggers can be configured using config functions defined
+    # in logging.config or by directly making calls to the main API
+    # of the logging module (see https://docs.python.org/3/library/logging.config.html)
+    # We opt to use the main API using functions like `addHandler` which is
+    # non-destructive, i.e. it does not overwrite any existing handlers.
+    # In contrast, logging.config.dictConfig() would overwrite any existing loggers.
+    # This is important during testing, since fixtures like `caplog` add handlers that would
+    # get overwritten if we call logging.config.dictConfig() during the scope of the test.
     consoleHandler = logging.StreamHandler(sys.stdout)
     formatter = get_formatter()
     consoleHandler.setFormatter(formatter)
