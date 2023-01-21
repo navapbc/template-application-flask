@@ -26,6 +26,10 @@ def init(program_name: str) -> None:
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
 
+    log_program_info(program_name)
+
+
+def log_program_info(program_name: str):
     logger.info(
         "start %s: %s %s %s, hostname %s, pid %i, user %i(%s)",
         program_name,

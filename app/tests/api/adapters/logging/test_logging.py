@@ -7,34 +7,33 @@ import api.logging
 import api.logging.formatters as formatters
 
 
-@pytest.fixture(scope="function")
-def init_logger(
-    request: pytest.FixtureRequest,
-    caplog: pytest.LogCaptureFixture,
-    monkeypatch: pytest.MonkeyPatch,
+def _init_test_logger(
+    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, log_format="human-readable"
 ):
     caplog.set_level(logging.DEBUG)
-
-    log_format = request.param if hasattr(request, "param") else "human-readable"
-
     monkeypatch.setenv("LOG_FORMAT", log_format)
-
     api.logging.init("test_logging")
-    yield
 
+
+@pytest.fixture
+def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
+    _init_test_logger(caplog, monkeypatch)
+    yield
     logging.root.handlers.clear()
 
 
 @pytest.mark.parametrize(
-    "init_logger,expected_formatter",
+    "log_format,expected_formatter",
     [
         ("human-readable", formatters.HumanReadableFormatter),
         ("json", formatters.JsonFormatter),
     ],
-    indirect=["init_logger"],
 )
-def test_init(init_logger, expected_formatter, caplog: pytest.LogCaptureFixture):
-    records = caplog.get_records("setup")
+def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expected_formatter):
+    caplog.set_level(logging.DEBUG)
+    _init_test_logger(caplog, monkeypatch, log_format)
+
+    records = caplog.records
     assert len(records) == 2
     assert re.match(
         r"^start test_logging: \w+ [0-9.]+ \w+, hostname \S+, pid \d+, user \d+\(\w+\)$",
@@ -46,7 +45,7 @@ def test_init(init_logger, expected_formatter, caplog: pytest.LogCaptureFixture)
     assert expected_formatter in formatter_types
 
 
-def test_log_exception(init_logger, caplog):
+def test_log_exception(init_test_logger, caplog):
     logger = logging.getLogger(__name__)
 
     try:
@@ -67,7 +66,7 @@ def test_log_exception(init_logger, caplog):
     assert last_record.__dict__["key2"] == "value2"
 
 
-def test_mask_pii(init_logger, caplog: pytest.LogCaptureFixture):
+def test_mask_pii(init_test_logger, caplog: pytest.LogCaptureFixture):
     logger = logging.getLogger(__name__)
 
     logger.info("pii", extra={"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"})

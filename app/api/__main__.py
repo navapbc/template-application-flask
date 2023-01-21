@@ -22,7 +22,7 @@ def main() -> None:
     app_config = AppConfig()
 
     api.logging.audit.init_security_logging()
-    api.logging.init(__package__)
+    api.logging.init()
 
     db_client = db.init()
     app = api.app.create_app(db_client=db_client, app_logger=logger)
