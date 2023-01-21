@@ -100,9 +100,15 @@ def _get_app_context_info(app: flask.Flask) -> dict:
 
 
 def _get_request_context_info(request: flask.Request) -> dict:
-    return {
+    data = {
         "request.id": request.headers.get("x-amzn-requestid", ""),
         "request.method": request.method,
         "request.path": request.path,
         "request.url_rule": str(request.url_rule),
     }
+    # Add query parameter data in the format request.query.<key> = <value>
+    # For example, the query string ?foo=bar&baz=qux would be added as
+    # request.query.foo = bar and request.query.baz = qux
+    for key, value in request.args.items():
+        data[f"request.query.{key}"] = value
+    return data

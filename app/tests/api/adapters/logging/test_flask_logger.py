@@ -61,17 +61,20 @@ def test_app_context_extra_attributes(
 
 
 def test_request_context_extra_attributes(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
+    app: Flask,
+    logger: logging.Logger,
+    caplog: pytest.LogCaptureFixture,
 ):
-    # Assert that the extra attributes related to the request context are present in all log records
     expected_extra = {
         "request.id": "",
         "request.method": "GET",
         "request.path": "/hello/jane",
         "request.url_rule": "/hello/<name>",
+        "request.query.up": "high",
+        "request.query.down": "low",
     }
 
-    app.test_client().get("/hello/jane")
+    app.test_client().get("/hello/jane?up=high&down=low")
 
     assert len(caplog.records) == 2
     for record in caplog.records:
@@ -82,4 +85,4 @@ def _assert_dict_contains(d: dict, expected: dict) -> None:
     """Assert that d contains all the key-value pairs in expected.
     Do this by checking to see if adding `expected` to `d` leaves `d` unchanged.
     """
-    assert d | expected == d
+    assert d == d | expected
