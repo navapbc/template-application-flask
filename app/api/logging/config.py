@@ -4,6 +4,13 @@ import sys
 
 import api.logging.formatters as formatters
 import api.logging.pii as pii
+from api.util.env_config import PydanticBaseEnvConfig
+
+logger = logging.getLogger(__name__)
+
+
+class LoggingConfig(PydanticBaseEnvConfig):
+    log_format: str = "json"
 
 
 def configure_logging() -> None:
@@ -14,6 +21,8 @@ def configure_logging() -> None:
     Also configures log levels third party packages.
     """
 
+    config = LoggingConfig()
+
     # Loggers can be configured using config functions defined
     # in logging.config or by directly making calls to the main API
     # of the logging module (see https://docs.python.org/3/library/logging.config.html)
@@ -23,7 +32,7 @@ def configure_logging() -> None:
     # This is important during testing, since fixtures like `caplog` add handlers that would
     # get overwritten if we call logging.config.dictConfig() during the scope of the test.
     consoleHandler = logging.StreamHandler(sys.stdout)
-    formatter = get_formatter()
+    formatter = get_formatter(config.log_format)
     consoleHandler.setFormatter(formatter)
     consoleHandler.addFilter(pii.mask_pii)
     logging.root.addHandler(consoleHandler)
@@ -33,17 +42,12 @@ def configure_logging() -> None:
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
 
 
-def get_formatter() -> logging.Formatter:
+def get_formatter(log_format: str) -> logging.Formatter:
     """Return the formatter used by the root logger.
 
     The formatter is determined by the environment variable LOG_FORMAT. If the
     environment variable is not set, the JSON formatter is used by default.
     """
-
-    log_format = os.getenv("LOG_FORMAT", "json")
-
-    print("get_formatter")
-    print(log_format)
     if log_format == "human-readable":
         return formatters.HumanReadableFormatter()
     return formatters.JsonFormatter()
