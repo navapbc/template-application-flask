@@ -39,6 +39,6 @@ class HumanReadableFormatter(logging.Formatter):
             record.name,
             record.funcName,
             record.levelname,
-            record.message,
+            record.msg,
             record.__dict__,
         )

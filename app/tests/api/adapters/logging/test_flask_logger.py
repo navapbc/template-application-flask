@@ -28,14 +28,23 @@ def app(logger):
     return app
 
 
-def test_log_route(app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture):
-    app.test_client().get("/hello/jane")
+@pytest.mark.parametrize(
+    "route,expected_messages",
+    [
+        ("/hello/jane", ["GET /hello/<name>", "hello, jane!"]),
+        ("/notfound", []),
+    ],
+)
+def test_log_route(
+    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture, route, expected_messages
+):
+    app.test_client().get(route)
 
     # Assert that the log messages are present
     # There should be the route log message that is logged in the before_request handler
     # as part of every request, followed by the log message in the route handler itself.
 
-    assert caplog.messages == ["GET /hello/<name>", "hello, jane!"]
+    assert caplog.messages == expected_messages
 
 
 def test_app_context_extra_attributes(
