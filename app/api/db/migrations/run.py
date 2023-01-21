@@ -2,6 +2,7 @@
 # rather than the command line. This allows poetry to package and alias it for
 # running on the production docker image from any directory.
 import itertools
+import logging
 import os
 from typing import Optional
 
@@ -10,8 +11,6 @@ from alembic import command, script
 from alembic.config import Config
 from alembic.operations.ops import MigrationScript
 from alembic.runtime import migration
-
-import logging
 
 logger = logging.getLogger(__name__)
 alembic_cfg = Config(os.path.join(os.path.dirname(__file__), "./alembic.ini"))

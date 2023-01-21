@@ -10,7 +10,6 @@ import logging
 import sys
 from typing import Any
 
-import logging
 import api.util.collections
 
 logger = logging.getLogger(__name__)

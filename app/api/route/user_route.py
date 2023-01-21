@@ -1,10 +1,10 @@
+import logging
 from typing import Any
 
 from apiflask import APIBlueprint
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
-import logging
 import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User

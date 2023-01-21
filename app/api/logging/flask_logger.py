@@ -1,8 +1,8 @@
-from contextvars import ContextVar
-import pprint
-import flask
-
 import logging
+import pprint
+from contextvars import ContextVar
+
+import flask
 
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:

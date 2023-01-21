@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import Optional
 
@@ -7,7 +8,6 @@ from werkzeug.exceptions import Unauthorized
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
-import logging
 import api.logging.flask_logger as flask_logger
 from api.auth.api_key_auth import User
 from api.route.healthcheck import healthcheck_blueprint

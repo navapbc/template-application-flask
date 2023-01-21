@@ -1,12 +1,12 @@
 # TODO move create_csv_script to a flask cli command so we don't need script_util.script_context_manager
 import csv
+import logging
 import os
 from dataclasses import asdict, dataclass
 
 from smart_open import open as smart_open
 
 import api.adapters.db as db
-import logging
 from api.db.models.user_models import User
 from api.scripts.util.script_util import script_context_manager
 from api.util.datetime_util import utcnow

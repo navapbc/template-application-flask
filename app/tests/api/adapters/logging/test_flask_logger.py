@@ -1,8 +1,9 @@
-import pytest
+import logging
 import sys
+
+import pytest
 from flask import Flask
 
-import logging
 import api.logging.flask_logger as flask_logger
 
 

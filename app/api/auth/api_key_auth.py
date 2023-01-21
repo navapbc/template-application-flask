@@ -1,3 +1,4 @@
+import logging
 import os
 import uuid
 from dataclasses import dataclass
@@ -5,8 +6,6 @@ from typing import Any
 
 import flask
 from apiflask import HTTPTokenAuth, abort
-
-import logging
 
 logger = logging.getLogger(__name__)
 

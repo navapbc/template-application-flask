@@ -1,3 +1,4 @@
+import logging
 from typing import Tuple
 
 from apiflask import APIBlueprint
@@ -6,7 +7,6 @@ from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import api.adapters.db.flask_db as flask_db
-import logging
 from api.route import response
 from api.route.schemas import request_schema
 

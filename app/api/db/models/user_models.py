@@ -1,4 +1,5 @@
 import enum
+import logging
 from datetime import date
 from typing import Optional
 from uuid import UUID
@@ -7,7 +8,6 @@ from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, relationship
 
-import logging
 from api.db.models.base import Base, IdMixin, TimestampMixin
 
 logger = logging.getLogger(__name__)
