@@ -50,13 +50,8 @@ def test_log_route(
 def test_app_context_extra_attributes(
     app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
 ):
-    # Assert that the extra attributes related to the request context are present in all log records
-    expected_extra = {
-        "request.id": "",
-        "request.method": "GET",
-        "request.path": "/hello/jane",
-        "request.url_rule": "/hello/<name>",
-    }
+    # Assert that extra attributes related to the app context are present in all log records
+    expected_extra = {"app.name": "test_app_name"}
 
     app.test_client().get("/hello/jane")
 
@@ -68,8 +63,13 @@ def test_app_context_extra_attributes(
 def test_request_context_extra_attributes(
     app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
 ):
-    # Assert that extra attributes related to the app context are present in all log records
-    expected_extra = {"app.name": "test_app_name"}
+    # Assert that the extra attributes related to the request context are present in all log records
+    expected_extra = {
+        "request.id": "",
+        "request.method": "GET",
+        "request.path": "/hello/jane",
+        "request.url_rule": "/hello/<name>",
+    }
 
     app.test_client().get("/hello/jane")
 
