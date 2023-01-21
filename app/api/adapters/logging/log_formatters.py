@@ -35,13 +35,11 @@ class HumanReadableFormatter(logging.Formatter):
     """
 
     def format(self, record: logging.LogRecord) -> str:
-        extra = record.__dict__
-
         return decodelog.format_line(
             datetime.utcfromtimestamp(record.created),
             record.name,
             record.funcName,
             record.levelname,
             record.message,
-            extra,
+            record.__dict__,
         )
