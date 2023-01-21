@@ -7,6 +7,7 @@ import sys
 from typing import Any, cast
 
 import api.adapters.logging.log_formatters as log_formatters
+import api.adapters.logging.pii as pii
 
 Logger = logging.Logger
 LogRecord = logging.LogRecord
@@ -19,6 +20,7 @@ def init(program_name: str) -> None:
     consoleHandler = logging.StreamHandler(sys.stdout)
     formatter = get_formatter()
     consoleHandler.setFormatter(formatter)
+    consoleHandler.addFilter(pii.mask_pii)
     logging.root.addHandler(consoleHandler)
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)

@@ -53,3 +53,13 @@ def test_log_exception(init_logger, caplog):
     assert last_record.exc_text.endswith("Exception: example exception")
     assert last_record.__dict__["key1"] == "value1"
     assert last_record.__dict__["key2"] == "value2"
+
+
+def test_mask_pii(init_logger, caplog: pytest.LogCaptureFixture):
+    logger = logging.get_logger(__name__)
+
+    logger.info("pii", extra={"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"})
+
+    assert len(caplog.records) == 1
+    assert caplog.records[0].__dict__["tin"] == "*********"
+    assert caplog.records[0].__dict__["dashed-ssn"] == "*********"
