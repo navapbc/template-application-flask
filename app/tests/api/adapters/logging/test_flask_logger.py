@@ -35,9 +35,7 @@ def app(logger):
         ("/notfound", []),
     ],
 )
-def test_log_route(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture, route, expected_messages
-):
+def test_log_route(app: Flask, caplog: pytest.LogCaptureFixture, route, expected_messages):
     app.test_client().get(route)
 
     # Assert that the log messages are present
@@ -47,9 +45,7 @@ def test_log_route(
     assert caplog.messages == expected_messages
 
 
-def test_app_context_extra_attributes(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
-):
+def test_app_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureFixture):
     # Assert that the extra attributes related to the request context are present in all log records
     expected_extra = {
         "request.id": "",
@@ -65,12 +61,18 @@ def test_app_context_extra_attributes(
         _assert_dict_contains(record.__dict__, expected_extra)
 
 
-def test_request_context_extra_attributes(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
-):
+def test_request_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureFixture):
     # Assert that extra attributes related to the app context are present in all log records
     expected_extra = {"app.name": "test_app_name"}
 
+    app.test_client().get("/hello/jane")
+
+    assert len(caplog.records) == 2
+    for record in caplog.records:
+        _assert_dict_contains(record.__dict__, expected_extra)
+
+
+def test_add_extra_log_data_for_current_request(app: Flask, caplog: pytest.LogCaptureFixture):
     @app.get("/pet/<name>")
     def pet(name):
         flask_logger.add_extra_data_to_current_request_logs({"pet.name": name})
@@ -81,19 +83,6 @@ def test_request_context_extra_attributes(
 
     last_record = caplog.records[-1]
     _assert_dict_contains(last_record.__dict__, {"pet.name": "kitty"})
-
-
-def test_add_extra_log_data_for_current_request(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture
-):
-    # Assert that extra attributes related to the app context are present in all log records
-    expected_extra = {"app.name": "test_app_name"}
-
-    app.test_client().get("/hello/jane")
-
-    assert len(caplog.records) == 2
-    for record in caplog.records:
-        _assert_dict_contains(record.__dict__, expected_extra)
 
 
 def _assert_dict_contains(d: dict, expected: dict) -> None:
