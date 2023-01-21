@@ -1,9 +1,42 @@
+"""Module for adding standard logging functionality to a Flask app.
+
+This module configures an application's logger to add extra attributes
+to all log messages. Flask application context attributes such as the 
+app name and request context attributes such as the request method and
+request url rule are added to the log record.
+
+This module also configures the Flask application to log every
+non-404 request.
+
+Usage:
+    import api.logging.flask_logger as flask_logger
+
+    logger = logging.getLogger(__name__)
+    app = create_app()
+
+    flask_logger.init_app(logger, app)
+"""
+
 import logging
 
 import flask
 
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
+    """Initialize the Flask app logger.
+
+    Adds the app context attributes to the log record.
+    Adds the request context attributes to the log record.
+    Logs every non-404 request.
+
+    Usage:
+        import api.logging.flask_logger as flask_logger
+
+        logger = logging.getLogger(__name__)
+        app = create_app()
+
+        flask_logger.init_app(logger, app)
+    """
     # Need to add filters to the handlers rather than to the logger itself, since
     # messages are passed directly to the ancestor loggers’ handlers bypassing any filters
     # set on the ancestors.
@@ -18,6 +51,10 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
 
 
 def _log_route(logger: logging.Logger) -> None:
+    """Log the route that is being requested.
+
+    If there is no matching route, then do not log anything.
+    """
     assert flask.request is not None
     request = flask.request
     if request.url_rule:
@@ -25,6 +62,10 @@ def _log_route(logger: logging.Logger) -> None:
 
 
 def _add_app_context_attributes_to_log_record(record: logging.LogRecord) -> bool:
+    """Add app context attributes to the log record.
+
+    If there is no app context, then do not add any attributes.
+    """
     if not flask.has_app_context():
         return True
 
@@ -35,6 +76,10 @@ def _add_app_context_attributes_to_log_record(record: logging.LogRecord) -> bool
 
 
 def _add_request_context_attributes_to_log_record(record: logging.LogRecord) -> bool:
+    """Add request context attributes to the log record.
+
+    If there is no request context, then do not add any attributes.
+    """
     if not flask.has_request_context():
         return True
 
