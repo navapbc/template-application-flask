@@ -3,6 +3,29 @@
 This module defines a filter that can be attached to a logger to mask PII
 from log records. The filter is applied to all log records, and masks PII
 that looks like social security numbers.
+
+You can add the filter to a handler:
+
+Example:
+    import logging
+    import api.logging.pii as pii
+
+    handler = logging.StreamHandler()
+    handler.addFilter(pii.mask_pii)
+    logger = logging.getLogger(__name__)
+    logger.addHandler(handler)
+
+Or you can add the filter directly to a logger.
+If adding the filter directly to a logger, take note that the filter
+will not be called for child loggers.
+See https://docs.python.org/3/library/logging.html#logging.Logger.propagate
+
+Example:
+    import logging
+    import api.logging.pii as pii
+
+    logger = logging.getLogger(__name__)
+    logger.addFilter(pii.mask_pii)
 """
 
 import logging
