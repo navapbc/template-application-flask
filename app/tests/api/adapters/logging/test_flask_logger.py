@@ -32,7 +32,7 @@ def app(logger):
     "route,expected_messages",
     [
         ("/hello/jane", ["GET /hello/<name>", "hello, jane!"]),
-        ("/notfound", []),
+        ("/notfound", ["GET /notfound"]),
     ],
 )
 def test_log_route(

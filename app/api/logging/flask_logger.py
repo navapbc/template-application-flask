@@ -63,6 +63,8 @@ def _log_route(logger: logging.Logger) -> None:
     request = flask.request
     if request.url_rule:
         logger.info(f"{request.method} {request.url_rule}")
+    else:
+        logger.info(f"{request.method} {request.path}")
 
 
 def _add_app_context_info_to_log_record(record: logging.LogRecord) -> bool:
