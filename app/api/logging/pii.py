@@ -1,3 +1,10 @@
+"""Mask PII from log records.
+
+This module defines a filter that can be attached to a logger to mask PII
+from log records. The filter is applied to all log records, and masks PII
+that looks like social security numbers.
+"""
+
 import logging
 import re
 from typing import Any, Optional
