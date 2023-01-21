@@ -1,6 +1,4 @@
 import logging
-import pprint
-from contextvars import ContextVar
 
 import flask
 
