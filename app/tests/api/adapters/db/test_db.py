@@ -1,5 +1,7 @@
 import logging  # noqa: B1
+from itertools import product
 
+import pytest
 from sqlalchemy import text
 
 import api.adapters.db as db
@@ -39,37 +41,49 @@ def test_verify_ssl_not_in_use(caplog):
     assert caplog.records[0].levelname == "WARNING"
 
 
-def test_make_connection_uri():
+@pytest.mark.parametrize(
+    "username_password_port,expected",
+    zip(
+        # Test all combinations of username, password, and port
+        product(["testuser", ""], ["testpass", None], ["5432", ""]),
+        [
+            "postgresql://testuser:testpass@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://testuser:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://testuser@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://testuser@localhost/dbname?options=-csearch_path=public",
+            "postgresql://:testpass@localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://localhost:5432/dbname?options=-csearch_path=public",
+            "postgresql://localhost/dbname?options=-csearch_path=public",
+        ],
+    ),
+)
+def test_make_connection_uri(username_password_port, expected):
+    username, password, port = username_password_port
     assert (
         make_connection_uri(
             DbConfig(
                 host="localhost",
                 name="dbname",
-                username="foo",
-                password="bar",
+                username=username,
+                password=password,
                 db_schema="public",
-                port="5432",
+                port=port,
             )
         )
-        == "postgresql://foo:bar@localhost:5432/dbname?options=-csearch_path=public"
-    )
-
-    assert (
-        make_connection_uri(
-            DbConfig(
-                host="localhost",
-                name="dbname",
-                username="foo",
-                password=None,
-                db_schema="public",
-                port="5432",
-            )
-        )
-        == "postgresql://foo@localhost:5432/dbname?options=-csearch_path=public"
+        == expected
     )
 
 
-def test_get_connection_parameters(monkeypatch):
+def test_get_connection_parameters_require_environment(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.delenv("ENVIRONMENT")
+    db_config = get_db_config()
+    with pytest.raises(Exception, match="ENVIRONMENT is not set"):
+        get_connection_parameters(db_config)
+
+
+def test_get_connection_parameters(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("ENVIRONMENT", "production")
     db_config = get_db_config()
     conn_params = get_connection_parameters(db_config)
 
@@ -81,6 +95,7 @@ def test_get_connection_parameters(monkeypatch):
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,
+        sslmode="require",
     )
 
 
