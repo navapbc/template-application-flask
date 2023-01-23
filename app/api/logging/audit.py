@@ -32,7 +32,13 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
     # For the full list of auditable events, see https://docs.python.org/3/library/audit_events.html
     # Define this variable locally so it can't be modified by other modules.
     #
-    # Events that we aren't logging:
+    # Events from the suggested audit hook locations in PEP 578 that we aren't logging:
+    #
+    # compile and import
+    #     Detects when code is being compiled or imported.
+    #
+    #     Why we aren't logging:
+    #     Logging as part of regular imports is too noisy.
     #
     # sys._getframe
     #     Detects when code is accessing frames directly.
