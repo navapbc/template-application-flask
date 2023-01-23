@@ -27,6 +27,7 @@ def configure_logging() -> None:
     console_handler.setFormatter(formatter)
     console_handler.addFilter(pii.mask_pii)
     logging.root.addHandler(console_handler)
+    logging.root.setLevel(logging.INFO)
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
