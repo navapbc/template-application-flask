@@ -60,17 +60,9 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         "sys.addaudithook": (),
         # Detects any attempt to set the open_code hook.
         "cpython.PyFile_SetOpenCodeHook": (),
-        # Detect dynamic code compilation, where code could be a string or AST.
-        # Note that this will be called for regular imports of source code,
-        # including those that were opened with open_code.
-        "compile": ("code", "filename_or_none"),
         # Detect dynamic execution of code objects. This only occurs for explicit
         # calls, and is not raised for normal function invocation.
         "exec": ("code_object",),
-        # Detect when modules are imported. This is raised before the module name
-        # is resolved to a file. All arguments other than the module name may be
-        # None if they are not used or available.
-        "import": ("module", "filename", "sys.path", "sys.meta_path", "sys.path_hooks"),
         # Detect when a file is about to be opened. path and mode are the usual
         # parameters to open if available, while flags is provided instead of
         # mode in some cases.
