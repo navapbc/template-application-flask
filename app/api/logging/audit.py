@@ -20,7 +20,9 @@ AUDIT = 32
 logging.addLevelName(AUDIT, "AUDIT")
 
 
-def init_security_logging() -> None:
+def init() -> None:
+    """Initialize the audit logging module to start
+    logging security audit events."""
     sys.addaudithook(audit_hook)
 
 

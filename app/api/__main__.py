@@ -19,7 +19,7 @@ def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
-    api.logging.audit.init_security_logging()
+    api.logging.audit.init()
     api.logging.init(__package__)
 
     db_client = db.init()
