@@ -97,6 +97,6 @@ def _mask_pii_for_key(key: str, value: Optional[Any]) -> Optional[Any]:
 
 
 def _mask_pii(value: Optional[Any]) -> Optional[Any]:
-    if TIN_RE.match(str(value)):
+    if TIN_RE.search(str(value)):
         return TIN_RE.sub("*********", str(value))
     return value
