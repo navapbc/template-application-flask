@@ -22,11 +22,11 @@ def configure_logging() -> None:
     # In contrast, logging.config.dictConfig() would overwrite any existing loggers.
     # This is important during testing, since fixtures like `caplog` add handlers that would
     # get overwritten if we call logging.config.dictConfig() during the scope of the test.
-    consoleHandler = logging.StreamHandler(sys.stdout)
+    console_handler = logging.StreamHandler(sys.stdout)
     formatter = get_formatter()
-    consoleHandler.setFormatter(formatter)
-    consoleHandler.addFilter(pii.mask_pii)
-    logging.root.addHandler(consoleHandler)
+    console_handler.setFormatter(formatter)
+    console_handler.addFilter(pii.mask_pii)
+    logging.root.addHandler(console_handler)
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
