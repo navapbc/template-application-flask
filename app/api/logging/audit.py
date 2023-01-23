@@ -23,29 +23,10 @@ logging.addLevelName(AUDIT, "AUDIT")
 def init() -> None:
     """Initialize the audit logging module to start
     logging security audit events."""
-    sys.addaudithook(audit_hook)
+    sys.addaudithook(handle_audit_event)
 
 
-IGNORE_AUDIT_EVENTS = {
-    "builtins.id",
-    "code.__new__",
-    "compile",
-    "exec",
-    "import",
-    "marshal.loads",
-    "object.__getattr__",
-    "object.__setattr__",
-    "os.listdir",
-    "os.scandir",
-    "os.walk",
-    "socket.__new__",
-    "sys._current_frames",
-    "sys._getframe",
-    "sys.settrace",  # interferes with PyCharm debugger
-}
-
-
-def audit_hook(event_name: str, args: tuple[Any, ...]) -> None:
+def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
     if event_name in IGNORE_AUDIT_EVENTS:
         return
     if event_name == "open" and isinstance(args[0], str) and "/__pycache__/" in args[0]:

@@ -11,13 +11,13 @@ def test_audit_hook(caplog):
     caplog.set_level(logging.INFO)
 
     # Should appear in audit log.
-    audit.audit_hook("open", ("/dev/null", None, 123000))
+    audit.handle_audit_event("open", ("/dev/null", None, 123000))
 
     # Various common cases that should not appear in audit log (normal behaviour & too noisy).
-    audit.audit_hook("compile", (b"def _(): pass", "<unknown>"))
-    audit.audit_hook("open", ("/srv/api/__pycache__/status.cpython-310.pyc", "r", 500010))
-    audit.audit_hook("os.chmod", (7, 1, -1))
-    audit.audit_hook(
+    audit.handle_audit_event("compile", (b"def _(): pass", "<unknown>"))
+    audit.handle_audit_event("open", ("/srv/api/__pycache__/status.cpython-310.pyc", "r", 500010))
+    audit.handle_audit_event("os.chmod", (7, 1, -1))
+    audit.handle_audit_event(
         "open", ("/app/.venv/lib/python3.10/site-packages/pytz/zoneinfo/US/Eastern", "r", 524288)
     )
 
