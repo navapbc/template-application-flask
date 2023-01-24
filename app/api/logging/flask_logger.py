@@ -62,11 +62,13 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     app_logger.info("initialized flask logger")
 
 
-def add_extra_data_to_current_request_logs(data: dict[str, str]) -> None:
+def add_extra_data_to_current_request_logs(
+    data: dict[str, str | int | float | bool | None]
+) -> None:
     """Add data to every log record for the current request."""
     assert flask.has_request_context(), "Must be in a request context"
 
-    extra_log_data: dict[str, str] = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
+    extra_log_data = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
     extra_log_data.update(data)
     setattr(flask.g, EXTRA_LOG_DATA_ATTR, extra_log_data)
 
