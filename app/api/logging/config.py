@@ -1,5 +1,4 @@
 import logging
-import os
 import sys
 
 import api.logging.formatters as formatters
