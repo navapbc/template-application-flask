@@ -21,6 +21,8 @@ import logging
 
 import flask
 
+logger = logging.getLogger(__name__)
+
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     """Initialize the Flask app logger.
@@ -49,22 +51,18 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
 
     # Use the app_logger to log every non-404 request before each request
     # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
-    app.before_request(lambda: _log_route(app_logger))
+    app.before_request(_log_start_request)
 
     app_logger.info("initialized flask logger")
 
 
-def _log_route(logger: logging.Logger) -> None:
-    """Log the route that is being requested.
+def _log_start_request() -> None:
+    """Log the start of a request.
 
-    If there is no matching route, then do not log anything.
+    Additional info about the request will be in the `extra` field
+    added by `_add_request_context_info_to_log_record`
     """
-    assert flask.request is not None
-    request = flask.request
-    if request.url_rule:
-        logger.info(f"{request.method} {request.url_rule}")
-    else:
-        logger.info(f"{request.method} {request.path}")
+    logger.info("start request")
 
 
 def _add_app_context_info_to_log_record(record: logging.LogRecord) -> bool:
