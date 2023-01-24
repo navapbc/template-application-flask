@@ -31,11 +31,11 @@ def configure_logging() -> logging.Logger:
     # In contrast, logging.config.dictConfig() would overwrite any existing loggers.
     # This is important during testing, since fixtures like `caplog` add handlers that would
     # get overwritten if we call logging.config.dictConfig() during the scope of the test.
-    consoleHandler = logging.StreamHandler(sys.stdout)
+    console_handler = logging.StreamHandler(sys.stdout)
     formatter = get_formatter(config.log_format)
-    consoleHandler.setFormatter(formatter)
-    consoleHandler.addFilter(pii.mask_pii)
-    logging.root.addHandler(consoleHandler)
+    console_handler.setFormatter(formatter)
+    console_handler.addFilter(pii.mask_pii)
+    logging.root.addHandler(console_handler)
     logging.root.setLevel(config.log_level)
 
     # Configure loggers for third party packages
