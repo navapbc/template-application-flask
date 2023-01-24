@@ -4,14 +4,15 @@
 
 import logging
 
-from api.logging import audit
+import api.logging.audit as audit
 
 
 def test_audit_hook(caplog):
+    audit.init()
     caplog.set_level(logging.INFO)
 
     # Should appear in audit log.
-    audit.handle_audit_event("open", ("/dev/null", None, 123000))
+    audit.handle_audit_event("io.open", ("/dev/null", None, 123000))
 
     # Various common cases that should not appear in audit log (normal behaviour & too noisy).
     audit.handle_audit_event("compile", (b"def _(): pass", "<unknown>"))
@@ -22,13 +23,11 @@ def test_audit_hook(caplog):
     )
 
     assert [(r.funcName, r.levelname, r.message) for r in caplog.records] == [
-        ("audit_log", "AUDIT", "open")
+        ("log_audit_event", "AUDIT", "io.open")
     ]
-    assert caplog.records[0].__dict__["audit.event_name"] == "open"
-    assert caplog.records[0].__dict__["audit.args.0"] == "/dev/null"
-    assert caplog.records[0].__dict__["audit.args.1"] is None
-    assert caplog.records[0].__dict__["audit.args.2"] == 123000
-    assert "audit.args.3" not in caplog.records[0].__dict__
+    assert caplog.records[0].__dict__["audit.args.path"] == "/dev/null"
+    assert caplog.records[0].__dict__["audit.args.mode"] is None
+    assert caplog.records[0].__dict__["audit.args.flags"] == 123000
 
 
 def test_audit_log_repeated_message(caplog):
