@@ -38,10 +38,13 @@ def configure_logging() -> logging.Logger:
     consoleHandler.addFilter(pii.mask_pii)
     logging.root.addHandler(consoleHandler)
     logging.root.setLevel(config.log_level)
+
+    # Configure loggers for third party packages
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+
     return logging.root
 
 
