@@ -13,7 +13,7 @@ class LoggingConfig(PydanticBaseEnvConfig):
     log_format: str = "json"
 
 
-def configure_logging() -> None:
+def configure_logging() -> logging.Logger:
     """Configure logging for the application.
 
     Configures the root module logger to log to stdout.
@@ -36,10 +36,12 @@ def configure_logging() -> None:
     consoleHandler.setFormatter(formatter)
     consoleHandler.addFilter(pii.mask_pii)
     logging.root.addHandler(consoleHandler)
+    logging.root.setLevel(logging.INFO)
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+    return logging.root
 
 
 def get_formatter(log_format: str) -> logging.Formatter:

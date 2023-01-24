@@ -36,10 +36,11 @@ logger = logging.getLogger(__name__)
 _original_argv = tuple(sys.argv)
 
 
-def init(program_name: str) -> None:
-    config.configure_logging()
+def init(program_name: str) -> logging.Logger:
+    root_logger = config.configure_logging()
 
     log_program_info(program_name)
+    return root_logger
 
 
 def log_program_info(program_name: str) -> None:
