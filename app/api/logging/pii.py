@@ -32,28 +32,10 @@ import logging
 import re
 from typing import Any, Optional
 
-# Attributes of LogRecord to exclude from the JSON formatted lines. An exclusion list approach is
-# used so that all "extra" attributes can be included in a line.
-EXCLUDE_ATTRIBUTES = {
-    "args",
-    "exc_info",
-    "filename",
-    "levelno",
-    "lineno",
-    "module",
-    "msecs",
-    "msg",
-    "pathname",
-    "processName",
-    "relativeCreated",
-}
-
 
 def mask_pii(record: logging.LogRecord) -> bool:
     record.__dict__ |= {
-        key: _mask_pii_for_key(key, value)
-        for key, value in record.__dict__.items()
-        if key not in EXCLUDE_ATTRIBUTES and value is not None
+        key: _mask_pii_for_key(key, value) for key, value in record.__dict__.items()
     }
     return True
 

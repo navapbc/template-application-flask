@@ -6,7 +6,7 @@ import api.logging.formatters as formatters
 import api.logging.pii as pii
 
 
-def configure_logging() -> None:
+def configure_logging() -> logging.Logger:
     """Configure logging for the application.
 
     Configures the root module logger to log to stdout.
@@ -32,6 +32,7 @@ def configure_logging() -> None:
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+    return logging.root
 
 
 def get_formatter() -> logging.Formatter:
