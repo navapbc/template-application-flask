@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 class LoggingConfig(PydanticBaseEnvConfig):
     log_format: str = "json"
+    log_level: int = logging.INFO
 
 
 def configure_logging() -> logging.Logger:
@@ -36,7 +37,7 @@ def configure_logging() -> logging.Logger:
     consoleHandler.setFormatter(formatter)
     consoleHandler.addFilter(pii.mask_pii)
     logging.root.addHandler(consoleHandler)
-    logging.root.setLevel(logging.INFO)
+    logging.root.setLevel(config.log_level)
     logging.getLogger("alembic").setLevel(logging.INFO)
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
