@@ -21,6 +21,8 @@ def init_audit_hook():
 
 
 test_audit_hook_data = [
+    pytest.param(eval, ("1+1", None, None), "exec", {}, id="eval"),
+    pytest.param(exec, ("1+1", None, None), "exec", {}, id="exec"),
     pytest.param(
         open,
         ("/dev/null", "w"),
