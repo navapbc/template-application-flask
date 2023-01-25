@@ -128,8 +128,7 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
 
 def log_audit_event(event_name: str, args: Sequence[Any], arg_names: Sequence[str]) -> None:
     """Log a message but only log recently repeated messages at intervals."""
-    arg_keys = map(lambda arg_name: f"audit.args.{arg_name}", arg_names)
-    extra = dict(zip(arg_keys, args))
+    extra = {f"audit.args.{arg_name}": arg for arg_name, arg in zip(arg_names, args)}
     logger.log(AUDIT, event_name, extra=extra)
 
 
