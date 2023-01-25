@@ -2,9 +2,11 @@
 # Tests for api.logging.audit.
 #
 
+import re
 import io
 import logging
 import os
+import socket
 import sys
 from typing import Any, Callable
 
@@ -58,6 +60,13 @@ test_audit_hook_data = [
         "sys.addaudithook",
         {},
         id="sys.addaudithook",
+    ),
+    pytest.param(
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect,
+        (("www.python.org", 80),),
+        "socket.connect",
+        {"audit.args.address": ("www.python.org", 80)},
+        id="socket.connect",
     ),
 ]
 

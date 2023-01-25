@@ -114,7 +114,7 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         # Detect when code is accessing frames directly.
         "sys._current_frames": (),
         # Detect access to network resources. The address is unmodified from the original call.
-        "socket.address": ("socket", "address"),
+        "socket.connect": ("socket", "address"),
         # Detects URL requests.
         "urllib.Request": ("url", "data", "headers", "method"),
     }
