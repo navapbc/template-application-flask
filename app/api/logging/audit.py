@@ -72,7 +72,7 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         # Detect when a file is about to be opened. path and mode are the usual
         # parameters to open if available, while flags is provided instead of
         # mode in some cases.
-        "io.open": ("path", "mode", "flags"),
+        "open": ("path", "mode", "flags"),
         # Detect when code is injecting trace functions. Because of the
         # implementation, exceptions raised from the hook will abort the
         # operation, but will not be raised in Python code. Note that

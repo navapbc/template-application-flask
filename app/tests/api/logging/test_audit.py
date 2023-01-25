@@ -2,29 +2,74 @@
 # Tests for api.logging.audit.
 #
 
+import io
 import logging
+import os
+from typing import Any, Callable
+
+import pytest
 
 import api.logging.audit as audit
 
 
-def test_audit_hook(caplog):
+@pytest.fixture(scope="session")
+def init_audit_hook():
     audit.init()
+
+
+test_audit_hook_data = [
+    pytest.param(
+        open,
+        ("/dev/null", "w"),
+        "open",
+        {
+            "audit.args.path": "/dev/null",
+            "audit.args.mode": "w",
+            "audit.args.flags": 524865,
+        },
+        id="open",
+    ),
+    pytest.param(
+        io.open,
+        ("/dev/null", "w"),
+        "open",
+        {
+            "audit.args.path": "/dev/null",
+            "audit.args.mode": "w",
+            "audit.args.flags": 524865,
+        },
+        id="io.open",
+    ),
+    pytest.param(
+        os.open,
+        ("/dev/null", os.O_RDWR | os.O_CREAT, 0o777),
+        "open",
+        {
+            "audit.args.path": "/dev/null",
+            "audit.args.mode": None,
+            "audit.args.flags": 524354,
+        },
+        id="os.open",
+    ),
+]
+
+
+@pytest.mark.parametrize("func,args,expected_msg,expected_extra", test_audit_hook_data)
+def test_audit_hook(
+    init_audit_hook,
+    caplog: pytest.LogCaptureFixture,
+    func: Callable,
+    args: tuple[Any],
+    expected_msg: str,
+    expected_extra: dict[str, Any],
+):
     caplog.set_level(logging.INFO)
+    caplog.clear()
 
-    # Should appear in audit log.
-    audit.handle_audit_event("io.open", ("/dev/null", None, 123000))
-
-    # Various common cases that should not appear in audit log (normal behaviour & too noisy).
-    audit.handle_audit_event("compile", (b"def _(): pass", "<unknown>"))
-    audit.handle_audit_event("open", ("/srv/api/__pycache__/status.cpython-310.pyc", "r", 500010))
-    audit.handle_audit_event("os.chmod", (7, 1, -1))
-    audit.handle_audit_event(
-        "open", ("/app/.venv/lib/python3.10/site-packages/pytz/zoneinfo/US/Eastern", "r", 524288)
-    )
-
-    assert [(r.funcName, r.levelname, r.message) for r in caplog.records] == [
-        ("log_audit_event", "AUDIT", "io.open")
-    ]
-    assert caplog.records[0].__dict__["audit.args.path"] == "/dev/null"
-    assert caplog.records[0].__dict__["audit.args.mode"] is None
-    assert caplog.records[0].__dict__["audit.args.flags"] == 123000
+    func(*args)
+    assert len(caplog.records) == 1
+    log_record: logging.LogRecord = caplog.records[0]
+    assert log_record.levelname == "AUDIT"
+    assert log_record.msg == expected_msg
+    for key, value in expected_extra.items():
+        assert log_record.__dict__[key] == value
