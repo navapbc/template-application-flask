@@ -5,6 +5,7 @@
 import io
 import logging
 import os
+import sys
 from typing import Any, Callable
 
 import pytest
@@ -50,6 +51,13 @@ test_audit_hook_data = [
             "audit.args.flags": 524354,
         },
         id="os.open",
+    ),
+    pytest.param(
+        sys.addaudithook,
+        (lambda *args: None,),
+        "sys.addaudithook",
+        {},
+        id="sys.addaudithook",
     ),
 ]
 
