@@ -30,7 +30,9 @@ Log querying systems are often limited in their querying abilities. Most log dat
 
 ### Log event type
 
-- **INFO for user/client error** – Use INFO events if it’s a user or client error, and ERROR events if it’s a system error. This helps us set stricter alerts on system errors that won’t be affected by fluctuations in user behavior.
+- **INFO** – Use INFO events to log something informational. This can be information that's useful for investigations, debugging, or tracking metrics. Note that events such as a user or client error (such as validation errors or 4XX bad request errors) should use INFO, since those are expected to occur as part of normal operation and do not necessarily indicate anything wrong with the system. Do not use ERROR or WARNING for user or client errors to avoid cluttering error logs.
+- **ERROR** – Use ERROR events if the the system is failed to complete some business operation. This can happen if there is an unexpected exception or failed assertion. Error logs can be used to trigger an alert to on-call engineers to look into a potential issue.
+- **WARNING** – Use WARNING to indicate that there *may* be something wrong with the system but that we have not yet detected any immediate impact on the system's ability to successfully complete the business operation. For example, you can warn on failed soft assumptions and soft constraints. Warning logs can be used to trigger notifications that engineers need to look into during business hours.
 
 ### Log messages
 
