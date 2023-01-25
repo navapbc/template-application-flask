@@ -62,10 +62,6 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
     #
 
     EVENTS_TO_LOG = {
-        # Detect when new audit hooks are being added.
-        "sys.addaudithook": (),
-        # Detects any attempt to set the open_code hook.
-        "cpython.PyFile_SetOpenCodeHook": (),
         # Detect dynamic execution of code objects. This only occurs for explicit
         # calls, and is not raised for normal function invocation.
         "exec": ("code_object",),
@@ -73,48 +69,10 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         # parameters to open if available, while flags is provided instead of
         # mode in some cases.
         "open": ("path", "mode", "flags"),
-        # Detect when code is injecting trace functions. Because of the
-        # implementation, exceptions raised from the hook will abort the
-        # operation, but will not be raised in Python code. Note that
-        # threading.setprofile eventually calls this function, so the event
-        # will be audited for each thread.
-        "sys.setprofile": (),
-        # Detect when code is injecting trace functions. Because of the
-        # implementation, exceptions raised from the hook will abort the
-        # operation, but will not be raised in Python code. Note that
-        # threading.settrace eventually calls this function, so the event will
-        # be audited for each thread.
-        "sys.settrace": (),
-        # Detect monkey patching of types and objects. This event is raised for
-        # the __class__ attribute and any attribute on type objects.
-        "object.__setattr__": ("object", "attr", "value"),
-        # Detect deletion of object attributes. This event is raised for any
-        # attribute on type objects.
-        "object.__delattr__": ("object", "attr"),
-        # Detect imports and global name lookup when unpickling.
-        "pickle.find_class": ("module_name", "global_name"),
-        # Notifies hooks they are being cleaned up, mainly in case the event is
-        # triggered unexpectedly. This event cannot be aborted.
-        "sys._clearaudithooks": (),
-        # Detect dynamic creation of code objects. This only occurs for direct
-        # instantiation, and is not raised for normal compilation.
-        "code.__new__": ("bytecode", "filename", "name"),
-        # Detect dynamic creation of function objects. This only occurs for
-        # direct instantiation, and is not raised for normal compilation.
-        "function.__new__": ("code",),
-        # Detect when native modules are used.
-        "ctypes.dlopen": ("module_or_path",),
-        # Collect information about specific symbols retrieved from native modules.
-        "ctypes.dlsym": ("lib_object", "name"),
-        # Detect when code is accessing arbitrary memory using ctypes.
-        "ctypes.cdata": ("ptr_as_int",),
-        # Detects creation of mmap objects. On POSIX, access may have been
-        # calculated from the prot and flags arguments.
-        "mmap.__new__": ("fileno", "map_size", "access", "offset"),
-        # Detect when code is accessing frames directly.
-        "sys._current_frames": (),
         # Detect access to network resources. The address is unmodified from the original call.
         "socket.connect": ("socket", "address"),
+        # Detect when new audit hooks are being added.
+        "sys.addaudithook": (),
         # Detects URL requests.
         "urllib.Request": ("url", "data", "headers", "method"),
     }
