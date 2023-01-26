@@ -5,6 +5,7 @@ import re
 import pytest
 
 import api.logging.formatters as formatters
+from tests.lib.assertions import assert_dict_contains
 
 
 def test_json_formatter(capsys: pytest.CaptureFixture):
@@ -26,7 +27,7 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
         "funcName": "test_json_formatter",
         "foo": "bar",
     }
-    assert json_record | expected == json_record
+    assert_dict_contains(json_record, expected)
 
 
 def test_human_readable_formatter(capsys: pytest.CaptureFixture):
