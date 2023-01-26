@@ -74,7 +74,8 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         # Detect when new audit hooks are being added.
         "sys.addaudithook": (),
         # Detects URL requests.
-        "urllib.Request": ("url", "data", "headers", "method"),
+        # Don't log data or headers because they may contain sensitive information.
+        "urllib.Request": ("url", "_", "_", "method"),
     }
 
     if event_name not in EVENTS_TO_LOG:
@@ -86,7 +87,9 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
 
 def log_audit_event(event_name: str, args: Sequence[Any], arg_names: Sequence[str]) -> None:
     """Log a message but only log recently repeated messages at intervals."""
-    extra = {f"audit.args.{arg_name}": arg for arg_name, arg in zip(arg_names, args)}
+    extra = {
+        f"audit.args.{arg_name}": arg for arg_name, arg in zip(arg_names, args) if arg_name != "_"
+    }
     logger.log(AUDIT, event_name, extra=extra)
 
 
