@@ -2,8 +2,8 @@
 
 This module configures an application's logger to add extra data
 to all log messages. Flask application context data such as the
-app name and request context data such as the request method and
-request url rule are added to the log record.
+app name and request context data such as the request method, request url
+rule, and query parameters are added to the log record.
 
 This module also configures the Flask application to log every
 non-404 request.
@@ -120,9 +120,18 @@ def _get_app_context_info(app: flask.Flask) -> dict:
 
 
 def _get_request_context_info(request: flask.Request) -> dict:
-    return {
+    data = {
         "request.id": request.headers.get("x-amzn-requestid", ""),
         "request.method": request.method,
         "request.path": request.path,
         "request.url_rule": str(request.url_rule),
     }
+
+    # Add query parameter data in the format request.query.<key> = <value>
+    # For example, the query string ?foo=bar&baz=qux would be added as
+    # request.query.foo = bar and request.query.baz = qux
+    # PII should be kept out of the URL, as URLs are logged in access logs.
+    # With that assumption, it is safe to log query parameters.
+    for key, value in request.args.items():
+        data[f"request.query.{key}"] = value
+    return data
