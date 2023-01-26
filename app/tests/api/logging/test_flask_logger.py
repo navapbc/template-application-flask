@@ -5,6 +5,7 @@ import pytest
 from flask import Flask
 
 import api.logging.flask_logger as flask_logger
+from tests.lib.assertions import assert_dict_contains
 
 
 @pytest.fixture
@@ -53,7 +54,7 @@ def test_app_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureFixtu
 
     assert len(caplog.records) == 2
     for record in caplog.records:
-        _assert_dict_contains(record.__dict__, expected_extra)
+        assert_dict_contains(record.__dict__, expected_extra)
 
 
 def test_request_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureFixture):
@@ -69,7 +70,7 @@ def test_request_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureF
 
     assert len(caplog.records) == 2
     for record in caplog.records:
-        _assert_dict_contains(record.__dict__, expected_extra)
+        assert_dict_contains(record.__dict__, expected_extra)
 
 
 def test_add_extra_log_data_for_current_request(app: Flask, caplog: pytest.LogCaptureFixture):
@@ -82,11 +83,4 @@ def test_add_extra_log_data_for_current_request(app: Flask, caplog: pytest.LogCa
     app.test_client().get("/pet/kitty")
 
     last_record = caplog.records[-1]
-    _assert_dict_contains(last_record.__dict__, {"pet.name": "kitty"})
-
-
-def _assert_dict_contains(d: dict, expected: dict) -> None:
-    """Assert that d contains all the key-value pairs in expected.
-    Do this by checking to see if adding `expected` to `d` leaves `d` unchanged.
-    """
-    assert d == d | expected
+    assert_dict_contains(last_record.__dict__, {"pet.name": "kitty"})
