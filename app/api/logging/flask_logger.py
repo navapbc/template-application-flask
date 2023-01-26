@@ -21,6 +21,8 @@ import logging
 
 import flask
 
+EXTRA_LOG_DATA_ATTR = "extra_log_data"
+
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
     """Initialize the Flask app logger.
@@ -47,11 +49,28 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         handler.addFilter(_add_app_context_info_to_log_record)
         handler.addFilter(_add_request_context_info_to_log_record)
 
+    # Add request context data to every log record for the current request
+    # such as request id, request method, request path, and the matching Flask request url rule
+    app.before_request(
+        lambda: add_extra_data_to_current_request_logs(_get_request_context_info(flask.request))
+    )
+
     # Use the app_logger to log every non-404 request before each request
     # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
     app.before_request(lambda: _log_route(app_logger))
 
     app_logger.info("initialized flask logger")
+
+
+def add_extra_data_to_current_request_logs(
+    data: dict[str, str | int | float | bool | None]
+) -> None:
+    """Add data to every log record for the current request."""
+    assert flask.has_request_context(), "Must be in a request context"
+
+    extra_log_data = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
+    extra_log_data.update(data)
+    setattr(flask.g, EXTRA_LOG_DATA_ATTR, extra_log_data)
 
 
 def _log_route(logger: logging.Logger) -> None:
@@ -90,7 +109,8 @@ def _add_request_context_info_to_log_record(record: logging.LogRecord) -> bool:
         return True
 
     assert flask.request is not None
-    record.__dict__ |= _get_request_context_info(flask.request)
+    extra_log_data: dict[str, str] = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
+    record.__dict__.update(extra_log_data)
 
     return True
 
