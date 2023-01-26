@@ -7,6 +7,7 @@ This module also contains lower level connection related functions such as
 make_connection_uri that can be used outside of the application context such as for
 database migrations.
 """
+import logging
 import os
 import urllib.parse
 from typing import Any, Optional
@@ -16,7 +17,6 @@ import sqlalchemy
 import sqlalchemy.pool as pool
 from sqlalchemy.orm import session
 
-import api.logging
 from api.adapters.db.config import DbConfig, get_db_config
 
 # Re-export the Connection type that is returned by the get_connection() method
@@ -27,7 +27,7 @@ Connection = sqlalchemy.engine.Connection
 # to be used for type hints.
 Session = session.Session
 
-logger = api.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class DBClient:

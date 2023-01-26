@@ -1,11 +1,11 @@
+import logging
 from typing import Optional
 
 from pydantic import Field
 
-import api.logging
 from api.util.env_config import PydanticBaseEnvConfig
 
-logger = api.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class DbConfig(PydanticBaseEnvConfig):

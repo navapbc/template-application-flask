@@ -1,3 +1,4 @@
+import logging
 import sys
 from typing import Any
 
@@ -22,6 +23,8 @@ import api.logging  # noqa: E402 isort:skip
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+logger = logging.getLogger("migrations")
 
 # Initialize logging
 api.logging.init("migrations")

@@ -1,61 +1,49 @@
+"""Module for initializing logging configuration for the application.
+
+There are two formatters for the log messages: human-readable and JSON.
+The formatter that is used is determined by the environment variable
+LOG_FORMAT. If the environment variable is not set, the JSON formatter
+is used by default. See api.logging.formatters for more information.
+
+The logger also adds a PII mask filter to the root logger. See
+api.logging.pii for more information.
+
+Usage:
+    import api.logging
+
+    api.logging.init("program name")
+
+Once the module has been initialized, the standard logging module can be
+used to log messages:
+
+Example:
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.info("message")
+"""
+
 import logging
-import logging.config
 import os
 import platform
 import pwd
 import sys
 from typing import Any, cast
 
-from api.logging.log_formatters import HumanReadableFormatter, JsonFormatter
+import api.logging.config as config
+
+logger = logging.getLogger(__name__)
+_original_argv = tuple(sys.argv)
 
 
-def get_logging_config(log_format: str) -> dict[str, Any]:
-    return {
-        "version": 1,
-        "disable_existing_loggers": False,
-        "root": {"handlers": ["console"], "level": "INFO"},
-        "formatters": {
-            "json": {"()": JsonFormatter},
-            "human-readable": {"()": HumanReadableFormatter},
-        },
-        "handlers": {
-            "console": {
-                # Note the formatter specified here points
-                # to the formatter specified above which
-                # in turn points to the format classes
-                "formatter": log_format,
-                "class": "logging.StreamHandler",
-                "level": "INFO",
-            }
-        },
-        "loggers": {
-            "alembic": {"handlers": ["console"], "level": "INFO", "propagate": False},
-            "werkzeug": {"handlers": ["console"], "level": "WARN", "propagate": False},
-            "api": {"handlers": ["console"], "level": "INFO", "propagate": False},
-            # Log DB pool connection invalidations and recycle events. At DEBUG
-            # level includes all connection checkin/checkouts to the pool.
-            #
-            # https://docs.sqlalchemy.org/en/13/core/engines.html#configuring-logging
-            "sqlalchemy.pool": {"handlers": ["console"], "level": "INFO", "propagate": False},
-            # Log PostgreSQL NOTICE messages
-            # https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#notice-logging
-            "sqlalchemy.dialects.postgresql": {
-                "handlers": ["console"],
-                "level": "INFO",
-                "propagate": False,
-            },
-        },
-    }
+def init(program_name: str) -> logging.Logger:
+    root_logger = config.configure_logging()
+
+    log_program_info(program_name)
+    return root_logger
 
 
-def init(program_name: str) -> None:
-    # Determine which log formatter to use
-    # based on the environment variable specified
-    # Defaults to JSON
-    log_format = os.getenv("LOG_FORMAT", "json")
-    logging_config = get_logging_config(log_format)
-    logging.config.dictConfig(logging_config)
-
+def log_program_info(program_name: str) -> None:
     logger.info(
         "start %s: %s %s %s, hostname %s, pid %i, user %i(%s)",
         program_name,
@@ -82,13 +70,4 @@ def init(program_name: str) -> None:
             ),
         },
     )
-    logger.info("invoked as: %s", " ".join(original_argv))
-
-
-def get_logger(name: str) -> logging.Logger:
-    """Return a logger with the specified name."""
-    return logging.getLogger(name)
-
-
-logger = get_logger(__name__)
-original_argv = tuple(sys.argv)
+    logger.info("invoked as: %s", " ".join(_original_argv))

@@ -1,3 +1,4 @@
+import logging
 import os
 import uuid
 from dataclasses import dataclass
@@ -6,9 +7,7 @@ from typing import Any
 import flask
 from apiflask import HTTPTokenAuth, abort
 
-import api.logging
-
-logger = api.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 # Initialize the authorization context
 # this needs to be attached to your
