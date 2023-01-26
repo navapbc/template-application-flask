@@ -90,6 +90,22 @@ def log_audit_event(event_name: str, args: Sequence[Any], arg_names: Sequence[st
     extra = {
         f"audit.args.{arg_name}": arg for arg_name, arg in zip(arg_names, args) if arg_name != "_"
     }
+
+    key = (event_name, repr(args))
+    if key not in audit_message_count:
+        count = 1
+    else:
+        count = audit_message_count[key] + 1
+    audit_message_count[key] = count
+
+    if count > 100 and count % 100 != 0:
+        return
+
+    if count > 10 and count % 10 != 0:
+        return
+
+    extra["count"] = count
+
     logger.log(AUDIT, event_name, extra=extra)
 
 

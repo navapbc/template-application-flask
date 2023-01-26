@@ -5,6 +5,7 @@
 import io
 import logging
 import os
+import pathlib
 import socket
 import sys
 import urllib.request
@@ -110,5 +111,58 @@ def test_audit_hook(
     assert len(caplog.records) == len(expected_records)
     for record, expected_record in zip(caplog.records, expected_records):
         assert record.levelname == "AUDIT"
-        for key, value in expected_record.items():
-            assert record.__dict__[key] == value
+        assert_record_match(record, expected_record)
+
+
+def test_repeated_audit_logs(
+    init_audit_hook, caplog: pytest.LogCaptureFixture, tmp_path: pathlib.Path
+):
+    caplog.set_level(logging.INFO)
+    caplog.clear()
+
+    for _ in range(1000):
+        open(tmp_path / "repeated-audit-logs", "w")
+
+    for r in caplog.records:
+        print(r.__dict__["msg"], r.__dict__["count"])
+
+    expected_records = [
+        {"msg": "open", "count": 1},
+        {"msg": "open", "count": 2},
+        {"msg": "open", "count": 3},
+        {"msg": "open", "count": 4},
+        {"msg": "open", "count": 5},
+        {"msg": "open", "count": 6},
+        {"msg": "open", "count": 7},
+        {"msg": "open", "count": 8},
+        {"msg": "open", "count": 9},
+        {"msg": "open", "count": 10},
+        {"msg": "open", "count": 20},
+        {"msg": "open", "count": 30},
+        {"msg": "open", "count": 40},
+        {"msg": "open", "count": 50},
+        {"msg": "open", "count": 60},
+        {"msg": "open", "count": 70},
+        {"msg": "open", "count": 80},
+        {"msg": "open", "count": 90},
+        {"msg": "open", "count": 100},
+        {"msg": "open", "count": 200},
+        {"msg": "open", "count": 300},
+        {"msg": "open", "count": 400},
+        {"msg": "open", "count": 500},
+        {"msg": "open", "count": 600},
+        {"msg": "open", "count": 700},
+        {"msg": "open", "count": 800},
+        {"msg": "open", "count": 900},
+        {"msg": "open", "count": 1000},
+    ]
+
+    assert len(caplog.records) == len(expected_records)
+    for record, expected_record in zip(caplog.records, expected_records):
+        assert record.levelname == "AUDIT"
+        assert_record_match(record, expected_record)
+
+
+def assert_record_match(record: logging.LogRecord, expected_record: dict[str, Any]):
+    for key, value in expected_record.items():
+        assert record.__dict__[key] == value
