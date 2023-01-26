@@ -36,9 +36,7 @@ def app(logger):
         ("/notfound", ["GET /notfound"]),
     ],
 )
-def test_log_route(
-    app: Flask, logger: logging.Logger, caplog: pytest.LogCaptureFixture, route, expected_messages
-):
+def test_log_route(app: Flask, caplog: pytest.LogCaptureFixture, route, expected_messages):
     app.test_client().get(route)
 
     # Assert that the log messages are present
@@ -73,3 +71,16 @@ def test_request_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureF
     assert len(caplog.records) == 2
     for record in caplog.records:
         assert_dict_contains(record.__dict__, expected_extra)
+
+
+def test_add_extra_log_data_for_current_request(app: Flask, caplog: pytest.LogCaptureFixture):
+    @app.get("/pet/<name>")
+    def pet(name):
+        flask_logger.add_extra_data_to_current_request_logs({"pet.name": name})
+        logging.getLogger("test.pet").info(f"petting {name}")
+        return "ok"
+
+    app.test_client().get("/pet/kitty")
+
+    last_record = caplog.records[-1]
+    assert_dict_contains(last_record.__dict__, {"pet.name": "kitty"})
