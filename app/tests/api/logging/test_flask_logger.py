@@ -64,9 +64,11 @@ def test_request_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureF
         "request.method": "GET",
         "request.path": "/hello/jane",
         "request.url_rule": "/hello/<name>",
+        "request.query.up": "high",
+        "request.query.down": "low",
     }
 
-    app.test_client().get("/hello/jane")
+    app.test_client().get("/hello/jane?up=high&down=low")
 
     assert len(caplog.records) == 2
     for record in caplog.records:
