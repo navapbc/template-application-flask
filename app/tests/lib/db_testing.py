@@ -1,12 +1,12 @@
 """Helper functions for testing database code."""
 import contextlib
+import logging
 import uuid
 
 import api.adapters.db as db
-from api import logging
 from api.adapters.db.config import get_db_config
 
-logger = logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager

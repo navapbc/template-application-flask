@@ -10,10 +10,9 @@ import logging
 import sys
 from typing import Any
 
-import api.logging
 import api.util.collections
 
-logger = api.logging.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 AUDIT = 32
 

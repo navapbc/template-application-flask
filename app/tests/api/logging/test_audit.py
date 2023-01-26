@@ -4,7 +4,7 @@
 
 import logging
 
-from api.logging import audit
+import api.logging.audit as audit
 
 
 def test_audit_hook(caplog):
