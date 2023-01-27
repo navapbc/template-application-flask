@@ -2,8 +2,8 @@
 
 This module configures an application's logger to add extra data
 to all log messages. Flask application context data such as the
-app name and request context data such as the request method and
-request url rule are added to the log record.
+app name and request context data such as the request method, request url
+rule, and query parameters are added to the log record.
 
 This module also configures the Flask application to log every
 non-404 request.
@@ -22,6 +22,7 @@ import logging
 import flask
 
 logger = logging.getLogger(__name__)
+EXTRA_LOG_DATA_ATTR = "extra_log_data"
 
 
 def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
@@ -49,11 +50,28 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         handler.addFilter(_add_app_context_info_to_log_record)
         handler.addFilter(_add_request_context_info_to_log_record)
 
+    # Add request context data to every log record for the current request
+    # such as request id, request method, request path, and the matching Flask request url rule
+    app.before_request(
+        lambda: add_extra_data_to_current_request_logs(_get_request_context_info(flask.request))
+    )
+
     # Use the app_logger to log every non-404 request before each request
     # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
     app.before_request(_log_start_request)
 
     app_logger.info("initialized flask logger")
+
+
+def add_extra_data_to_current_request_logs(
+    data: dict[str, str | int | float | bool | None]
+) -> None:
+    """Add data to every log record for the current request."""
+    assert flask.has_request_context(), "Must be in a request context"
+
+    extra_log_data = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
+    extra_log_data.update(data)
+    setattr(flask.g, EXTRA_LOG_DATA_ATTR, extra_log_data)
 
 
 def _log_start_request() -> None:
@@ -88,7 +106,8 @@ def _add_request_context_info_to_log_record(record: logging.LogRecord) -> bool:
         return True
 
     assert flask.request is not None
-    record.__dict__ |= _get_request_context_info(flask.request)
+    extra_log_data: dict[str, str] = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
+    record.__dict__.update(extra_log_data)
 
     return True
 
@@ -98,9 +117,18 @@ def _get_app_context_info(app: flask.Flask) -> dict:
 
 
 def _get_request_context_info(request: flask.Request) -> dict:
-    return {
+    data = {
         "request.id": request.headers.get("x-amzn-requestid", ""),
         "request.method": request.method,
         "request.path": request.path,
         "request.url_rule": str(request.url_rule),
     }
+
+    # Add query parameter data in the format request.query.<key> = <value>
+    # For example, the query string ?foo=bar&baz=qux would be added as
+    # request.query.foo = bar and request.query.baz = qux
+    # PII should be kept out of the URL, as URLs are logged in access logs.
+    # With that assumption, it is safe to log query parameters.
+    for key, value in request.args.items():
+        data[f"request.query.{key}"] = value
+    return data
