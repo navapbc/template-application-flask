@@ -23,7 +23,7 @@ def app(logger):
     @app.get("/hello/<name>")
     def hello(name):
         logging.getLogger("api.hello").info(f"hello, {name}!")
-        return {"data": "ok"}
+        return "ok"
 
     flask_logger.init_app(logger, app)
     return app
@@ -32,7 +32,7 @@ def app(logger):
 @pytest.mark.parametrize(
     "route,expected_extras",
     [
-        (
+        pytest.param(
             "/hello/jane",
             [
                 {"msg": "start request"},
@@ -40,13 +40,14 @@ def app(logger):
                 {
                     "msg": "end request",
                     "response.status_code": 200,
-                    "response.content_length": 14,
-                    "response.content_type": "application/json",
-                    "response.mimetype": "application/json",
+                    "response.content_length": 2,
+                    "response.content_type": "text/html; charset=utf-8",
+                    "response.mimetype": "text/html",
                 },
             ],
+            id="200",
         ),
-        (
+        pytest.param(
             "/notfound",
             [
                 {"msg": "start request"},
@@ -54,10 +55,11 @@ def app(logger):
                     "msg": "end request",
                     "response.status_code": 404,
                     "response.content_length": 207,
-                    "response.content_type": "application/json",
-                    "response.mimetype": "application/json",
+                    "response.content_type": "text/html; charset=utf-8",
+                    "response.mimetype": "text/html",
                 },
             ],
+            id="404",
         ),
     ],
 )
