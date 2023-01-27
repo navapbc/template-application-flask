@@ -80,7 +80,7 @@ P = ParamSpec("P")
 T = TypeVar("T")
 
 
-def with_db_client(f: Callable[Concatenate[db.Session, P], T]) -> Callable[P, T]:
+def with_db_client(f: Callable[Concatenate[db.DBClient, P], T]) -> Callable[P, T]:
     """Decorator for functions that need the database client.
 
     This decorator will get the database client from the extensions dictionary
