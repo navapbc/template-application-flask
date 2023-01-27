@@ -56,9 +56,8 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         lambda: add_extra_data_to_current_request_logs(_get_request_context_info(flask.request))
     )
 
-    # Use the app_logger to log every non-404 request before each request
-    # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
     app.before_request(_log_start_request)
+    app.after_request(_log_end_request)
 
     app_logger.info("initialized flask logger")
 
@@ -77,10 +76,26 @@ def add_extra_data_to_current_request_logs(
 def _log_start_request() -> None:
     """Log the start of a request.
 
+    This function handles the Flask's before_request event.
+    See https://tedboy.github.io/flask/interface_api.application_object.html#flask.Flask.before_request
+
     Additional info about the request will be in the `extra` field
     added by `_add_request_context_info_to_log_record`
     """
     logger.info("start request")
+
+
+def _log_end_request(response: flask.Response) -> flask.Response:
+    """Log the end of a request.
+
+    This function handles the Flask's after_request event.
+    See https://tedboy.github.io/flask/interface_api.application_object.html#flask.Flask.after_request
+
+    Additional info about the request will be in the `extra` field
+    added by `_add_request_context_info_to_log_record`
+    """
+    logger.info("end request")
+    return response
 
 
 def _add_app_context_info_to_log_record(record: logging.LogRecord) -> bool:
