@@ -94,7 +94,16 @@ def _log_end_request(response: flask.Response) -> flask.Response:
     Additional info about the request will be in the `extra` field
     added by `_add_request_context_info_to_log_record`
     """
-    logger.info("end request")
+
+    logger.info(
+        "end request",
+        extra={
+            "response.status_code": response.status_code,
+            "response.content_length": response.content_length,
+            "response.content_type": response.content_type,
+            "response.mimetype": response.mimetype,
+        },
+    )
     return response
 
 

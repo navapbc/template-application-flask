@@ -23,27 +23,57 @@ def app(logger):
     @app.get("/hello/<name>")
     def hello(name):
         logging.getLogger("api.hello").info(f"hello, {name}!")
-        return "ok"
+        return {"data": "ok"}
 
     flask_logger.init_app(logger, app)
     return app
 
 
 @pytest.mark.parametrize(
-    "route,expected_messages",
+    "route,expected_extras",
     [
-        ("/hello/jane", ["start request", "hello, jane!", "end request"]),
-        ("/notfound", ["start request", "end request"]),
+        (
+            "/hello/jane",
+            [
+                {"msg": "start request"},
+                {"msg": "hello, jane!"},
+                {
+                    "msg": "end request",
+                    "response.status_code": 200,
+                    "response.content_length": 14,
+                    "response.content_type": "application/json",
+                    "response.mimetype": "application/json",
+                },
+            ],
+        ),
+        (
+            "/notfound",
+            [
+                {"msg": "start request"},
+                {
+                    "msg": "end request",
+                    "response.status_code": 404,
+                    "response.content_length": 207,
+                    "response.content_type": "application/json",
+                    "response.mimetype": "application/json",
+                },
+            ],
+        ),
     ],
 )
-def test_log_route(app: Flask, caplog: pytest.LogCaptureFixture, route, expected_messages):
+def test_request_lifecycle_logs(
+    app: Flask, caplog: pytest.LogCaptureFixture, route, expected_extras
+):
     app.test_client().get(route)
 
     # Assert that the log messages are present
     # There should be the route log message that is logged in the before_request handler
     # as part of every request, followed by the log message in the route handler itself.
+    # then the log message in the after_request handler.
 
-    assert caplog.messages == expected_messages
+    assert len(caplog.records) == len(expected_extras)
+    for record, expected_extra in zip(caplog.records, expected_extras):
+        assert_dict_contains(record.__dict__, expected_extra)
 
 
 def test_app_context_extra_attributes(app: Flask, caplog: pytest.LogCaptureFixture):
