@@ -15,6 +15,17 @@ def test_get_db(app: Flask):
     assert response.get_json() == {"data": "hello, world"}
 
 
+def test_with_db_client(app: Flask):
+    @app.route("/hello")
+    @flask_db.with_db_client
+    def hello(db_client: db.DBClient):
+        with db_client.get_connection() as conn:
+            return {"data": conn.scalar(text("SELECT 'hello, world'"))}
+
+    response = app.test_client().get("/hello")
+    assert response.get_json() == {"data": "hello, world"}
+
+
 def test_with_db_session(app: Flask):
     @app.route("/hello")
     @flask_db.with_db_session

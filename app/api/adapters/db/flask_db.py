@@ -80,6 +80,30 @@ P = ParamSpec("P")
 T = TypeVar("T")
 
 
+def with_db_client(f: Callable[Concatenate[db.Session, P], T]) -> Callable[P, T]:
+    """Decorator for functions that need the database client.
+
+    This decorator will get the database client from the extensions dictionary
+    of the current Flask app and pass it to the function as the first positional
+    argument.
+
+    Usage:
+        @with_db_client
+        def foo(db_client: db.DBClient):
+            ...
+
+        @with_db_client
+        def bar(db_client: db.DBClient, x, y):
+            ...
+    """
+
+    @wraps(f)
+    def wrapper(*args: Any, **kwargs: Any) -> T:
+        return f(get_db(current_app), *args, **kwargs)
+
+    return wrapper
+
+
 def with_db_session(f: Callable[Concatenate[db.Session, P], T]) -> Callable[P, T]:
     """Decorator for functions that need a database session.
 
