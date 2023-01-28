@@ -28,7 +28,7 @@ For more complex usages, it is recommended you put the implementation into a sep
 
 # Swagger
 
-The Swagger UI  can be reached locally at [http://localhost:8080/v1/docs](http://localhost:8080/v1/docs) when running the API. The UI is based on the [openapi.yml](/app/openapi.yml) file.
+The Swagger UI  can be reached locally at [http://localhost:8080/docs](http://localhost:8080/docs) when running the API. The UI is based on the [openapi.yml](/app/openapi.yml) file.
 ![Swagger UI](/docs/app/images/swagger-ui.png)
 
 Each of the endpoints you've described in your openapi.yml file will appear here, organized based on their defined tags. For any endpoints with authentication added, you can add your authentication information by selecting `Authorize` in the top right.

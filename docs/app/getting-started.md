@@ -1,14 +1,14 @@
 # Getting started
 
-This application is dockerized. Take a look at [Dockerfile](./app/Dockerfile) to see how it works.
+This application is dockerized. Take a look at [Dockerfile](/app/Dockerfile) to see how it works.
 
-A very simple [docker-compose.yml](./docker-compose.yml) has been included to support local development and deployment. Take a look at [docker-compose.yml](./docker-compose.yml) for more information.
+A very simple [docker-compose.yml](/docker-compose.yml) has been included to support local development and deployment. Take a look at [docker-compose.yml](/docker-compose.yml) for more information.
 
 ## Prerequisites
 
 **Note:** Run everything from within the `/app` folder:
 
-1. Install the version of Python specified in [.python-version](../../app/.python-version)
+1. Install the version of Python specified in [.python-version](/app/.python-version)
    [pyenv](https://github.com/pyenv/pyenv#installation) is one popular option for installing Python,
    or [asdf](https://asdf-vm.com/).
 
