@@ -29,39 +29,42 @@ def app(logger):
     return app
 
 
+test_request_lifecycle_logs_data = [
+    pytest.param(
+        "/hello/jane",
+        [
+            {"msg": "start request"},
+            {"msg": "hello, jane!"},
+            {
+                "msg": "end request",
+                "response.status_code": 200,
+                "response.content_length": 2,
+                "response.content_type": "text/html; charset=utf-8",
+                "response.mimetype": "text/html",
+            },
+        ],
+        id="200",
+    ),
+    pytest.param(
+        "/notfound",
+        [
+            {"msg": "start request"},
+            {
+                "msg": "end request",
+                "response.status_code": 404,
+                "response.content_length": 207,
+                "response.content_type": "text/html; charset=utf-8",
+                "response.mimetype": "text/html",
+            },
+        ],
+        id="404",
+    ),
+]
+
+
 @pytest.mark.parametrize(
     "route,expected_extras",
-    [
-        pytest.param(
-            "/hello/jane",
-            [
-                {"msg": "start request"},
-                {"msg": "hello, jane!"},
-                {
-                    "msg": "end request",
-                    "response.status_code": 200,
-                    "response.content_length": 2,
-                    "response.content_type": "text/html; charset=utf-8",
-                    "response.mimetype": "text/html",
-                },
-            ],
-            id="200",
-        ),
-        pytest.param(
-            "/notfound",
-            [
-                {"msg": "start request"},
-                {
-                    "msg": "end request",
-                    "response.status_code": 404,
-                    "response.content_length": 207,
-                    "response.content_type": "text/html; charset=utf-8",
-                    "response.mimetype": "text/html",
-                },
-            ],
-            id="404",
-        ),
-    ],
+    test_request_lifecycle_logs_data,
 )
 def test_request_lifecycle_logs(
     app: Flask, caplog: pytest.LogCaptureFixture, route, expected_extras
