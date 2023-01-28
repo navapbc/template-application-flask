@@ -74,7 +74,7 @@ def format_line(
     extra: Mapping[str, str],
 ) -> str:
     """Format log fields as a coloured string."""
-    return "%s  %s%-36s%s %-28s %s%-8s %-50s %s%s%s" % (
+    return "%s  %s%-36s%s %-28s %s%-8s %-80s %s%s%s" % (
         format_datetime(created),
         colour_for_name(name),
         name,
