@@ -22,6 +22,7 @@ root
 │       └── route               API route definitions
 │           └── handler         API route implementations
 │       └── scripts             Backend scripts that run separate from the application
+|       └── services            Methods for service layer
 │       └── util                Utility methods and classes useful to most areas of the code
 │
 │   └── tests
@@ -37,7 +38,7 @@ root
 ## Information
 
 * [API Technical Overview](./technical-overview.md)
-* [Database Migrations](./database-migrations.md)
+* [Database Migrations](./database/database-migrations.md)
 * [Formatting and Linting](./formatting-and-linting.md)
 * [Writing Tests](./writing-tests.md)
 
@@ -47,7 +48,7 @@ root
 
 `make clean-volumes` will spin down the docker containers + delete the volumes. This can be useful to reset your DB, or fix any bad states your local environment may have gotten into.
 
-See the [Makefile](./app/Makefile) for a full list of commands you can run.
+See the [Makefile](/app/Makefile) for a full list of commands you can run.
 
 ## Docker and Native Development
 
@@ -67,9 +68,9 @@ Running in the native/local approach may require additional packages to be insta
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](./app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](./docker-compose.yml) file, and loaded [by a script](./app/api/util/local.py) automatically when running most other components outside the container.
+Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/docker-compose.yml) file, and loaded [by a script](/app/api/util/local.py) automatically when running most other components outside the container.
 
-Any environment variables specified directly in the [docker-compose](./docker-compose.yml) file will take precedent over those specified in the [local.env](./app/local.env) file.
+Any environment variables specified directly in the [docker-compose](/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
 
 ## Authentication
 
