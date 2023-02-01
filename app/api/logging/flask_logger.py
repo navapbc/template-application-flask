@@ -21,6 +21,7 @@ import logging
 
 import flask
 
+logger = logging.getLogger(__name__)
 EXTRA_LOG_DATA_ATTR = "extra_log_data"
 
 
@@ -55,9 +56,8 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         lambda: add_extra_data_to_current_request_logs(_get_request_context_info(flask.request))
     )
 
-    # Use the app_logger to log every non-404 request before each request
-    # See https://flask.palletsprojects.com/en/2.2.x/api/#flask.Flask.before_request
-    app.before_request(lambda: _log_route(app_logger))
+    app.before_request(_log_start_request)
+    app.after_request(_log_end_request)
 
     app_logger.info("initialized flask logger")
 
@@ -73,17 +73,38 @@ def add_extra_data_to_current_request_logs(
     setattr(flask.g, EXTRA_LOG_DATA_ATTR, extra_log_data)
 
 
-def _log_route(logger: logging.Logger) -> None:
-    """Log the route that is being requested.
+def _log_start_request() -> None:
+    """Log the start of a request.
 
-    If there is no matching route, then do not log anything.
+    This function handles the Flask's before_request event.
+    See https://tedboy.github.io/flask/interface_api.application_object.html#flask.Flask.before_request
+
+    Additional info about the request will be in the `extra` field
+    added by `_add_request_context_info_to_log_record`
     """
-    assert flask.request is not None
-    request = flask.request
-    if request.url_rule:
-        logger.info(f"{request.method} {request.url_rule}")
-    else:
-        logger.info(f"{request.method} {request.path}")
+    logger.info("start request")
+
+
+def _log_end_request(response: flask.Response) -> flask.Response:
+    """Log the end of a request.
+
+    This function handles the Flask's after_request event.
+    See https://tedboy.github.io/flask/interface_api.application_object.html#flask.Flask.after_request
+
+    Additional info about the request will be in the `extra` field
+    added by `_add_request_context_info_to_log_record`
+    """
+
+    logger.info(
+        "end request",
+        extra={
+            "response.status_code": response.status_code,
+            "response.content_length": response.content_length,
+            "response.content_type": response.content_type,
+            "response.mimetype": response.mimetype,
+        },
+    )
+    return response
 
 
 def _add_app_context_info_to_log_record(record: logging.LogRecord) -> bool:

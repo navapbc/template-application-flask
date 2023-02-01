@@ -7,7 +7,7 @@ from alembic import context
 
 # Alembic cli seems to reset the path on load causing issues with local module imports.
 # Workaround is to force set the path to the current run directory (top level api folder)
-# See database migrations section in `api/README.md` for details about running migrations.
+# See database migrations section in `./database/database-migrations.md` for details about running migrations.
 sys.path.insert(0, ".")  # noqa: E402
 
 # Load env vars before anything further
