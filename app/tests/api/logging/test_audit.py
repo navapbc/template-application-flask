@@ -8,6 +8,7 @@ import os
 import pathlib
 import signal
 import socket
+import subprocess
 import sys
 import urllib.request
 from typing import Any, Callable
@@ -74,6 +75,18 @@ test_audit_hook_data = [
             }
         ],
         id="os.rename",
+    ),
+    pytest.param(
+        subprocess.Popen,
+        (["/usr/bin/git", "commit", "-m", "Fixes a bug."],),
+        [
+            {
+                "msg": "subprocess.Popen",
+                "audit.args.executable": "/usr/bin/git",
+                "audit.args.args": ["/usr/bin/git", "commit", "-m", "Fixes a bug."],
+            }
+        ],
+        id="subprocess.Popen",
     ),
     pytest.param(
         os.open,
