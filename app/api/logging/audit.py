@@ -15,7 +15,7 @@ import api.util.collections
 logger = logging.getLogger(__name__)
 
 AUDIT = 32
-
+logging.INFO
 logging.addLevelName(AUDIT, "AUDIT")
 
 
@@ -41,6 +41,7 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         "open": ("path", "mode", "flags"),
         # Detect access to network resources. The address is unmodified from the original call.
         "socket.connect": ("socket", "address"),
+        "socket.getaddrinfo": ("host", "port", "family", "type", "protocol"),
         # Detect when new audit hooks are being added.
         "sys.addaudithook": (),
         # Detects URL requests.

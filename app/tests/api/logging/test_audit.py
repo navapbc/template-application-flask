@@ -76,15 +76,26 @@ test_audit_hook_data = [
         id="socket.connect",
     ),
     pytest.param(
+        socket.getaddrinfo,
+        ("www.python.org", 80),
+        [{"msg": "socket.getaddrinfo", "audit.args.host": "www.python.org", "audit.args.port": 80}],
+        id="socket.getaddrinfo",
+    ),
+    pytest.param(
         urllib.request.urlopen,
         ("https://www.python.org",),
-        # urllib.request.urlopen calls socket.connect under the hood, which
-        # triggers another audit log entry
+        # urllib.request.urlopen calls socket.getaddrinfo and socket.connect under the hood,
+        # both of which trigger audit log entries
         [
             {
                 "msg": "urllib.Request",
                 "audit.args.url": "https://www.python.org",
                 "audit.args.method": "GET",
+            },
+            {
+                "msg": "socket.getaddrinfo",
+                "audit.args.host": "www.python.org",
+                "audit.args.port": 443,
             },
             {
                 "msg": "socket.connect",
