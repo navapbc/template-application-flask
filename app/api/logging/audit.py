@@ -41,6 +41,8 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         "open": ("path", "mode", "flags"),
         # Detect when a signal is sent to a process.
         "os.kill": ("pid", "sig"),
+        # Detect when a file is renamed.
+        "os.rename": ("src", "dst", "src_dir_fd", "dst_dir_fd"),
         # Detect access to network resources. The address is unmodified from the original call.
         "socket.connect": ("socket", "address"),
         "socket.getaddrinfo": ("host", "port", "family", "type", "protocol"),

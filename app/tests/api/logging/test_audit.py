@@ -64,6 +64,18 @@ test_audit_hook_data = [
         id="os.kill",
     ),
     pytest.param(
+        os.rename,
+        ("/tmp/oldname", "/tmp/newname"),
+        [
+            {
+                "msg": "os.rename",
+                "audit.args.src": "/tmp/oldname",
+                "audit.args.dst": "/tmp/newname",
+            }
+        ],
+        id="os.rename",
+    ),
+    pytest.param(
         os.open,
         ("/dev/null", os.O_RDWR | os.O_CREAT, 0o777),
         [
