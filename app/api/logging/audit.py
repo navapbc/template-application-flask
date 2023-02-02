@@ -39,6 +39,8 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
         # parameters to open if available, while flags is provided instead of
         # mode in some cases.
         "open": ("path", "mode", "flags"),
+        # Detect when a signal is sent to a process.
+        "os.kill": ("pid", "sig"),
         # Detect access to network resources. The address is unmodified from the original call.
         "socket.connect": ("socket", "address"),
         "socket.getaddrinfo": ("host", "port", "family", "type", "protocol"),

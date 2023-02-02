@@ -6,6 +6,7 @@ import io
 import logging
 import os
 import pathlib
+import signal
 import socket
 import sys
 import urllib.request
@@ -49,6 +50,18 @@ test_audit_hook_data = [
             }
         ],
         id="io.open",
+    ),
+    pytest.param(
+        os.kill,
+        (-1, signal.SIGTERM),  # Using PID=-1 since it should not ever be a valid PID
+        [
+            {
+                "msg": "os.kill",
+                "audit.args.pid": -1,
+                "audit.args.sig": signal.SIGTERM,
+            }
+        ],
+        id="os.kill",
     ),
     pytest.param(
         os.open,
@@ -117,7 +130,10 @@ def test_audit_hook(
     caplog.set_level(logging.INFO)
     caplog.clear()
 
-    func(*args)
+    try:
+        func(*args)
+    except Exception:
+        pass
 
     assert len(caplog.records) == len(expected_records)
     for record, expected_record in zip(caplog.records, expected_records):
