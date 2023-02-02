@@ -166,6 +166,16 @@ def test_audit_hook(
         assert_record_match(record, expected_record)
 
 
+def test_do_not_log_sensitive_args(
+    init_audit_hook,
+    caplog: pytest.LogCaptureFixture,
+    monkeypatch: pytest.MonkeyPatch,
+):
+    monkeypatch.setenv("FOO", "sensitive-data")
+    subprocess.Popen(["ls"], env=os.environ)
+    assert "sensitive-data" not in str(caplog.records[0].__dict__)
+
+
 def test_repeated_audit_logs(
     init_audit_hook, caplog: pytest.LogCaptureFixture, tmp_path: pathlib.Path
 ):
