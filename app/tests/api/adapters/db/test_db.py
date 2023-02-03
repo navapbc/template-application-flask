@@ -75,7 +75,6 @@ def test_make_connection_uri(username_password_port, expected):
     )
 
 
-# Include db_client fixture to set environment variables needed by get_db_config
 def test_get_connection_parameters_require_environment(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.delenv("ENVIRONMENT")
     db_config = get_db_config()
@@ -83,7 +82,6 @@ def test_get_connection_parameters_require_environment(monkeypatch: pytest.Monke
         get_connection_parameters(db_config)
 
 
-# Include db_client fixture to set environment variables needed by get_db_config
 def test_get_connection_parameters(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("ENVIRONMENT", "production")
     db_config = get_db_config()
@@ -101,20 +99,17 @@ def test_get_connection_parameters(monkeypatch: pytest.MonkeyPatch):
     )
 
 
-# Include db_client fixture to set environment variables needed by get_db_config
 def test_db_connection():
     db_client = db.init(check_db_connection=False)
     with db_client.get_connection() as conn:
         assert conn.scalar(text("SELECT 1")) == 1
 
 
-# Include db_client fixture to set environment variables needed by get_db_config
 def test_check_db_connection(caplog):
     db.init(check_db_connection=True)
     assert "database connection is not using SSL" in caplog.messages
 
 
-# Include db_client fixture to set environment variables needed by get_db_config
 def test_get_session():
     client = db.init(check_db_connection=False)
     with client.get_session() as session:
