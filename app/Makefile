@@ -121,8 +121,10 @@ db-migrate-heads: ## Show migrations marked as a head
 # Testing
 ##################################################
 
+# Turn off log capture for failed tests by default.
+# To re-enable log capture, run `make test args="--show-capture=all"`
 test: ## Run all tests except for audit logging tests
-	$(PY_RUN_CMD) pytest -m "not audit" $(args)
+	$(PY_RUN_CMD) pytest -m "not audit" --show-capture=no $(args)
 
 test-audit: ## Run audit logging tests
 	$(PY_RUN_CMD) pytest -m "audit" $(args)
