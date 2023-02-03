@@ -100,5 +100,8 @@ filterwarnings = [
   "ignore::DeprecationWarning:apispec.*",
   "ignore::DeprecationWarning:certifi.*"] # pytest-watch errors if the closing bracket is on it's own line
 
+markers = [
+  "audit: mark a test as a security audit log test, to be run isolated from other tests"]
+
 [tool.coverage.run]
 omit = ["api/db/migrations/*.py"]
