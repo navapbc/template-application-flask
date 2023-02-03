@@ -41,18 +41,6 @@ test_audit_hook_data = [
         id="open",
     ),
     pytest.param(
-        os.kill,
-        (-1, signal.SIGTERM),  # Using PID=-1 since it should not ever be a valid PID
-        [
-            {
-                "msg": "os.kill",
-                "audit.args.pid": -1,
-                "audit.args.sig": signal.SIGTERM,
-            }
-        ],
-        id="os.kill",
-    ),
-    pytest.param(
         os.rename,
         ("/tmp/oldname", "/tmp/newname"),
         [
@@ -154,10 +142,28 @@ def test_audit_hook(
         assert_record_match(record, expected_record)
 
 
+def test_os_kill(init_audit_hook, caplog: pytest.LogCaptureFixture):
+    # Start a process to kill
+    process = subprocess.Popen("cat")
+    os.kill(process.pid, signal.SIGTERM)
+
+    expected_records = [
+        {"msg": "subprocess.Popen"},
+        {
+            "msg": "os.kill",
+            "audit.args.pid": process.pid,
+            "audit.args.sig": signal.SIGTERM,
+        },
+    ]
+
+    assert len(caplog.records) == len(expected_records)
+    for record, expected_record in zip(caplog.records, expected_records):
+        assert record.levelname == "AUDIT"
+        assert_record_match(record, expected_record)
+
+
 def test_do_not_log_popen_env(
-    init_audit_hook,
-    caplog: pytest.LogCaptureFixture,
-    monkeypatch: pytest.MonkeyPatch,
+    init_audit_hook, caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch
 ):
     monkeypatch.setenv("FOO", "SENSITIVE-DATA")
     subprocess.Popen(["ls"], env=os.environ)

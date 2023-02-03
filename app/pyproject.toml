@@ -83,6 +83,10 @@ warn_unused_ignores = true
 
 plugins = ["sqlalchemy.ext.mypy.plugin"]
 
+[tool.bandit]
+# Ignore audit logging test file since test audit logging requires a lot of operations that trigger bandit warnings
+exclude_dirs = ["./tests/api/logging/test_audit.py"]
+
 [[tool.mypy.overrides]]
 # Migrations are generated without "-> None"
 # for the returns. Rather than require manually
@@ -102,3 +106,4 @@ filterwarnings = [
 
 [tool.coverage.run]
 omit = ["api/db/migrations/*.py"]
+
