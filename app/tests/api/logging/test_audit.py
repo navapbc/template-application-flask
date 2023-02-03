@@ -42,19 +42,6 @@ test_audit_hook_data = [
         id="open",
     ),
     pytest.param(
-        io.open,
-        ("/dev/null", "w"),
-        [
-            {
-                "msg": "open",
-                "audit.args.path": "/dev/null",
-                "audit.args.mode": "w",
-                "audit.args.flags": 524865,
-            }
-        ],
-        id="io.open",
-    ),
-    pytest.param(
         os.kill,
         (-1, signal.SIGTERM),  # Using PID=-1 since it should not ever be a valid PID
         [
