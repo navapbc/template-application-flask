@@ -62,6 +62,15 @@ def handle_audit_event(event_name: str, args: tuple[Any, ...]) -> None:
     log_audit_event(event_name, args, arg_names)
 
 
+# Set the audit hook to be traceable so that coverage module can track calls to it
+# The coverage module relies on Python's trace hooks
+# (See https://coverage.readthedocs.io/en/7.1.0/howitworks.html#execution)
+# According to the docs for sys.addaudithook, the audit hook is only traced if the callable
+# has a __cantrace__ member that is set to a true value.
+# (See https://docs.python.org/3/library/sys.html#sys.addaudithook)
+handle_audit_event.__cantrace__ = True
+
+
 def log_audit_event(event_name: str, args: Sequence[Any], arg_names: Sequence[str]) -> None:
     """Log a message but only log recently repeated messages at intervals."""
     extra = {
