@@ -164,7 +164,7 @@ lint-poetry-version: ## Check poetry version
 	grep --quiet 'lock-version = "1.1"' poetry.lock
 
 lint-security: # https://bandit.readthedocs.io/en/latest/index.html
-	$(PY_RUN_CMD) bandit -r . --number 3 --skip B101 -ll -x ./.venv
+	$(PY_RUN_CMD) bandit -c pyproject.toml -r . --number 3 --skip B101 -ll -x ./.venv
 
 
 ##################################################
