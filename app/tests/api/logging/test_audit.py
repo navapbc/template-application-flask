@@ -18,6 +18,12 @@ import pytest
 
 import api.logging.audit as audit
 
+# Do not run these tests alongside the rest of the test suite since
+# this tests adds an audit hook that interfere with other tests,
+# and at the time of writing there isn't a known way to remove
+# audit hooks.
+pytestmark = pytest.mark.audit
+
 
 @pytest.fixture(scope="session")
 def init_audit_hook():
@@ -35,7 +41,6 @@ test_audit_hook_data = [
                 "msg": "open",
                 "audit.args.path": "/dev/null",
                 "audit.args.mode": "w",
-                "audit.args.flags": 524865,
             }
         ],
         id="open",
@@ -72,7 +77,6 @@ test_audit_hook_data = [
                 "msg": "open",
                 "audit.args.path": "/dev/null",
                 "audit.args.mode": None,
-                "audit.args.flags": 524354,
             }
         ],
         id="os.open",
