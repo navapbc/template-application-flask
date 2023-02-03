@@ -125,6 +125,7 @@ db-migrate-heads: ## Show migrations marked as a head
 # To re-enable display of captured logs when tests fail, run `make test args="--show-capture=all"`
 # Or to turn off capturing of logs (and have logs print to stdout in realtime), run `make test args="--capture=no"`
 # or for short `make test args="-s"`
+# See https://docs.pytest.org/en/latest/how-to/capture-stdout-stderr.html#how-to-capture-stdout-stderr-output
 test: ## Run all tests except for audit logging tests
 	$(PY_RUN_CMD) pytest -m "not audit" --show-capture=no $(args)
 
