@@ -2,7 +2,6 @@
 # Tests for api.logging.audit.
 #
 
-import io
 import logging
 import os
 import pathlib
