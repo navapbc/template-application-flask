@@ -144,7 +144,7 @@ def test_audit_hook(
 
 def test_os_kill(init_audit_hook, caplog: pytest.LogCaptureFixture):
     # Start a process to kill
-    process = subprocess.Popen("ls")
+    process = subprocess.Popen("cat")
     os.kill(process.pid, signal.SIGTERM)
 
     expected_records = [
