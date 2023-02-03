@@ -10,6 +10,8 @@ import signal
 import socket
 import subprocess
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 from typing import Any, Callable
 
@@ -166,14 +168,31 @@ def test_audit_hook(
         assert_record_match(record, expected_record)
 
 
-def test_do_not_log_sensitive_args(
+def test_do_not_log_popen_env(
     init_audit_hook,
     caplog: pytest.LogCaptureFixture,
     monkeypatch: pytest.MonkeyPatch,
 ):
-    monkeypatch.setenv("FOO", "sensitive-data")
+    monkeypatch.setenv("FOO", "SENSITIVE-DATA")
     subprocess.Popen(["ls"], env=os.environ)
-    assert "sensitive-data" not in str(caplog.records[0].__dict__)
+    for record in caplog.records:
+        assert "SENSITIVE-DATA" not in str(record.__dict__)
+
+
+def test_do_not_log_request_data(
+    init_audit_hook,
+    caplog: pytest.LogCaptureFixture,
+):
+    data = urllib.parse.urlencode({"foo": "SENSITIVE-DATA"}).encode()
+    req = urllib.request.Request("https://www.python.org", data=data)
+    req.add_header("X-Bar", "SENSITIVE-DATA")
+    try:
+        urllib.request.urlopen(req)
+    except urllib.error.HTTPError:
+        pass
+
+    for record in caplog.records:
+        assert "SENSITIVE-DATA" not in str(record.__dict__)
 
 
 def test_repeated_audit_logs(
