@@ -111,7 +111,7 @@ def test_check_db_connection(caplog):
 
 
 def test_get_session():
-    client = db.init(check_db_connection=False)
-    with client.get_session() as session:
+    db_client = db.init(check_db_connection=False)
+    with db_client.get_session() as session:
         with session.begin():
             assert session.scalar(text("SELECT 1")) == 1
