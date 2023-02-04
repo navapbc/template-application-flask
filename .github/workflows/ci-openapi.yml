@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - app/**
+      - Makefile
       - .github/workflows/ci-openapi.yml
 
 defaults:
