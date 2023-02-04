@@ -12,6 +12,14 @@ defaults:
   run:
     working-directory: ./app
 
+# Only trigger run one update of the OpenAPI spec at a time on the branch.
+# If new commits are pushed to the branch, cancel in progress runs and start
+# a new one.
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+
 jobs:
   update-openapi-docs:
     runs-on: ubuntu-latest
