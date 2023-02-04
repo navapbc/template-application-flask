@@ -18,10 +18,6 @@ def create_isolated_db(monkeypatch) -> None:
     """
     schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
-    monkeypatch.setenv("POSTGRES_DB", "main-db")
-    monkeypatch.setenv("POSTGRES_USER", "local_db_user")
-    monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
-    monkeypatch.setenv("ENVIRONMENT", "local")
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
