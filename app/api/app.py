@@ -21,11 +21,11 @@ logger = logging.getLogger(__name__)
 def create_app() -> APIFlask:
     app = APIFlask(__name__)
 
-    db_client = db.init()
-    flask_db.init_app(db_client, app)
-
     root_logger = api.logging.init(__package__)
     flask_logger.init_app(root_logger, app)
+
+    db_client = db.init()
+    flask_db.init_app(db_client, app)
 
     configure_app(app)
     register_blueprints(app)
