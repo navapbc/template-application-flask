@@ -138,7 +138,9 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 ####################
 
 
-@pytest.fixture
+# Make app session scoped so the database connection pool is only created once
+# for the test session. This speeds up the tests.
+@pytest.fixture(scope="session")
 def app():
     return app_entry.create_app()
 
