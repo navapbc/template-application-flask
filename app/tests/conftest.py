@@ -133,20 +133,14 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
         yield session
 
 
-@pytest.fixture
-def test_logger():
-    api.logging.init(__package__)
-    return logging.getLogger(__package__)
-
-
 ####################
 # Test App & Client
 ####################
 
 
 @pytest.fixture
-def app(db_client, test_logger):
-    return app_entry.create_app(db_client=db_client, app_logger=test_logger)
+def app():
+    return app_entry.create_app()
 
 
 @pytest.fixture

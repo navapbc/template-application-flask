@@ -22,10 +22,8 @@ def main() -> None:
     app_config = AppConfig()
 
     api.logging.audit.init()
-    root_logger = api.logging.init(__package__)
+    app = api.app.create_app()
 
-    db_client = db.init()
-    app = api.app.create_app(db_client=db_client, app_logger=root_logger)
     environment = app_config.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be

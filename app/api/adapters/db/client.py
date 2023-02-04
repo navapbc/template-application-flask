@@ -10,7 +10,7 @@ database migrations.
 import logging
 import os
 import urllib.parse
-from typing import Any, Optional
+from typing import Any
 
 import psycopg2
 import sqlalchemy
@@ -40,7 +40,14 @@ class DBClient:
     _engine: sqlalchemy.engine.Engine
 
     def __init__(self) -> None:
-        self._engine = _create_db_engine()
+        self.config = get_db_config()
+        self._engine = _create_db_engine(self.config)
+
+        # Try connecting to the database immediately upon initialization
+        # so that we can fail fast if the database is not available.
+        # Checking the db connection on db init is disabled in tests.
+        if self.config.check_connection_on_init:
+            self.check_db_connection()
 
     def get_connection(self) -> Connection:
         """Return a new database connection object.
@@ -97,15 +104,8 @@ class DBClient:
             #     have_all_migrations_run(engine)
 
 
-def init(*, check_db_connection: bool = True) -> DBClient:
-    db = DBClient()
-
-    # Try connecting to the database immediately upon initialization
-    # so that we can fail fast if the database is not available.
-    # Checking the db connection on db init is disabled in tests.
-    if check_db_connection:
-        db.check_db_connection()
-    return db
+def init() -> DBClient:
+    return DBClient()
 
 
 def verify_ssl(connection_info: Any) -> None:
@@ -124,9 +124,7 @@ def verify_ssl(connection_info: Any) -> None:
 
 # TODO rename to create_db since the key interface is that it's something that responds
 # to .connect() method. Doesn't really matter that it's an Engine class instance
-def _create_db_engine(config: Optional[DbConfig] = None) -> sqlalchemy.engine.Engine:
-    db_config: DbConfig = config if config is not None else get_db_config()
-
+def _create_db_engine(db_config: DbConfig) -> sqlalchemy.engine.Engine:
     # We want to be able to control the connection parameters for each
     # connection because for IAM authentication with RDS, short-lived tokens are
     # used as the password, and so we potentially need to generate a fresh token
