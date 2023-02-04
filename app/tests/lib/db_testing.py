@@ -22,6 +22,7 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")
     monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
     monkeypatch.setenv("ENVIRONMENT", "local")
+    monkeypatch.setenv("DB_CHECK_CONNECTION_ON_INIT", "False")
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
