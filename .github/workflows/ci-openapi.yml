@@ -17,7 +17,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          ref: ${{ github.ref }}
+          # Checkout the feature branch associated with the pull request
+          ref: ${{ github.head_ref }}
 
       - name: Update OpenAPI spec
         run: make openapi-spec
