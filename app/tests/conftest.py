@@ -29,7 +29,7 @@ def env_vars():
 
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="session")
-def monkeypatch_session(request):
+def monkeypatch_session():
     """
     Create a monkeypatch instance that can be used to
     monkeypatch global environment, objects, and attributes
@@ -42,7 +42,7 @@ def monkeypatch_session(request):
 
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="module")
-def monkeypatch_module(request):
+def monkeypatch_module():
     mpatch = _pytest.monkeypatch.MonkeyPatch()
     yield mpatch
     mpatch.undo()
