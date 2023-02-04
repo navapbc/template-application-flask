@@ -7,7 +7,6 @@
 
 import logging
 
-import api.adapters.db as db
 import api.app
 import api.logging
 import api.logging.audit

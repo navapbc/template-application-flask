@@ -8,7 +8,6 @@ import sqlalchemy
 
 import api.adapters.db as db
 import api.app as app_entry
-import api.logging
 import tests.api.db.models.factories as factories
 from api.db import models
 from api.util.local import load_local_env_vars
