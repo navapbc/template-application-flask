@@ -1,0 +1,30 @@
+# Update OpenAPI docs so that they remain up to date with the application
+name: Update OpenAPI Docs
+
+on:
+  pull_request:
+    paths:
+      - app/**
+      - .github/workflows/ci-openapi.yml
+
+defaults:
+  run:
+    working-directory: ./app
+
+jobs:
+  update-openapi-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update OpenAPI spec
+        run: make openapi-spec
+
+      - name: Push changes
+        run: |
+          git config user.name nava-platform-bot
+          git config user.email platform-admins@navapbc.com
+          git add --all
+          # Commit changes (if no changes then no-op)
+          git diff-index --quiet HEAD || git commit -m "Update OpenAPI spec"
+          git push
