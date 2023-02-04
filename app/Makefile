@@ -57,8 +57,10 @@ stop:
 
 check: format-check lint test
 
+# Just run openapi-spec generation in Docker only since overriding the LOG_LEVEL env var
+# uses different syntax in docker-compose vs. poetry run
 openapi-spec: ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml > ./openapi.yml
+	docker-compose run --env LOG_LEVEL=CRITICAL $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run flask --env-file local.env spec --format yaml > ./openapi.yml
 
 
 ##################################################
