@@ -7,45 +7,45 @@ Digest: sha256:20acd76c89966bb81d420146a098279d6d2aa0d5029d20750c4a1673ea1057e6
 Status: Downloaded newer image for python:3-slim
  ---> 6c6673d57b08
 Step 2/11 : RUN pip install poetry
- ---> Running in e87f9efd9f84
+ ---> Running in 59ca2448508a
 Collecting poetry
   Downloading poetry-1.3.2-py3-none-any.whl (218 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 218.9/218.9 kB 33.6 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 218.9/218.9 kB 13.4 MB/s eta 0:00:00
 Collecting cachecontrol[filecache]<0.13.0,>=0.12.9
   Downloading CacheControl-0.12.11-py2.py3-none-any.whl (21 kB)
 Collecting cleo<3.0.0,>=2.0.0
   Downloading cleo-2.0.1-py3-none-any.whl (77 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 77.3/77.3 kB 22.2 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 77.3/77.3 kB 23.7 MB/s eta 0:00:00
 Collecting crashtest<0.5.0,>=0.4.1
   Downloading crashtest-0.4.1-py3-none-any.whl (7.6 kB)
 Collecting dulwich<0.21.0,>=0.20.46
   Downloading dulwich-0.20.50-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (501 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 501.7/501.7 kB 94.3 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 501.7/501.7 kB 51.7 MB/s eta 0:00:00
 Collecting filelock<4.0.0,>=3.8.0
   Downloading filelock-3.9.0-py3-none-any.whl (9.7 kB)
 Collecting html5lib<2.0,>=1.0
   Downloading html5lib-1.1-py2.py3-none-any.whl (112 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.2/112.2 kB 5.1 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 112.2/112.2 kB 33.3 MB/s eta 0:00:00
 Collecting jsonschema<5.0.0,>=4.10.0
   Downloading jsonschema-4.17.3-py3-none-any.whl (90 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.4/90.4 kB 28.0 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 90.4/90.4 kB 26.8 MB/s eta 0:00:00
 Collecting keyring<24.0.0,>=23.9.0
   Downloading keyring-23.13.1-py3-none-any.whl (37 kB)
 Collecting lockfile<0.13.0,>=0.12.2
   Downloading lockfile-0.12.2-py2.py3-none-any.whl (13 kB)
 Collecting packaging>=20.4
   Downloading packaging-23.0-py3-none-any.whl (42 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.7/42.7 kB 16.3 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 42.7/42.7 kB 14.0 MB/s eta 0:00:00
 Collecting pexpect<5.0.0,>=4.7.0
   Downloading pexpect-4.8.0-py2.py3-none-any.whl (59 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.0/59.0 kB 23.7 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 59.0/59.0 kB 14.8 MB/s eta 0:00:00
 Collecting pkginfo<2.0,>=1.5
   Downloading pkginfo-1.9.6-py3-none-any.whl (30 kB)
 Collecting platformdirs<3.0.0,>=2.5.2
   Downloading platformdirs-2.6.2-py3-none-any.whl (14 kB)
 Collecting poetry-core==1.4.0
   Downloading poetry_core-1.4.0-py3-none-any.whl (546 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 546.4/546.4 kB 96.3 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 546.4/546.4 kB 79.8 MB/s eta 0:00:00
 Collecting poetry-plugin-export<2.0.0,>=1.2.0
   Downloading poetry_plugin_export-1.3.0-py3-none-any.whl (10 kB)
 Collecting requests<3.0,>=2.18
@@ -53,7 +53,7 @@ Collecting requests<3.0,>=2.18
      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 62.8/62.8 kB 22.4 MB/s eta 0:00:00
 Collecting requests-toolbelt<0.11.0,>=0.9.1
   Downloading requests_toolbelt-0.10.1-py2.py3-none-any.whl (54 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54.5/54.5 kB 21.6 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 54.5/54.5 kB 18.2 MB/s eta 0:00:00
 Collecting shellingham<2.0,>=1.5
   Downloading shellingham-1.5.0.post1-py2.py3-none-any.whl (9.4 kB)
 Collecting tomlkit!=0.11.2,!=0.11.3,<1.0.0,>=0.11.1
@@ -62,13 +62,13 @@ Collecting trove-classifiers>=2022.5.19
   Downloading trove_classifiers-2023.1.20-py3-none-any.whl (13 kB)
 Collecting urllib3<2.0.0,>=1.26.0
   Downloading urllib3-1.26.14-py2.py3-none-any.whl (140 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 140.6/140.6 kB 51.9 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 140.6/140.6 kB 43.8 MB/s eta 0:00:00
 Collecting virtualenv!=20.4.5,!=20.4.6,<21.0.0,>=20.4.3
   Downloading virtualenv-20.17.1-py3-none-any.whl (8.8 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 115.8 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.8/8.8 MB 117.5 MB/s eta 0:00:00
 Collecting msgpack>=0.5.2
   Downloading msgpack-1.0.4.tar.gz (128 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.1/128.1 kB 48.5 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 128.1/128.1 kB 44.3 MB/s eta 0:00:00
   Installing build dependencies: started
   Installing build dependencies: finished with status 'done'
   Getting requirements to build wheel: started
@@ -79,17 +79,17 @@ Collecting msgpack>=0.5.2
   Preparing metadata (pyproject.toml): finished with status 'done'
 Collecting rapidfuzz<3.0.0,>=2.2.0
   Downloading rapidfuzz-2.13.7-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.2 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 119.2 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.2/2.2 MB 113.2 MB/s eta 0:00:00
 Collecting six>=1.9
   Downloading six-1.16.0-py2.py3-none-any.whl (11 kB)
 Collecting webencodings
   Downloading webencodings-0.5.1-py2.py3-none-any.whl (11 kB)
 Collecting attrs>=17.4.0
   Downloading attrs-22.2.0-py3-none-any.whl (60 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.0/60.0 kB 23.2 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 60.0/60.0 kB 20.2 MB/s eta 0:00:00
 Collecting pyrsistent!=0.17.0,!=0.17.1,!=0.17.2,>=0.14.0
   Downloading pyrsistent-0.19.3-py3-none-any.whl (57 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.5/57.5 kB 23.0 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.5/57.5 kB 17.3 MB/s eta 0:00:00
 Collecting jaraco.classes
   Downloading jaraco.classes-3.2.3-py3-none-any.whl (6.0 kB)
 Collecting importlib-metadata>=4.11.4
@@ -98,39 +98,39 @@ Collecting SecretStorage>=3.2
   Downloading SecretStorage-3.3.3-py3-none-any.whl (15 kB)
 Collecting jeepney>=0.4.2
   Downloading jeepney-0.8.0-py3-none-any.whl (48 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.4/48.4 kB 19.3 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 48.4/48.4 kB 17.4 MB/s eta 0:00:00
 Collecting ptyprocess>=0.5
   Downloading ptyprocess-0.7.0-py2.py3-none-any.whl (13 kB)
 Collecting charset-normalizer<4,>=2
   Downloading charset_normalizer-3.0.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (196 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 196.8/196.8 kB 65.8 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 196.8/196.8 kB 56.4 MB/s eta 0:00:00
 Collecting idna<4,>=2.5
   Downloading idna-3.4-py3-none-any.whl (61 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.5/61.5 kB 23.1 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 61.5/61.5 kB 17.3 MB/s eta 0:00:00
 Collecting certifi>=2017.4.17
   Downloading certifi-2022.12.7-py3-none-any.whl (155 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 155.3/155.3 kB 50.2 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 155.3/155.3 kB 43.0 MB/s eta 0:00:00
 Collecting distlib<1,>=0.3.6
   Downloading distlib-0.3.6-py2.py3-none-any.whl (468 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 468.5/468.5 kB 94.2 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 468.5/468.5 kB 72.5 MB/s eta 0:00:00
 Collecting zipp>=0.5
   Downloading zipp-3.12.0-py3-none-any.whl (6.6 kB)
 Collecting cryptography>=2.0
   Downloading cryptography-39.0.0-cp36-abi3-manylinux_2_28_x86_64.whl (4.2 MB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 128.5 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 4.2/4.2 MB 98.1 MB/s eta 0:00:00
 Collecting more-itertools
   Downloading more_itertools-9.0.0-py3-none-any.whl (52 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 52.8/52.8 kB 20.6 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 52.8/52.8 kB 14.9 MB/s eta 0:00:00
 Collecting cffi>=1.12
   Downloading cffi-1.15.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (462 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 462.6/462.6 kB 88.3 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 462.6/462.6 kB 69.4 MB/s eta 0:00:00
 Collecting pycparser
   Downloading pycparser-2.21-py2.py3-none-any.whl (118 kB)
-     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.7/118.7 kB 45.1 MB/s eta 0:00:00
+     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 118.7/118.7 kB 24.9 MB/s eta 0:00:00
 Building wheels for collected packages: msgpack
   Building wheel for msgpack (pyproject.toml): started
   Building wheel for msgpack (pyproject.toml): finished with status 'done'
-  Created wheel for msgpack: filename=msgpack-1.0.4-cp311-cp311-linux_x86_64.whl size=15530 sha256=1637a9e9db5ca4b258816cc32e27389538be90c225f581567854dfec979a1c02
+  Created wheel for msgpack: filename=msgpack-1.0.4-cp311-cp311-linux_x86_64.whl size=15530 sha256=f08be1149a0a3552665aac78027a5db645ef5e84d665fdcab279759c34ab3211
   Stored in directory: /root/.cache/pip/wheels/be/38/62/bffc8d68ee5e3a6a3080b2f8a520e8302fe333528d93a488af
 Successfully built msgpack
 Installing collected packages: webencodings, trove-classifiers, ptyprocess, msgpack, lockfile, distlib, charset-normalizer, zipp, urllib3, tomlkit, six, shellingham, rapidfuzz, pyrsistent, pycparser, poetry-core, platformdirs, pkginfo, pexpect, packaging, more-itertools, jeepney, idna, filelock, crashtest, certifi, attrs, virtualenv, requests, jsonschema, jaraco.classes, importlib-metadata, html5lib, dulwich, cleo, cffi, requests-toolbelt, cryptography, cachecontrol, SecretStorage, keyring, poetry-plugin-export, poetry
@@ -139,17 +139,17 @@ Successfully installed SecretStorage-3.3.3 attrs-22.2.0 cachecontrol-0.12.11 cer
 [0m[91m
 [notice] A new release of pip available: 22.3.1 -> 23.0
 [notice] To update, run: pip install --upgrade pip
-[0mRemoving intermediate container e87f9efd9f84
- ---> 82578973c338
+[0mRemoving intermediate container 59ca2448508a
+ ---> 95d8ba568e6f
 Step 3/11 : RUN apt-get update     && apt-get install --no-install-recommends --yes     build-essential     libpq-dev     postgresql
- ---> Running in b91988b32e15
+ ---> Running in 5f8b8ffb5cbe
 Get:1 http://deb.debian.org/debian bullseye InRelease [116 kB]
 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [48.4 kB]
 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.1 kB]
 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8183 kB]
 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [222 kB]
 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [14.6 kB]
-Fetched 8628 kB in 1s (6393 kB/s)
+Fetched 8628 kB in 1s (6689 kB/s)
 Reading package lists...
 Reading package lists...
 Building dependency tree...
@@ -257,7 +257,7 @@ Get:64 http://deb.debian.org/debian bullseye/main amd64 postgresql-common all 22
 Get:65 http://deb.debian.org/debian bullseye/main amd64 postgresql-13 amd64 13.9-0+deb11u1 [15.2 MB]
 Get:66 http://deb.debian.org/debian bullseye/main amd64 postgresql all 13+225 [64.7 kB]
 [91mdebconf: delaying package configuration, since apt-utils is not installed
-[0mFetched 127 MB in 1s (153 MB/s)
+[0mFetched 127 MB in 1s (149 MB/s)
 Selecting previously unselected package perl-modules-5.32.
 (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 7031 files and directories currently installed.)
 Preparing to unpack .../00-perl-modules-5.32_5.32.1-4+deb11u2_all.deb ...
@@ -594,22 +594,22 @@ Setting up g++ (4:10.2.1-1) ...
 update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
 Setting up build-essential (12.9) ...
 Processing triggers for libc-bin (2.31-13+deb11u5) ...
-Removing intermediate container b91988b32e15
- ---> 161a82058cfa
+Removing intermediate container 5f8b8ffb5cbe
+ ---> 2f6c705d4c19
 Step 4/11 : WORKDIR /srv
- ---> Running in 06619bcd8b02
-Removing intermediate container 06619bcd8b02
- ---> 925bb30ed043
+ ---> Running in 21b9f241cacc
+Removing intermediate container 21b9f241cacc
+ ---> 1aee5d01ab5b
 Step 5/11 : COPY pyproject.toml poetry.lock ./
- ---> ff50c3cbc537
+ ---> 280cd2314aed
 Step 6/11 : RUN poetry config virtualenvs.in-project false && poetry env use python
- ---> Running in a82eefec4c5b
+ ---> Running in ed2e5263daab
 [91mCreating virtualenv template-application-flask-o9msT97p-py3.11 in /root/.cache/pypoetry/virtualenvs
 [0mUsing virtualenv: /root/.cache/pypoetry/virtualenvs/template-application-flask-o9msT97p-py3.11
-Removing intermediate container a82eefec4c5b
- ---> c410256a65e3
+Removing intermediate container ed2e5263daab
+ ---> 75fa7f583f77
 Step 7/11 : RUN poetry install --no-root
- ---> Running in ce2a54adc995
+ ---> Running in d18df900c31f
 Installing dependencies from lock file
 
 Package operations: 79 installs, 0 updates, 0 removals
@@ -622,10 +622,10 @@ Package operations: 79 installs, 0 updates, 0 removals
   • Installing urllib3 (1.26.12)
   • Installing botocore (1.27.69)
   • Installing certifi (2022.6.15)
-  • Installing click (8.1.3)
-  • Installing idna (3.3)
-  • Installing itsdangerous (2.1.2)
   • Installing charset-normalizer (2.1.1)
+  • Installing click (8.1.3)
+  • Installing itsdangerous (2.1.2)
+  • Installing idna (3.3)
   • Installing jinja2 (3.1.2)
   • Installing packaging (21.3)
   • Installing pycparser (2.21)
@@ -651,10 +651,10 @@ Package operations: 79 installs, 0 updates, 0 removals
   • Installing typing-extensions (4.3.0)
   • Installing apispec (5.2.2)
   • Installing boto3 (1.24.69)
-  • Installing colorama (0.4.5)
   • Installing cryptography (38.0.1)
-  • Installing faker (14.2.0)
   • Installing docopt (0.6.2)
+  • Installing colorama (0.4.5)
+  • Installing faker (14.2.0)
   • Installing flake8 (5.0.4)
   • Installing flask-httpauth (4.7.0)
   • Installing flask-marshmallow (0.14.0)
@@ -677,10 +677,10 @@ Package operations: 79 installs, 0 updates, 0 removals
   • Installing xmltodict (0.13.0)
   • Installing alembic (1.8.1)
   • Installing apiflask (1.2.0)
+  • Installing black (22.8.0)
+  • Installing factory-boy (3.2.1)
   • Installing bandit (1.7.4)
   • Installing coverage (6.4.4)
-  • Installing factory-boy (3.2.1)
-  • Installing black (22.8.0)
   • Installing flake8-alfred (1.1.1)
   • Installing flake8-bugbear (22.8.23)
   • Installing isort (5.10.1)
@@ -693,29 +693,29 @@ Package operations: 79 installs, 0 updates, 0 removals
   • Installing pytz (2022.2.1)
   • Installing smart-open (6.1.0)
   • Installing types-pytz (2022.2.1.0)
-Removing intermediate container ce2a54adc995
- ---> 78e92b12a476
+Removing intermediate container d18df900c31f
+ ---> a5e503a5dc5c
 Step 8/11 : COPY . /srv
- ---> 87275221581b
+ ---> 642f4b9fef7d
 Step 9/11 : ENV HOST=0.0.0.0
- ---> Running in e6be37bde862
-Removing intermediate container e6be37bde862
- ---> 752d47b8455c
+ ---> Running in d8541890233e
+Removing intermediate container d8541890233e
+ ---> 64fad0edf2df
 Step 10/11 : RUN poetry install
- ---> Running in 3a685ead6a3b
+ ---> Running in ead46beb8b12
 Installing dependencies from lock file
 
 No dependencies to install or update
 
 Installing the current project: template-application-flask (0.1.0)
-Removing intermediate container 3a685ead6a3b
- ---> c51c29bdbe50
+Removing intermediate container ead46beb8b12
+ ---> fe5c42438deb
 Step 11/11 : CMD ["poetry", "run", "python", "-m", "api"]
- ---> Running in 70a954732f05
-Removing intermediate container 70a954732f05
- ---> 3e40fcac39a7
+ ---> Running in b83ce594519c
+Removing intermediate container b83ce594519c
+ ---> 20925ed6af46
 
-Successfully built 3e40fcac39a7
+Successfully built 20925ed6af46
 Successfully tagged template-application-flask_main-app:latest
 info:
   title: Template Application Flask
