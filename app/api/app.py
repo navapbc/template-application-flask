@@ -8,6 +8,7 @@ from werkzeug.exceptions import Unauthorized
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
+import api.logging
 import api.logging.flask_logger as flask_logger
 from api.auth.api_key_auth import User, get_app_security_scheme
 from api.route.healthcheck import healthcheck_blueprint
@@ -17,10 +18,15 @@ from api.route.user_route import user_blueprint
 logger = logging.getLogger(__name__)
 
 
-def create_app(*, db_client: db.DBClient, app_logger: logging.Logger) -> APIFlask:
+def create_app() -> APIFlask:
     app = APIFlask(__name__)
+
+    root_logger = api.logging.init(__package__)
+    flask_logger.init_app(root_logger, app)
+
+    db_client = db.init()
     flask_db.init_app(db_client, app)
-    flask_logger.init_app(app_logger, app)
+
     configure_app(app)
     register_blueprints(app)
     return app

@@ -1,3 +1,4 @@
+import pytest
 from flask import Flask, current_app
 from sqlalchemy import text
 
@@ -5,22 +6,32 @@ import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
 
 
-def test_get_db(app: Flask):
-    @app.route("/hello")
+# Define an isolated example Flask app fixture specific to this test module
+# to avoid dependencies on any project-specific fixtures in conftest.py
+@pytest.fixture
+def example_app() -> Flask:
+    app = Flask(__name__)
+    db_client = db.init()
+    flask_db.init_app(db_client, app)
+    return app
+
+
+def test_get_db(example_app: Flask):
+    @example_app.route("/hello")
     def hello():
         with flask_db.get_db(current_app).get_connection() as conn:
             return {"data": conn.scalar(text("SELECT 'hello, world'"))}
 
-    response = app.test_client().get("/hello")
+    response = example_app.test_client().get("/hello")
     assert response.get_json() == {"data": "hello, world"}
 
 
-def test_with_db_session(app: Flask):
-    @app.route("/hello")
+def test_with_db_session(example_app: Flask):
+    @example_app.route("/hello")
     @flask_db.with_db_session
     def hello(db_session: db.Session):
         with db_session.begin():
             return {"data": db_session.scalar(text("SELECT 'hello, world'"))}
 
-    response = app.test_client().get("/hello")
+    response = example_app.test_client().get("/hello")
     assert response.get_json() == {"data": "hello, world"}

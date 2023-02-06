@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @contextlib.contextmanager
-def create_isolated_db(monkeypatch) -> None:
+def create_isolated_db(monkeypatch) -> db.DBClient:
     """
     Creates a temporary PostgreSQL schema and creates a database engine
     that connects to that schema. Drops the schema after the context manager
@@ -22,10 +22,11 @@ def create_isolated_db(monkeypatch) -> None:
     monkeypatch.setenv("POSTGRES_USER", "local_db_user")
     monkeypatch.setenv("POSTGRES_PASSWORD", "secret123")
     monkeypatch.setenv("ENVIRONMENT", "local")
+    monkeypatch.setenv("DB_CHECK_CONNECTION_ON_INIT", "False")
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
-    db_client = db.init(check_db_connection=False)
+    db_client = db.init()
     with db_client.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:

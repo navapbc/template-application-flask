@@ -58,7 +58,7 @@ stop:
 check: format-check lint test
 
 openapi-spec: ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml > ./openapi.yml
+	$(PY_RUN_CMD) flask spec --format yaml --output ./openapi.yml
 
 
 ##################################################
