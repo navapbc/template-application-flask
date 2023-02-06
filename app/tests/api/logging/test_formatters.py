@@ -14,12 +14,13 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
     console_handler.setFormatter(formatters.JsonFormatter())
     logger.addHandler(console_handler)
 
-    logger.warning("hello", extra={"foo": "bar"})
+    logger.warning("hello %s", "interpolated_string", extra={"foo": "bar"})
 
     json_record = json.loads(capsys.readouterr().err)
     expected = {
         "name": "test_json_formatter",
-        "msg": "hello",
+        "message": "hello interpolated_string",
+        "msg": "hello %s",
         "levelname": "WARNING",
         "levelno": 30,
         "filename": "test_formatters.py",

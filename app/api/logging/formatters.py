@@ -18,6 +18,9 @@ class JsonFormatter(logging.Formatter):
     """A logging formatter which formats each line as JSON."""
 
     def format(self, record: logging.LogRecord) -> str:
+        # logging.Formatter.format adds the `message` attribute to the LogRecord
+        # see https://github.com/python/cpython/blob/main/Lib/logging/__init__.py#L690-L720
+        super().format(record)
         return json.dumps(record.__dict__, separators=(",", ":"))
 
 
