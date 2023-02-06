@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 class LoggingConfig(PydanticBaseEnvConfig):
     log_format: str = "json"
-    log_level: int = logging.INFO
+    log_level: str = "INFO"
 
 
 def configure_logging() -> logging.Logger:
