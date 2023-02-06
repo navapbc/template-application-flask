@@ -36,4 +36,7 @@ jobs:
         run: make lint-security
 
       - name: Start tests
-        run: make test-coverage
+        run: |
+          make test-audit
+          make test-coverage
+        
