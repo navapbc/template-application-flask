@@ -36,10 +36,10 @@ def test_human_readable_formatter(capsys: pytest.CaptureFixture):
     console_handler.setFormatter(formatters.HumanReadableFormatter())
     logger.addHandler(console_handler)
 
-    logger.warning("hello", extra={"foo": "bar"})
+    logger.warning("hello %s", "interpolated_string", extra={"foo": "bar"})
 
     text = capsys.readouterr().err
     assert re.match(
-        r"\d{2}:\d{2}:\d{2}\.\d{3}  test_human_readable_formatter       \x1b\[0m test_human_readable_formatter \x1b\[31mWARNING  hello                                                                            \x1b\[34mfoo=bar\x1b\[0m\n",
+        r"\d{2}:\d{2}:\d{2}\.\d{3}  test_human_readable_formatter       \x1b\[0m test_human_readable_formatter \x1b\[31mWARNING  hello interpolated_string                                                        \x1b\[34mfoo=bar\x1b\[0m\n",
         text,
     )
