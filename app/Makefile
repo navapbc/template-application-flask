@@ -121,14 +121,17 @@ db-migrate-heads: ## Show migrations marked as a head
 # Testing
 ##################################################
 
-test:
-	$(PY_RUN_CMD) pytest $(args)
+test: ## Run all tests except for audit logging tests
+	$(PY_RUN_CMD) pytest -m "not audit" $(args)
+
+test-audit: ## Run audit logging tests
+	$(PY_RUN_CMD) pytest -m "audit" $(args)
 
 test-watch:
 	$(PY_RUN_CMD) pytest-watch --clear $(args)
 
 test-coverage:
-	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest $(args)
+	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest -m "not audit" $(args)
 	$(PY_RUN_CMD) coverage report
 
 test-coverage-report: ## Open HTML test coverage report
@@ -161,7 +164,7 @@ lint-poetry-version: ## Check poetry version
 	grep --quiet 'lock-version = "1.1"' poetry.lock
 
 lint-security: # https://bandit.readthedocs.io/en/latest/index.html
-	$(PY_RUN_CMD) bandit -r . --number 3 --skip B101 -ll -x ./.venv
+	$(PY_RUN_CMD) bandit -c pyproject.toml -r . --number 3 --skip B101 -ll -x ./.venv
 
 
 ##################################################
