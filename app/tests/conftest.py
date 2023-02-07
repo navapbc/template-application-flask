@@ -8,7 +8,6 @@ import sqlalchemy
 
 import api.adapters.db as db
 import api.app as app_entry
-import api.logging
 import tests.api.db.models.factories as factories
 from api.db import models
 from api.util.local import load_local_env_vars
@@ -29,7 +28,7 @@ def env_vars():
 
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="session")
-def monkeypatch_session(request):
+def monkeypatch_session():
     """
     Create a monkeypatch instance that can be used to
     monkeypatch global environment, objects, and attributes
@@ -42,7 +41,7 @@ def monkeypatch_session(request):
 
 # From https://github.com/pytest-dev/pytest/issues/363
 @pytest.fixture(scope="module")
-def monkeypatch_module(request):
+def monkeypatch_module():
     mpatch = _pytest.monkeypatch.MonkeyPatch()
     yield mpatch
     mpatch.undo()
@@ -133,20 +132,16 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
         yield session
 
 
-@pytest.fixture
-def test_logger():
-    api.logging.init(__package__)
-    return logging.getLogger(__package__)
-
-
 ####################
 # Test App & Client
 ####################
 
 
-@pytest.fixture
-def app(db_client, test_logger):
-    return app_entry.create_app(db_client=db_client, app_logger=test_logger)
+# Make app session scoped so the database connection pool is only created once
+# for the test session. This speeds up the tests.
+@pytest.fixture(scope="session")
+def app():
+    return app_entry.create_app()
 
 
 @pytest.fixture
