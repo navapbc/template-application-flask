@@ -21,10 +21,19 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(record.__dict__, separators=(",", ":"))
 
 
+HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_LENGTH = decodelog.DEFAULT_MESSAGE_LENGTH
+
+
 class HumanReadableFormatter(logging.Formatter):
     """A logging formatter which formats each line
     as color-code human readable text
     """
+
+    message_length: int
+
+    def __init__(self, message_length: int = HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_LENGTH):
+        super().__init__()
+        self.message_length = message_length
 
     def format(self, record: logging.LogRecord) -> str:
         return decodelog.format_line(
@@ -34,4 +43,5 @@ class HumanReadableFormatter(logging.Formatter):
             record.levelname,
             record.msg,
             record.__dict__,
+            message_length=self.message_length,
         )
