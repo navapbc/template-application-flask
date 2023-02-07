@@ -1,6 +1,7 @@
 import logging
 import sys
 
+import api.logging.audit
 import api.logging.formatters as formatters
 import api.logging.pii as pii
 from api.util.env_config import PydanticBaseEnvConfig
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 class LoggingConfig(PydanticBaseEnvConfig):
     log_format: str = "json"
     log_level: str = "INFO"
+    log_enable_audit: bool = True
 
 
 def configure_logging() -> logging.Logger:
@@ -37,6 +39,9 @@ def configure_logging() -> logging.Logger:
     console_handler.addFilter(pii.mask_pii)
     logging.root.addHandler(console_handler)
     logging.root.setLevel(config.log_level)
+
+    if config.log_enable_audit:
+        api.logging.audit.init()
 
     # Configure loggers for third party packages
     logging.getLogger("alembic").setLevel(logging.INFO)
