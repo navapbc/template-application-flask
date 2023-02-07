@@ -24,7 +24,7 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(record.__dict__, separators=(",", ":"))
 
 
-HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_LENGTH = decodelog.DEFAULT_MESSAGE_LENGTH
+HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH = decodelog.DEFAULT_MESSAGE_WIDTH
 
 
 class HumanReadableFormatter(logging.Formatter):
@@ -32,11 +32,11 @@ class HumanReadableFormatter(logging.Formatter):
     as color-code human readable text
     """
 
-    message_length: int
+    message_width: int
 
-    def __init__(self, message_length: int = HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_LENGTH):
+    def __init__(self, message_width: int = HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH):
         super().__init__()
-        self.message_length = message_length
+        self.message_width = message_width
 
     def format(self, record: logging.LogRecord) -> str:
         message = super().format(record)
@@ -47,5 +47,5 @@ class HumanReadableFormatter(logging.Formatter):
             record.levelname,
             message,
             record.__dict__,
-            message_length=self.message_length,
+            message_width=self.message_width,
         )

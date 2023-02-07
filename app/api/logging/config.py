@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
-    message_length: int = formatters.HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_LENGTH
+    message_width: int = formatters.HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH
 
 
 class LoggingConfig(PydanticBaseEnvConfig):
@@ -77,4 +77,4 @@ def get_human_readable_formatter(
     config: HumanReadableFormatterConfig,
 ) -> formatters.HumanReadableFormatter:
     """Return the human readable formatter used by the root logger."""
-    return formatters.HumanReadableFormatter(message_length=config.message_length)
+    return formatters.HumanReadableFormatter(message_width=config.message_width)

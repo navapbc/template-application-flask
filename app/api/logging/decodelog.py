@@ -21,7 +21,7 @@ ORANGE = "\033[38;5;208m"
 RESET = "\033[0m"
 NO_COLOUR = ""
 
-DEFAULT_MESSAGE_LENGTH = 50
+DEFAULT_MESSAGE_WIDTH = 50
 
 output_dates = None
 
@@ -74,7 +74,7 @@ def format_line(
     level: str,
     message: str,
     extra: Mapping[str, str],
-    message_length: int = DEFAULT_MESSAGE_LENGTH,
+    message_width: int = DEFAULT_MESSAGE_WIDTH,
 ) -> str:
     """Format log fields as a coloured string."""
     return "{created}  {logger_color}{logger_name:<36}{reset_color} {func_name:<28} {level_color}{level:<8} {message} {extra_color}{extra}{reset_color}".format(
@@ -85,10 +85,10 @@ def format_line(
         func_name=func_name,
         level_color=colour_for_level(level),
         level=level,
-        message=message.ljust(message_length),
+        message=message.ljust(message_width),
         extra_color=BLUE,
         extra=format_extra(extra),
-        message_length=message_length,
+        message_width=message_width,
     )
 
 
