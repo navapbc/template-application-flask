@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Optional
 
 import api.logging.audit
 import api.logging.formatters as formatters

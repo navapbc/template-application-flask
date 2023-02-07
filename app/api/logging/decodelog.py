@@ -88,7 +88,6 @@ def format_line(
         message=message.ljust(message_width),
         extra_color=BLUE,
         extra=format_extra(extra),
-        message_width=message_width,
     )
 
 
