@@ -29,6 +29,8 @@ We have two separate ways of formatting the logs which are controlled by the `LO
 
 `human-readable` (set by default in `local.env`) -> Produces color coded logs for local development or for troubleshooting.
 
+![Human readable logs](human-readable-logs.png)
+
 ## Logging Extra Data in a Request
 
 The [api.logging.flask_logger](../../../app/api/logging/flask_logger.py) module adds logging functionality to Flask applications. It automatically adds useful data from the Flask request object to logs, logs the start and end of requests, and provides a mechanism for developers to dynamically add extra data to all subsequent logs for the current request.
@@ -46,17 +48,3 @@ The api.logging.pii](../../../app/api/logging/pii.py) module defines a filter th
 * [Python's Logging HOWTO](https://docs.python.org/3/howto/logging.html#logging-basic-tutorial)
 * [Python's logging module API docs](https://docs.python.org/3/library/logging.html)
 * [Formatter objects](https://docs.python.org/3/library/logging.html#formatter-objects)
-
-
-# Logging
-
-This application uses the standard [Python logging library](https://docs.python.org/3/library/logging.config.html) with a few configurational updates in order to be easier to work with.
-
-## Configurations
-Log configurations can be found in [logging/__init__.py](/app/api/logging/__init__.py). Sevaral `loggers` are defined which adjust the log level of various libraries we depend on.
-
-### Formatting
-
-
-`human-readable` -> Produces log messages with color formatting that are easier to parse.
-TODO - add image once the new example endpoint is created.

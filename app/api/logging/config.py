@@ -1,6 +1,7 @@
 import logging
 import sys
 
+import api.logging.audit
 import api.logging.formatters as formatters
 import api.logging.pii as pii
 from api.util.env_config import PydanticBaseEnvConfig
@@ -8,9 +9,19 @@ from api.util.env_config import PydanticBaseEnvConfig
 logger = logging.getLogger(__name__)
 
 
+class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
+    message_width: int = formatters.HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH
+
+
 class LoggingConfig(PydanticBaseEnvConfig):
-    log_format: str = "json"
-    log_level: str = "INFO"
+    format = "json"
+    level = "INFO"
+    enable_audit = True
+    human_readable_formatter = HumanReadableFormatterConfig()
+
+    class Config:
+        env_prefix = "log_"
+        env_nested_delimiter = "__"
 
 
 def configure_logging() -> logging.Logger:
@@ -32,11 +43,14 @@ def configure_logging() -> logging.Logger:
     # This is important during testing, since fixtures like `caplog` add handlers that would
     # get overwritten if we call logging.config.dictConfig() during the scope of the test.
     console_handler = logging.StreamHandler(sys.stdout)
-    formatter = get_formatter(config.log_format)
+    formatter = get_formatter(config)
     console_handler.setFormatter(formatter)
     console_handler.addFilter(pii.mask_pii)
     logging.root.addHandler(console_handler)
-    logging.root.setLevel(config.log_level)
+    logging.root.setLevel(config.level)
+
+    if config.enable_audit:
+        api.logging.audit.init()
 
     # Configure loggers for third party packages
     logging.getLogger("alembic").setLevel(logging.INFO)
@@ -47,12 +61,19 @@ def configure_logging() -> logging.Logger:
     return logging.root
 
 
-def get_formatter(log_format: str) -> logging.Formatter:
+def get_formatter(config: LoggingConfig) -> logging.Formatter:
     """Return the formatter used by the root logger.
 
     The formatter is determined by the environment variable LOG_FORMAT. If the
     environment variable is not set, the JSON formatter is used by default.
     """
-    if log_format == "human-readable":
-        return formatters.HumanReadableFormatter()
+    if config.format == "human-readable":
+        return get_human_readable_formatter(config.human_readable_formatter)
     return formatters.JsonFormatter()
+
+
+def get_human_readable_formatter(
+    config: HumanReadableFormatterConfig,
+) -> formatters.HumanReadableFormatter:
+    """Return the human readable formatter used by the root logger."""
+    return formatters.HumanReadableFormatter(message_width=config.message_width)

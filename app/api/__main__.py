@@ -9,7 +9,6 @@ import logging
 
 import api.app
 import api.logging
-import api.logging.audit
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
@@ -20,7 +19,6 @@ def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
-    api.logging.audit.init()
     app = api.app.create_app()
 
     environment = app_config.environment
