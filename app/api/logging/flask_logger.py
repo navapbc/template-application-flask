@@ -16,7 +16,7 @@ Usage:
 
     flask_logger.init_app(logger, app)
 """
-
+from datetime import datetime
 import logging
 
 import flask
@@ -56,6 +56,7 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
         lambda: add_extra_data_to_current_request_logs(_get_request_context_info(flask.request))
     )
 
+    app.before_request(_track_request_start_time)
     app.before_request(_log_start_request)
     app.after_request(_log_end_request)
 
@@ -71,6 +72,11 @@ def add_extra_data_to_current_request_logs(
     extra_log_data = getattr(flask.g, EXTRA_LOG_DATA_ATTR, {})
     extra_log_data.update(data)
     setattr(flask.g, EXTRA_LOG_DATA_ATTR, extra_log_data)
+
+
+def _track_request_start_time() -> None:
+    """Store the request start time in flask.g"""
+    flask.g.request_start_time = datetime.now()
 
 
 def _log_start_request() -> None:
@@ -102,6 +108,7 @@ def _log_end_request(response: flask.Response) -> flask.Response:
             "response.content_length": response.content_length,
             "response.content_type": response.content_type,
             "response.mimetype": response.mimetype,
+            "duration": datetime.now() - flask.g.request_start_time
         },
     )
     return response
