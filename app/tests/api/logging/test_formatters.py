@@ -45,5 +45,5 @@ def test_human_readable_formatter(capsys: pytest.CaptureFixture):
     assert re.match(r"^\d{2}:\d{2}:\d{2}\.\d{3}", created_time)
     assert (
         rest
-        == "  test_human_readable_formatter       \x1b[0m test_human_readable_formatter \x1b[31mWARNING  hello interpolated_string                          \x1b[34mfoo=bar\x1b[0m\n"
+        == "  test_human_readable_formatter       \x1b[0m test_human_readable_formatter \x1b[31mWARNING \x1b[0m \x1b[31mhello interpolated_string                         \x1b[0m \x1b[34mfoo=bar\x1b[0m\n"
     )
