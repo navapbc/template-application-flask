@@ -69,7 +69,7 @@ def decode_json_line(line: str) -> Optional[str]:
 
 def format_line(
     created: datetime.datetime,
-    name: str,
+    logger_name: str,
     func_name: str,
     level: str,
     message: str,
@@ -77,21 +77,23 @@ def format_line(
     message_width: int = DEFAULT_MESSAGE_WIDTH,
 ) -> str:
     """Format log fields as a coloured string."""
-    return "{created}  {logger_color}{logger_name:<36}{reset_color} {func_name:<28} {level_color}{level:<8} {message} {extra_color}{extra}{reset_color}".format(
+    logger_name_color = color_for_name(logger_name)
+    level_color = color_for_level(level)
+    return "{created}  {logger_name} {func_name:<28} {level} {message} {extra}".format(
         created=format_datetime(created),
-        logger_color=colour_for_name(name),
-        logger_name=name,
-        reset_color=RESET,
+        logger_name=colorize(logger_name.ljust(36), logger_name_color),
         func_name=func_name,
-        level_color=colour_for_level(level),
-        level=level,
-        message=message.ljust(message_width),
-        extra_color=BLUE,
-        extra=format_extra(extra),
+        level=colorize(level.ljust(8), level_color),
+        message=colorize(message.ljust(message_width), level_color),
+        extra=colorize(format_extra(extra), BLUE),
     )
 
 
-def colour_for_name(name: str) -> str:
+def colorize(text: str, color: str) -> str:
+    return f"{color}{text}{RESET}"
+
+
+def color_for_name(name: str) -> str:
     if name.startswith("api"):
         return GREEN
     elif name.startswith("sqlalchemy"):
@@ -99,7 +101,7 @@ def colour_for_name(name: str) -> str:
     return NO_COLOUR
 
 
-def colour_for_level(level: str) -> str:
+def color_for_level(level: str) -> str:
     if level in ("WARNING", "ERROR", "CRITICAL"):
         return RED
     return NO_COLOUR
