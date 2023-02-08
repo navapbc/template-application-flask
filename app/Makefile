@@ -57,8 +57,11 @@ stop:
 
 check: format-check lint test
 
-openapi-spec: ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml > ./openapi.yml
+# Set init-db as pre-requisite since there seems to be a race condition
+# where the DB can't yet receive connections if it's starting from a 
+# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
+openapi-spec: init-db ## Generate OpenAPI spec
+	$(PY_RUN_CMD) flask spec --format yaml --output ./openapi.yml
 
 
 ##################################################

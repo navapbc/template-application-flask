@@ -73,7 +73,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/ValidationError'
           description: Successful response
-        '400':
+        '422':
           content:
             application/json:
               schema:
@@ -92,7 +92,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateUser'
+              $ref: '#/components/schemas/User'
       security:
       - ApiKeyAuth: []
   /v1/user/{user_id}:
@@ -175,7 +175,7 @@ paths:
                     items:
                       $ref: '#/components/schemas/ValidationError'
           description: Successful response
-        '400':
+        '422':
           content:
             application/json:
               schema:
@@ -200,7 +200,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/PatchUserUpdate'
+              $ref: '#/components/schemas/UserUpdate'
       security:
       - ApiKeyAuth: []
 openapi: 3.0.3
@@ -239,61 +239,6 @@ components:
       properties:
         type:
           description: The name of the role
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-    CreateUser:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        first_name:
-          type: string
-          description: The user's first name
-        middle_name:
-          type: string
-          description: The user's middle name
-        last_name:
-          type: string
-          description: The user's last name
-        phone_number:
-          type: string
-          description: The user's phone number
-          example: 123-456-7890
-          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
-        date_of_birth:
-          type: string
-          format: date
-          description: The users date of birth
-        is_active:
-          type: boolean
-          description: Whether the user is active
-        roles:
-          type: array
-          items:
-            $ref: '#/components/schemas/Role'
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          readOnly: true
-      required:
-      - date_of_birth
-      - first_name
-      - is_active
-      - last_name
-      - phone_number
-      - roles
     User:
       type: object
       properties:
@@ -341,7 +286,7 @@ components:
       - last_name
       - phone_number
       - roles
-    PatchUserUpdate:
+    UserUpdate:
       type: object
       properties:
         id:
