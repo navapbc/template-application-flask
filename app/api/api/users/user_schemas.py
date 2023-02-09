@@ -4,10 +4,6 @@ from marshmallow import fields as marshmallow_fields
 from api.db.models import user_models
 from api.api.schemas import request_schema
 
-##############
-# Role Models
-##############
-
 
 class RoleSchema(request_schema.OrderedSchema):
     type = marshmallow_fields.Enum(
@@ -18,11 +14,6 @@ class RoleSchema(request_schema.OrderedSchema):
 
     # Note that user_id is not included in the API schema since the role
     # will always be a nested fields of the API user
-
-
-##############
-# User Models
-##############
 
 
 class UserSchema(request_schema.OrderedSchema):
