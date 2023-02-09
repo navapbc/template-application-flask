@@ -46,7 +46,7 @@ paths:
       tags:
       - Health
       summary: Health
-  /v1/user:
+  /v1/users:
     post:
       parameters: []
       responses:
@@ -87,7 +87,7 @@ paths:
           description: Authentication error
       tags:
       - User
-      summary: POST /v1/user
+      summary: POST /v1/users
       requestBody:
         content:
           application/json:
@@ -95,7 +95,7 @@ paths:
               $ref: '#/components/schemas/User'
       security:
       - ApiKeyAuth: []
-  /v1/user/{user_id}:
+  /v1/users/{user_id}:
     get:
       parameters:
       - in: path
