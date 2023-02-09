@@ -1,5 +1,7 @@
 import logging
 
+import flask
+import flask.testing
 import _pytest.monkeypatch
 import boto3
 import moto
@@ -140,13 +142,18 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 # Make app session scoped so the database connection pool is only created once
 # for the test session. This speeds up the tests.
 @pytest.fixture(scope="session")
-def app():
+def app() -> flask.Flask:
     return app_entry.create_app()
 
 
 @pytest.fixture
-def client(app):
+def client(app: flask.Flask) -> flask.testing.FlaskClient:
     return app.test_client()
+
+
+@pytest.fixture
+def cli_runner(app: flask.Flask) -> flask.testing.CliRunner:
+    return app.test_cli_runner()
 
 
 @pytest.fixture
