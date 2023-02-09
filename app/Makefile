@@ -34,6 +34,13 @@ PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
 ##################################################
+# Local Development Setup
+##################################################
+
+setup-local:
+	cp .env.example .env
+
+##################################################
 # API Build & Run
 ##################################################
 
