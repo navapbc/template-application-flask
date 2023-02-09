@@ -1,8 +1,6 @@
 import logging
 import os
 
-from flask.cli import AppGroup
-
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
 import api.services.users as user_service
@@ -10,10 +8,11 @@ from api.api.users.user_blueprint import user_blueprint
 from api.util.datetime_util import utcnow
 
 logger = logging.getLogger(__name__)
-user_cli = AppGroup("user")
+
+user_blueprint.cli.help = "User commands"
 
 
-@user_blueprint.cli.command("create-csv")
+@user_blueprint.cli.command("create-csv", help="Create a CSV of all users and their roles")
 @flask_db.with_db_session
 def create_csv(db_session: db.Session):
     # Build the path for the output file
