@@ -33,12 +33,18 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
+FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
+
 ##################################################
-# Local Development Setup
+# Local Development Environment Setup
 ##################################################
 
 setup-local:
-	cp .env.example .env
+	# Configure poetry to use virtualenvs in the project directory
+	poetry config virtualenvs.in-project true
+
+	# Install dependencies
+	poetry install --no-root
 
 ##################################################
 # API Build & Run
@@ -63,13 +69,6 @@ stop:
 	docker-compose down
 
 check: format-check lint test
-
-# Set init-db as pre-requisite since there seems to be a race condition
-# where the DB can't yet receive connections if it's starting from a 
-# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
-openapi-spec: init-db ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml --output ./openapi.yml
-
 
 ##################################################
 # DB & migrations
@@ -178,11 +177,18 @@ lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 
 
 ##################################################
-# Flask CLI Custom Commands
+# Flask CLI Commands
 ##################################################
 
 cli:
-	$(PY_RUN_CMD) flask $(args)
+	$(FLASK_CMD) $(args)
+
+# Set init-db as pre-requisite since there seems to be a race condition
+# where the DB can't yet receive connections if it's starting from a 
+# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
+openapi-spec: init-db ## Generate OpenAPI spec
+	$(FLASK_CMD) spec --format yaml --output ./openapi.yml
+
 
 ##################################################
 # Miscellaneous Utilities
@@ -194,10 +200,3 @@ login: start ## Start shell in running container
 # Pauses for 5 seconds
 sleep-5:
 	sleep 5
-
-setup-local:
-	# Configure poetry to use virtualenvs in the project directory
-	poetry config virtualenvs.in-project true
-
-	# Install dependencies
-	poetry install --no-root
