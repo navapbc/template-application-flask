@@ -2,7 +2,7 @@ from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.db.models import user_models
-from api.route.schemas import request_schema
+from api.api.schemas import request_schema
 
 ##############
 # Role Models

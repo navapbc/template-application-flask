@@ -8,8 +8,8 @@ import api.adapters.db.flask_db as flask_db
 import api.services.users as user_service
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
-from api.route import response
-from api.route.schemas import user_schemas
+from api.api import response
+from api.api.schemas import user_schemas
 from api.services import users
 
 logger = logging.getLogger(__name__)
@@ -18,14 +18,12 @@ logger = logging.getLogger(__name__)
 user_blueprint = APIBlueprint("user", __name__, tag="User")
 
 
-@user_blueprint.post("/v1/user")
 @user_blueprint.input(user_schemas.UserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
 @flask_db.with_db_session
 def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> dict:
     """
-    POST /v1/user
     """
     user = user_service.create_user(db_session, user_params)
 
@@ -38,7 +36,6 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
-@user_blueprint.patch("/v1/user/<uuid:user_id>")
 # Allow partial updates. partial=true means requests that are missing
 # required fields will not be rejected.
 # https://marshmallow.readthedocs.io/en/stable/quickstart.html#partial-loading
@@ -59,7 +56,6 @@ def user_patch(
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
-@user_blueprint.get("/v1/user/<uuid:user_id>")
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
 @flask_db.with_db_session

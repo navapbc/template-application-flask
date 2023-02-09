@@ -2,7 +2,7 @@ import dataclasses
 from typing import Optional
 
 from api.db.models.base import Base
-from api.route.schemas import response_schema
+from api.api.schemas import response_schema
 
 
 @dataclasses.dataclass
