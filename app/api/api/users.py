@@ -29,11 +29,7 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
     """
     user = user_service.create_user(db_session, user_params)
 
-    logger.info(
-        "Successfully inserted user",
-        extra=get_user_log_params(user),
-    )
-    print("Successfully inserted user", get_user_log_params(user))
+    logger.info("Successfully inserted user", extra=get_user_log_params(user))
 
     return response.ApiResponse(message="Success", data=user).asdict()
 
@@ -51,10 +47,7 @@ def user_patch(
 ) -> dict:
     user = user_service.patch_user(db_session, user_id, patch_user_params)
 
-    logger.info(
-        "Successfully patched user",
-        extra=get_user_log_params(user),
-    )
+    logger.info("Successfully patched user", extra=get_user_log_params(user))
 
     return response.ApiResponse(message="Success", data=user).asdict()
 
@@ -66,13 +59,10 @@ def user_patch(
 def user_get(db_session: db.Session, user_id: str) -> dict:
     user = user_service.get_user(db_session, user_id)
 
-    logger.info(
-        "Successfully fetched user",
-        extra=get_user_log_params(user),
-    )
+    logger.info("Successfully fetched user", extra=get_user_log_params(user))
 
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
 def get_user_log_params(user: User) -> dict[str, Any]:
-    return {"user_id": user.id}
+    return {"user.id": user.id}
