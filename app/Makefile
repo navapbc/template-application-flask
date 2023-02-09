@@ -59,7 +59,6 @@ start:
 run-logs: start
 	docker-compose logs --follow --no-color $(APP_NAME)
 
-
 init: build init-db
 
 clean-volumes: ## Remove project docker volumes (which includes the DB state)
