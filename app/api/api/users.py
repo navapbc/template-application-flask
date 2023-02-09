@@ -28,9 +28,7 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
     POST /v1/users
     """
     user = user_service.create_user(db_session, user_params)
-
     logger.info("Successfully inserted user", extra=get_user_log_params(user))
-
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
@@ -46,9 +44,7 @@ def user_patch(
     db_session: db.Session, user_id: str, patch_user_params: users.PatchUserParams
 ) -> dict:
     user = user_service.patch_user(db_session, user_id, patch_user_params)
-
     logger.info("Successfully patched user", extra=get_user_log_params(user))
-
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
@@ -58,9 +54,7 @@ def user_patch(
 @flask_db.with_db_session
 def user_get(db_session: db.Session, user_id: str) -> dict:
     user = user_service.get_user(db_session, user_id)
-
     logger.info("Successfully fetched user", extra=get_user_log_params(user))
-
     return response.ApiResponse(message="Success", data=user).asdict()
 
 
