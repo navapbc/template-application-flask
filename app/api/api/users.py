@@ -5,12 +5,12 @@ from apiflask import APIBlueprint
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
+import api.api.response as response
+import api.api.schemas.user_schemas as user_schemas
 import api.services.users as user_service
+import api.services.users as users
 from api.auth.api_key_auth import api_key_auth
 from api.db.models.user_models import User
-from api.api import response
-from api.api.schemas import user_schemas
-from api.services import users
 
 logger = logging.getLogger(__name__)
 
