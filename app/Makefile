@@ -171,11 +171,11 @@ lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 
 
 ##################################################
-# Scripts
+# Flask CLI Custom Commands
 ##################################################
 
-create-user-csv:
-	$(PY_RUN_CMD) create-user-csv
+cli:
+	$(PY_RUN_CMD) flask $(args)
 
 ##################################################
 # Miscellaneous Utilities
