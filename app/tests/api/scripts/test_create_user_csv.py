@@ -10,7 +10,6 @@ import api.app as app_entry
 import tests.api.db.models.factories as factories
 from api.db import models
 from api.db.models.user_models import User
-from api.services.users.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from tests.api.db.models.factories import UserFactory
 from tests.lib import db_testing
 

@@ -1,7 +1,8 @@
-from typing import Optional
-import click
 import logging
 import os.path as path
+from typing import Optional
+
+import click
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
@@ -18,7 +19,7 @@ user_blueprint.cli.help = "User commands"
 @flask_db.with_db_session
 @click.option("--dir", default=".")
 @click.option("--filename", default=None)
-def create_csv(db_session: db.Session, dir: str, filename: str):
+def create_csv(db_session: db.Session, dir: str, filename: Optional[str]) -> None:
     if filename is None:
         filename = utcnow().strftime("%Y-%m-%d-%H-%M-%S") + "-user-roles.csv"
     filepath = path.join(dir, filename)

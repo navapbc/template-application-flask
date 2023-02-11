@@ -1,9 +1,9 @@
 import logging
 
-import flask
-import flask.testing
 import _pytest.monkeypatch
 import boto3
+import flask
+import flask.testing
 import moto
 import pytest
 import sqlalchemy

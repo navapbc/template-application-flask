@@ -1,8 +1,8 @@
 import dataclasses
 from typing import Optional
 
-from api.db.models.base import Base
 from api.api.schemas import response_schema
+from api.db.models.base import Base
 
 
 @dataclasses.dataclass

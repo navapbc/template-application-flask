@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 
 def join_list(joining_list: Optional[list], join_txt: str = "\n") -> str:
