@@ -1,4 +1,6 @@
+import os
 import os.path as path
+import re
 
 import flask.testing
 import pytest
@@ -80,3 +82,9 @@ def test_create_user_csv(
         path.join(path.dirname(__file__), "test_create_user_csv_expected.csv")
     ).read()
     assert output == expected_output
+
+
+def test_default_filename(cli_runner: flask.testing.FlaskCliRunner, tmp_path: str):
+    cli_runner.invoke(args=["user", "create-csv", "--dir", tmp_path])
+    filenames = os.listdir(tmp_path)
+    assert re.match(r"\d{4}-\d{2}-\d{2}-\d{2}-\d{2}-\d{2}-user-roles.csv", filenames[0])
