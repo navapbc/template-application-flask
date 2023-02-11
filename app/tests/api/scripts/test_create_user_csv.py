@@ -1,15 +1,15 @@
-import csv
-import os
+import os.path as path
 
 import flask.testing
 import pytest
+from pytest_lazyfixture import lazy_fixture
 from smart_open import open as smart_open
 
 import api.adapters.db as db
 import api.app as app_entry
 import tests.api.db.models.factories as factories
 from api.db import models
-from api.db.models.user_models import User
+from api.db.models.user_models import User, Role
 from api.services.users.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
 from api.util.file_util import list_files
 from api.util.string_utils import blank_for_null
@@ -52,61 +52,34 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 @pytest.fixture
 def prepopulated_users(isolated_db_factories_session) -> list[User]:
     return [
-        UserFactory.create(first_name="A"),
-        UserFactory.create(first_name="B"),
-        UserFactory.create(first_name="C"),
+        UserFactory.create(first_name="Jon", last_name="Doe", is_active=True),
+        UserFactory.create(first_name="Jane", last_name="Doe", is_active=False),
+        UserFactory.create(
+            first_name="Alby",
+            last_name="Testin",
+            is_active=True,
+        ),
     ]
 
 
-def read_csv_records(file_path):
-    with smart_open(file_path) as csv_file:
-        csv_reader = csv.DictReader(csv_file)
-        csv_rows = list(csv_reader)
-        return csv_rows
+@pytest.fixture
+def tmp_s3_folder(mock_s3_bucket):
+    return f"s3://{mock_s3_bucket}/path/to/"
 
 
-def validate_csv_records(db_records, csv_records):
-
-    assert len(csv_records) == len(db_records)
-
-    # Sort the two lists by name and zip together for validation
-    csv_records.sort(key=lambda record: record["User Name"])
-    db_records.sort(key=lambda record: record.first_name)
-    for csv_record, db_record in zip(csv_records, db_records):
-        assert (
-            csv_record[USER_CSV_RECORD_HEADERS.user_name]
-            == f"{db_record.first_name} {db_record.last_name}"
-        )
-        assert csv_record[USER_CSV_RECORD_HEADERS.roles] == " ".join(
-            [role.type for role in db_record.roles]
-        )
-        assert csv_record[USER_CSV_RECORD_HEADERS.is_user_active] == blank_for_null(
-            db_record.is_active
-        )
-
-
-def test_create_user_csv_s3(
-    cli_runner: flask.testing.FlaskCliRunner, prepopulated_users: list[User], mock_s3_bucket: str
+@pytest.mark.parametrize(
+    "dir",
+    [
+        pytest.param(lazy_fixture("tmp_s3_folder"), id="write-to-s3"),
+        pytest.param(lazy_fixture("tmp_path"), id="write-to-local"),
+    ],
+)
+def test_create_user_csv(
+    cli_runner: flask.testing.FlaskCliRunner, prepopulated_users: list[User], dir: str
 ):
-    s3_filepath = f"s3://{mock_s3_bucket}/path/to/test.csv"
-
-    cli_runner.invoke(
-        args=[
-            "user",
-            "create-csv",
-            "--dir",
-            f"s3://{mock_s3_bucket}/path/to/",
-            "--filename",
-            "test.csv",
-        ]
-    )
-    csv_rows = read_csv_records(s3_filepath)
-    validate_csv_records(prepopulated_users, csv_rows)
-
-
-def test_create_user_csv_local(
-    cli_runner: flask.testing.FlaskCliRunner, prepopulated_users: list[User], tmp_path
-):
-    cli_runner.invoke(args=["user", "create-csv", "--dir", str(tmp_path), "--filename", "test.csv"])
-    csv_rows = read_csv_records(os.path.join(tmp_path, "test.csv"))
-    validate_csv_records(prepopulated_users, csv_rows)
+    cli_runner.invoke(args=["user", "create-csv", "--dir", dir, "--filename", "test.csv"])
+    output = smart_open(path.join(dir, "test.csv")).read()
+    expected_output = open(
+        path.join(path.dirname(__file__), "test_create_user_csv_expected.csv")
+    ).read()
+    assert output == expected_output
