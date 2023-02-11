@@ -1,5 +1,7 @@
+from typing import Optional
+import click
 import logging
-import os
+import os.path as path
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
@@ -14,16 +16,10 @@ user_blueprint.cli.help = "User commands"
 
 @user_blueprint.cli.command("create-csv", help="Create a CSV of all users and their roles")
 @flask_db.with_db_session
-def create_csv(db_session: db.Session):
-    # Build the path for the output file
-    # This will create a file in the folder specified like:
-    # s3://your-bucket/path/to/2022-09-09-12-00-00-user-roles.csv
-    # The file path can be either S3 or local disk.
-    output_path = os.getenv("USER_ROLE_CSV_OUTPUT_PATH", None)
-    if not output_path:
-        raise Exception("Please specify an USER_ROLE_CSV_OUTPUT_PATH env var")
-
-    file_name = utcnow().strftime("%Y-%m-%d-%H-%M-%S") + "-user-roles.csv"
-    output_file_path = os.path.join(output_path, file_name)
-
-    user_service.create_user_csv(db_session, output_file_path)
+@click.option("--dir", default=".")
+@click.option("--filename", default=None)
+def create_csv(db_session: db.Session, dir: str, filename: str):
+    if filename is None:
+        filename = utcnow().strftime("%Y-%m-%d-%H-%M-%S") + "-user-roles.csv"
+    filepath = path.join(dir, filename)
+    user_service.create_user_csv(db_session, filepath)

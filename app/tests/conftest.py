@@ -65,25 +65,6 @@ def db_client(monkeypatch_session) -> db.DBClient:
         yield db_client
 
 
-@pytest.fixture(scope="function")
-def isolated_db(monkeypatch) -> db.DBClient:
-    """
-    Creates an isolated database for the test function.
-
-    Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a db.DB instance that can be used to
-    get connections or sessions to this database schema. The schema is dropped
-    after the test function completes.
-
-    This is similar to the db fixture except the scope of the schema is the
-    individual test rather the test session.
-    """
-
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        models.metadata.create_all(bind=db.get_connection())
-        yield db
-
-
 @pytest.fixture
 def empty_schema(monkeypatch) -> db.DBClient:
     """
@@ -126,14 +107,6 @@ def factories_db_session(monkeypatch, test_db_session) -> db.Session:
     return test_db_session
 
 
-@pytest.fixture
-def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.Session:
-    with isolated_db.get_session() as session:
-        monkeypatch.setattr(factories, "_db_session", session)
-        logger.info("set factories db_session to %s", session)
-        yield session
-
-
 ####################
 # Test App & Client
 ####################
@@ -142,7 +115,7 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 # Make app session scoped so the database connection pool is only created once
 # for the test session. This speeds up the tests.
 @pytest.fixture(scope="session")
-def app() -> flask.Flask:
+def app(db_client) -> flask.Flask:
     return app_entry.create_app()
 
 
