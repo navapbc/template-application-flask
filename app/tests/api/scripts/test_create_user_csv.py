@@ -9,10 +9,8 @@ import api.adapters.db as db
 import api.app as app_entry
 import tests.api.db.models.factories as factories
 from api.db import models
-from api.db.models.user_models import User, Role
+from api.db.models.user_models import User
 from api.services.users.create_user_csv import USER_CSV_RECORD_HEADERS, create_user_csv
-from api.util.file_util import list_files
-from api.util.string_utils import blank_for_null
 from tests.api.db.models.factories import UserFactory
 from tests.lib import db_testing
 
