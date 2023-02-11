@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class DbConfig(PydanticBaseEnvConfig):
+    check_connection_on_init: bool = Field(True, env="DB_CHECK_CONNECTION_ON_INIT")
     host: str = Field("localhost", env="DB_HOST")
     name: str = Field("main-db", env="POSTGRES_DB")
     username: str = Field("local_db_user", env="POSTGRES_USER")

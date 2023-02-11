@@ -7,10 +7,8 @@
 
 import logging
 
-import api.adapters.db as db
 import api.app
 import api.logging
-import api.logging.audit
 from api.app_config import AppConfig
 from api.util.local import load_local_env_vars
 
@@ -21,11 +19,8 @@ def main() -> None:
     load_local_env_vars()
     app_config = AppConfig()
 
-    api.logging.audit.init()
-    root_logger = api.logging.init(__package__)
+    app = api.app.create_app()
 
-    db_client = db.init()
-    app = api.app.create_app(db_client=db_client, app_logger=root_logger)
     environment = app_config.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be
