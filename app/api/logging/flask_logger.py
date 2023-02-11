@@ -16,10 +16,10 @@ Usage:
 
     flask_logger.init_app(logger, app)
 """
-from datetime import datetime
 import logging
 
 import flask
+from time import perf_counter
 
 logger = logging.getLogger(__name__)
 EXTRA_LOG_DATA_ATTR = "extra_log_data"
@@ -76,7 +76,7 @@ def add_extra_data_to_current_request_logs(
 
 def _track_request_start_time() -> None:
     """Store the request start time in flask.g"""
-    flask.g.request_start_time = datetime.now()
+    flask.g.request_start_time = perf_counter()
 
 
 def _log_start_request() -> None:
@@ -108,7 +108,7 @@ def _log_end_request(response: flask.Response) -> flask.Response:
             "response.content_length": response.content_length,
             "response.content_type": response.content_type,
             "response.mimetype": response.mimetype,
-            "duration": datetime.now() - flask.g.request_start_time
+            "response.time_ms": (perf_counter() - flask.g.request_start_time)*1000
         },
     )
     return response
