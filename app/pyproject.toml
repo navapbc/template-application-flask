@@ -6,12 +6,16 @@ packages = [{ include = "api" }]
 authors = ["Nava Engineering <engineering@navapbc.com>"]
 include = ["openapi.yml"]
 
+# Base packages for all versions of the images
+# Any packages needed for scripts called from outside of the app
+# would go here, ie create-user-csv
 [tool.poetry.dependencies]
 python = "^3.10"
 
 [tool.poetry.group.app]
 optional = true
 
+# Packages needed for the app, will be in the release image
 # Pin the version to a specific version to speed up build times
 ## https://github.com/python-poetry/poetry/issues/2094
 [tool.poetry.group.app.dependencies]
@@ -31,6 +35,9 @@ marshmallow = "3.19.0"
 [tool.poetry.group.dev]
 optional = true
 
+# Local only packages, any packages needed for the testing suite
+# Pin the version to a specific version to speed up build times
+## https://github.com/python-poetry/poetry/issues/2094
 [tool.poetry.group.dev.dependencies]
 pytest = "7.2.0"
 black = "22.12.0"
