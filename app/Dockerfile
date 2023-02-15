@@ -81,9 +81,6 @@ COPY . ./
 # The name of the wheel file comes from pyproject.toml
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
-USER root
-RUN rm -rf /etc/ssl/ssl-cert-snakeoil.key || true
-
 #-------------------------------------------------------------------------------
 # Application only
 #-------------------------------------------------------------------------------
