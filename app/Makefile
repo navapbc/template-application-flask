@@ -33,15 +33,37 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
+# Docker user configuration
+#
+# Can be set by adding user=<username> and/ or uid=<id> to make command.
+#
+# If variables are not set explicitly: try looking up values from current
+# environment, otherwise fixed defaults.
+#
+# uid= defaults to 0 if user= set (which makes sense if user=root, otherwise you
+# probably want to set uid as well).
+#
+# Tested to work consistently on popular Linux flavors and Mac.
+ifeq ($(user),)
+RUN_USER ?= $(or $(strip $(USER)),nodummy)
+RUN_UID ?= $(or $(strip $(shell id -u)),4000)
+else
+RUN_USER = $(user)
+RUN_UID = $(or $(strip $(uid)),0)
+endif
+
+export RUN_USER
+export RUN_UID
+
 ##################################################
 # API Build & Run
 ##################################################
 
 build:
-	docker-compose build
+	docker-compose build $(APP_NAME)
 
 start:
-	docker-compose up --detach
+	docker-compose up --detach $(APP_NAME)
 
 run-logs: start
 	docker-compose logs --follow --no-color $(APP_NAME)
@@ -176,6 +198,21 @@ lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 
 create-user-csv:
 	$(PY_RUN_CMD) create-user-csv
+
+
+##################################################
+# Release Management
+##################################################
+
+release-build:
+	docker buildx build \
+		--target release \
+		--platform=linux/amd64 \
+		$(OPTS) \
+		--build-arg RUN_USER=container \
+		--build-arg RUN_UID=4000 \
+		.
+
 
 ##################################################
 # Miscellaneous Utilities
