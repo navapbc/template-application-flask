@@ -63,7 +63,7 @@ run-api = "api.__main__:main"
 db-migrate-up = "api.db.migrations.run:up"
 db-migrate-down = "api.db.migrations.run:down"
 db-migrate-down-all = "api.db.migrations.run:downall"
-create-user-csv = "api.services.users.create_user_csv:main"
+create-user-csv = "api.scripts.create_user_csv:main"
 
 [tool.black]
 line-length = 100
