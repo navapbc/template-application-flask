@@ -22,7 +22,12 @@ services:
   main-app:
     # This service relies on building from a Dockerfile in this file directory,
     # not on an image repository.
-    build: ./app
+    build: 
+      context: ./app
+      target: dev
+      args:
+        - RUN_UID=${RUN_UID:-4000}
+        - RUN_USER=${RUN_USER:-nodummy}
     # Expose the application port for local development.
 
     container_name: main-app
