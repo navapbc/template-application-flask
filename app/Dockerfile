@@ -12,14 +12,19 @@ RUN apt-get update \
     libpq-dev \
     postgresql
 
-# Install poetry, the package manager.
-# https://python-poetry.org
+# Install poetry, the package manager - https://python-poetry.org
+# We use --no-cache-dir here because the pip caches normally, and if 
+#  we don't cache, it will reduce the overall image size
+# The version is pinned so that there is a known good configuration 
+#  that we have better control over vs a range that can be used
 RUN pip install --no-cache-dir poetry==1.3.1
 
 # setup user stuff
 ARG RUN_UID
 ARG RUN_USER
 
+# The following logic creates the RUN_USER home directory and the directory where
+#  we will be storing the application in the image. This runs when the user is not root
 RUN : "${RUN_USER:?RUN_USER and RUN_UID need to be set and non-empty.}" && \
     [ "${RUN_USER}" = "root" ] || \
     (useradd -mU --home "/home/${RUN_USER}" --uid ${RUN_UID} "${RUN_USER}" \
@@ -33,19 +38,24 @@ USER ${RUN_USER}
 #-------------------------------------------------------------------------------
 FROM build as dev
 
+# Runtime arguement for what user will the bulk of this stage run as
 ARG RUN_USER
 
+# In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
+# If there is anything that needs to be ran as root, this is the spot
+
+# Change the user from root to ${RUN_USER}
 USER ${RUN_USER}
 
 # Set the application working directory.
-WORKDIR /srv
+WORKDIR /app
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.in-project false && poetry env use python
 RUN poetry install --no-root --with app,dev
 
 # Copy application files.
-COPY . /srv
+COPY . /app
 
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
@@ -63,7 +73,13 @@ CMD ["poetry", "run", "python", "-m", "api"]
 #-------------------------------------------------------------------------------
 FROM build as app-build
 
+# Runtime arguement for what user will the bulk of this stage run as
 ARG RUN_USER
+
+# In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
+# If there is anything that needs to be ran as root, this is the spot
+
+# Change the user from root to ${RUN_USER}
 USER ${RUN_USER}
 
 # Set the application working directory.
@@ -82,12 +98,18 @@ COPY . ./
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
 #-------------------------------------------------------------------------------
-# Application only
+# Production Application Image only
 #-------------------------------------------------------------------------------
-# now copy over just the installed components into the final image
+# Now copy over just the installed components into the final image
 FROM scratch as release
 
+# Runtime arguement for what user will the bulk of this stage run as
 ARG RUN_USER
+
+# In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
+# If there is anything that needs to be ran as root, this is the spot
+
+# Change the user from root to ${RUN_USER}
 USER ${RUN_USER}
 
 COPY --from=app-build /etc/passwd /etc/group /etc/
