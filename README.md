@@ -36,3 +36,13 @@ rm -fr template-application-flask
 ```
 
 Now you're ready to [get started](/docs/app/getting-started.md).
+
+## Vulnerability scanner config files
+In this repo are four configuration files for vulnerability scanner from the [template-infra repo](https://github.com/navapbc/template-infra). These files include 
+
+ - `.dockleconfig` -> Configuration for the `Dockle` scanner
+ - `.grype` -> Configuration for the `Anchore` scanner
+ - `.hadolint` -> Configuration for the `Hadolint` scanner
+ - `.trivyignore` -> Configuration for the `Trivy` scanner
+
+For more information about the configuration files and available options, see the [vulnerability README](https://github.com/navapbc/template-infra/blob/main/docs/infra/vulnerability-management.md) in the infra repo

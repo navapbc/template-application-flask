@@ -14,9 +14,9 @@ RUN apt-get update \
 
 # Install poetry, the package manager - https://python-poetry.org
 # We use --no-cache-dir here because the pip caches normally, and if 
-#  we don't cache, it will reduce the overall image size
+# we don't cache, it will reduce the overall image size
 # The version is pinned so that there is a known good configuration 
-#  that we have better control over vs a range that can be used
+# that we have better control over vs a range that can be used
 RUN pip install --no-cache-dir poetry==1.3.1
 
 # setup user stuff
@@ -24,7 +24,7 @@ ARG RUN_UID
 ARG RUN_USER
 
 # The following logic creates the RUN_USER home directory and the directory where
-#  we will be storing the application in the image. This runs when the user is not root
+# we will be storing the application in the image. This runs when the user is not root
 RUN : "${RUN_USER:?RUN_USER and RUN_UID need to be set and non-empty.}" && \
     [ "${RUN_USER}" = "root" ] || \
     (useradd -mU --home "/home/${RUN_USER}" --uid ${RUN_UID} "${RUN_USER}" \
@@ -50,12 +50,9 @@ USER ${RUN_USER}
 # Set the application working directory.
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
-RUN poetry config virtualenvs.in-project false && poetry env use python
-RUN poetry install --no-root --with app,dev
-
-# Copy application files.
 COPY . /app
+RUN poetry config virtualenvs.in-project false && poetry env use python
+RUN poetry install --no-root --with dev
 
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
@@ -85,13 +82,11 @@ USER ${RUN_USER}
 # Set the application working directory.
 WORKDIR /app
 
-# install dependencies
-# use a project-local virtualenv to be easy to find
+# Install dependencies
+# Use a project-local virtualenv to be easy to find
 ENV POETRY_VIRTUALENVS_IN_PROJECT true
-COPY pyproject.toml poetry.lock ./
-RUN poetry install --no-root --with app --without dev
-
-COPY . ./
+COPY . /app
+RUN poetry install --no-root --without dev
 
 # Install application dependencies
 # The name of the wheel file comes from pyproject.toml
@@ -112,11 +107,10 @@ ARG RUN_USER
 # Change the user from root to ${RUN_USER}
 USER ${RUN_USER}
 
+# Any required files or directories will need to be explicitly copied to
+# the release image
 COPY --from=app-build /etc/passwd /etc/group /etc/
 COPY --from=app-build /app/.venv /app/.venv
-
-# Include GPG for the DOR Import task.
-# Ideally this isn't included for every other ECS task/service, but we'll do it for now.
 
 COPY --from=app-build /usr/share/ca-certificates/* /usr/share/ca-certificates/
 COPY --from=app-build /usr/local/bin/python* /usr/local/bin/
