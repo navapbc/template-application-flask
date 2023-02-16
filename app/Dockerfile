@@ -3,7 +3,7 @@
 
 # The build stage that will be used to deploy to the various environments
 # This is what the other stages will call as their base
-FROM python:3.11-slim-bullseye AS build
+FROM python:3.11-slim-bullseye AS base
 
 # Keep container packages up-to-date.
 RUN apt-get update \
@@ -33,10 +33,10 @@ RUN : "${RUN_USER:?RUN_USER and RUN_UID need to be set and non-empty.}" && \
 
 USER ${RUN_USER}
 
-#-------------------------------------------------------------------------------
-# Development build environment
-#-------------------------------------------------------------------------------
-FROM build as dev
+######################
+##    Dev  Image    ##
+######################
+FROM base as dev
 
 # Runtime arguement for what user will the bulk of this stage run as
 ARG RUN_USER
@@ -65,10 +65,12 @@ RUN poetry install
 # Run the application.
 CMD ["poetry", "run", "python", "-m", "api"]
 
-#-------------------------------------------------------------------------------
-# Non-development build environment
-#-------------------------------------------------------------------------------
-FROM build as app-build
+#####################
+## Release Builder ##
+#####################
+# This stage is to configure the image that will be used to copy from in
+# the production stage below
+FROM base as release-build
 
 # Runtime arguement for what user will the bulk of this stage run as
 ARG RUN_USER
@@ -83,18 +85,26 @@ USER ${RUN_USER}
 WORKDIR /app
 
 # Install dependencies
-# Use a project-local virtualenv to be easy to find
-ENV POETRY_VIRTUALENVS_IN_PROJECT true
+# Set virtualenv location to be in project to be easy to find
+# This will create a virtualenv in /app/.venv/
+# See https://python-poetry.org/docs/configuration/#virtualenvsin-project
+# See https://python-poetry.org/docs/configuration/#using-environment-variables
+ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 COPY . /app
-RUN poetry install --no-root --without dev
 
 # Install application dependencies
-# The name of the wheel file comes from pyproject.toml
+RUN poetry install --no-root --without dev
+
+# Build the application binary (python wheel) defined in pyproject.toml
+# Note that this will only copy over python files, and files stated in the
+# include section in pyproject.toml. Also note that if you change the name or
+# version section in pyproject.toml, you will need to change the dist/... to match
+# or the application will not build
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
-#-------------------------------------------------------------------------------
-# Production Application Image only
-#-------------------------------------------------------------------------------
+######################
+## Production Image ##
+######################
 # Now copy over just the installed components into the final image
 FROM scratch as release
 
@@ -109,25 +119,31 @@ USER ${RUN_USER}
 
 # Any required files or directories will need to be explicitly copied to
 # the release image
-COPY --from=app-build /etc/passwd /etc/group /etc/
-COPY --from=app-build /app/.venv /app/.venv
+COPY --from=release-build /etc/passwd /etc/group /etc/
 
-COPY --from=app-build /usr/share/ca-certificates/* /usr/share/ca-certificates/
-COPY --from=app-build /usr/local/bin/python* /usr/local/bin/
+# This copies over the files generated in the application binary (python wheel)
+# from the previous step
+COPY --from=release-build /app/.venv /app/.venv
+
+COPY --from=release-build /usr/share/ca-certificates/* /usr/share/ca-certificates/
+COPY --from=release-build /usr/local/bin/python* /usr/local/bin/
 
 # Include etc files that link to /usr/local/lib/
-COPY --from=app-build /etc/ld.so.conf /etc/ld.so.cache /etc/
-COPY --from=app-build /etc/ld.so.conf.d/ /etc/ld.so.conf.d/
+COPY --from=release-build /etc/ld.so.conf /etc/ld.so.cache /etc/
+COPY --from=release-build /etc/ld.so.conf.d/ /etc/ld.so.conf.d/
 
 # Include required libs
-COPY --from=app-build /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
-COPY --from=app-build /lib/* /lib/
-COPY --from=app-build /usr/local/lib/ /usr/local/lib/
-COPY --from=app-build /usr/local/include/python* /usr/local/include/
-COPY --from=app-build /lib64/* /lib64/
-COPY --from=app-build --chown=${RUN_USER} /tmp/ /tmp/
+COPY --from=release-build /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
+COPY --from=release-build /lib/* /lib/
+COPY --from=release-build /usr/local/lib/ /usr/local/lib/
+COPY --from=release-build /usr/local/include/python* /usr/local/include/
+COPY --from=release-build /lib64/* /lib64/
+COPY --from=release-build --chown=${RUN_USER} /tmp/ /tmp/
 
+# By adding the application binary path, you can run scripts defined in the
+# pyproject.toml file as a command directly
 ENV PATH="/app/.venv/bin:$PATH"
 
-# run the application
+# Run the application using the command defined in the scripts section
+# of pyproject.toml
 CMD ["run-api"]
