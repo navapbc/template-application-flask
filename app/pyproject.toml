@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "A template flask API for building ontop of"
 packages = [{ include = "api" }]
 authors = ["Nava Engineering <engineering@navapbc.com>"]
-include = ["openapi.yml"]
+# Any non-python files that are required by the application need
+# to be included in the below section, remove the leading comment
+# include = ["path/to/some/file", "another_file.yml"]
 
 # Base packages for all versions of the images
 # Pin the version to a specific version to speed up build times
