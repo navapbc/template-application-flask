@@ -79,32 +79,16 @@ def empty_schema(monkeypatch) -> db.DBClient:
 
 
 @pytest.fixture
-def test_db_session(db_client: db.DBClient) -> db.Session:
-    # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    with db_client.get_connection() as connection:
-        trans = connection.begin()
-
-        # Rather than call db.get_session() to create a new session with a new connection,
-        # create a session bound to the existing connection that has a transaction manually start.
-        # This allows the transaction to be rolled back after the test completes.
-        with db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
-            session.begin_nested()
-
-            @sqlalchemy.event.listens_for(session, "after_transaction_end")
-            def restart_savepoint(session, transaction):
-                if transaction.nested and not transaction._parent.nested:
-                    session.begin_nested()
-
-            yield session
-
-        trans.rollback()
+def db_session(db_client: db.DBClient) -> db.Session:
+    with db_client.get_session() as session:
+        yield session
 
 
 @pytest.fixture
-def factories_db_session(monkeypatch, test_db_session) -> db.Session:
-    monkeypatch.setattr(factories, "_db_session", test_db_session)
-    logger.info("set factories db_session to %s", test_db_session)
-    return test_db_session
+def factories_db_session(monkeypatch, db_session) -> db.Session:
+    monkeypatch.setattr(factories, "_db_session", db_session)
+    logger.info("set factories db_session to %s", db_session)
+    return db_session
 
 
 ####################
