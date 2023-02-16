@@ -10,15 +10,15 @@ APP_NAME := main-app
 # Note that you can also change the LOG_FORMAT env var to switch
 # between JSON & human readable format. This is left in place
 # in the event JSON is output from a process we don't log.
-DECODE_LOG := 2>&1 | python3 -u api/logging/util/decodelog.py
+DECODE_LOG := 2>&1 | python3 -u src/logging/util/decodelog.py
 
 # A few commands need adjustments if they're run in CI, specify those here
 # TODO - when CI gets hooked up, actually test this.
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
- FLAKE8_FORMAT := '::warning file=api/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+ FLAKE8_FORMAT := '::warning file=src/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
  MYPY_FLAGS := --no-pretty
- MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=api\/\1,line=\2,col=\3::\4/"
+ MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=src\/\1,line=\2,col=\3::\4/"
 else
  FLAKE8_FORMAT := default
 endif
@@ -92,7 +92,7 @@ db-recreate: clean-docker-volumes init-db
 # DB Migrations
 #########################
 
-alembic_config := ./api/db/migrations/alembic.ini
+alembic_config := ./src/db/migrations/alembic.ini
 alembic_cmd := $(PY_RUN_CMD) alembic --config $(alembic_config)
 
 db-upgrade: ## Apply pending migrations to db
@@ -139,7 +139,7 @@ test-watch:
 	$(PY_RUN_CMD) pytest-watch --clear $(args)
 
 test-coverage:
-	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest -m "not audit" $(args)
+	$(PY_RUN_CMD) coverage run --branch --source=src -m pytest -m "not audit" $(args)
 	$(PY_RUN_CMD) coverage report
 
 test-coverage-report: ## Open HTML test coverage report
@@ -151,22 +151,22 @@ test-coverage-report: ## Open HTML test coverage report
 ##################################################
 
 format:
-	$(PY_RUN_CMD) isort --atomic api tests
-	$(PY_RUN_CMD) black api tests
+	$(PY_RUN_CMD) isort --atomic src tests
+	$(PY_RUN_CMD) black src tests
 
 format-check:
-	$(PY_RUN_CMD) isort --atomic --check-only api tests
-	$(PY_RUN_CMD) black --check api tests
+	$(PY_RUN_CMD) isort --atomic --check-only src tests
+	$(PY_RUN_CMD) black --check src tests
 
 lint: lint-py
 
 lint-py: lint-flake lint-mypy lint-poetry-version
 
 lint-flake:
-	$(PY_RUN_CMD) flake8 --format=$(FLAKE8_FORMAT) api tests
+	$(PY_RUN_CMD) flake8 --format=$(FLAKE8_FORMAT) src tests
 
 lint-mypy:
-	$(PY_RUN_CMD) mypy --show-error-codes $(MYPY_FLAGS) api $(MYPY_POSTPROC)
+	$(PY_RUN_CMD) mypy --show-error-codes $(MYPY_FLAGS) src $(MYPY_POSTPROC)
 
 lint-poetry-version: ## Check poetry version
 	grep --quiet 'lock-version = "1.1"' poetry.lock

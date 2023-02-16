@@ -8,11 +8,11 @@ import moto
 import pytest
 import sqlalchemy
 
-import api.adapters.db as db
-import api.app as app_entry
-import tests.api.db.models.factories as factories
-from api.db import models
-from api.util.local import load_local_env_vars
+import src.adapters.db as db
+import src.app as app_entry
+import tests.src.db.models.factories as factories
+from src.db import models
+from src.util.local import load_local_env_vars
 from tests.lib import db_testing
 
 logger = logging.getLogger(__name__)
