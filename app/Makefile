@@ -34,16 +34,15 @@ PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
 # Docker user configuration
-#
-# Can be set by adding user=<username> and/ or uid=<id> to make command.
-#
+# This logic is to avoid issues with permissions and mounting local volumes,
+# which should be owned by the same UID for Linux distros. Mac OS can use root,
+# but it is best practice to run things as with least permission where possible
+
+# Can be set by adding user=<username> and/ or uid=<id> after the make command
 # If variables are not set explicitly: try looking up values from current
 # environment, otherwise fixed defaults.
-#
 # uid= defaults to 0 if user= set (which makes sense if user=root, otherwise you
 # probably want to set uid as well).
-#
-# Tested to work consistently on popular Linux flavors and Mac.
 ifeq ($(user),)
 RUN_USER ?= $(or $(strip $(USER)),nodummy)
 RUN_UID ?= $(or $(strip $(shell id -u)),4000)
