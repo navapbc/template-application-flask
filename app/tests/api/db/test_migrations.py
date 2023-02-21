@@ -20,8 +20,8 @@ def empty_schema(monkeypatch) -> db.DBClient:
     This is similar to what the db_client fixture does but does not create any tables in the
     schema.
     """
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        yield db
+    with db_testing.create_isolated_db(monkeypatch) as db_client:
+        yield db_client
 
 
 def test_only_single_head_revision_in_migrations():
