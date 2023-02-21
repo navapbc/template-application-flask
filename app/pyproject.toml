@@ -2,7 +2,7 @@
 name = "template-application-flask"
 version = "0.1.0"
 description = "A template flask API for building ontop of"
-packages = [{ include = "src" }]
+packages = [{ include = "api" }]
 authors = ["Nava Engineering <engineering@navapbc.com>"]
 
 [tool.poetry.dependencies]
@@ -44,9 +44,9 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-db-migrate-up = "src.db.migrations.run:up"
-db-migrate-down = "src.db.migrations.run:down"
-db-migrate-down-all = "src.db.migrations.run:downall"
+db-migrate-up = "api.db.migrations.run:up"
+db-migrate-down = "api.db.migrations.run:down"
+db-migrate-down-all = "api.db.migrations.run:downall"
 
 [tool.black]
 line-length = 100
@@ -85,14 +85,14 @@ plugins = ["sqlalchemy.ext.mypy.plugin"]
 
 [tool.bandit]
 # Ignore audit logging test file since test audit logging requires a lot of operations that trigger bandit warnings
-exclude_dirs = ["./tests/src/logging/test_audit.py"]
+exclude_dirs = ["./tests/api/logging/test_audit.py"]
 
 [[tool.mypy.overrides]]
 # Migrations are generated without "-> None"
 # for the returns. Rather than require manually
 # fixing this for every migration generated,
 # disable the check for that folder.
-module = "src.db.migrations.versions.*"
+module = "api.db.migrations.versions.*"
 disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
@@ -108,5 +108,5 @@ markers = [
   "audit: mark a test as a security audit log test, to be run isolated from other tests"]
 
 [tool.coverage.run]
-omit = ["src/db/migrations/*.py"]
+omit = ["api/db/migrations/*.py"]
 

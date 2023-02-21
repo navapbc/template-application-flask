@@ -34,4 +34,4 @@ ENV HOST=0.0.0.0
 # https://python-poetry.org/docs/basic-usage/#installing-dependencies
 RUN poetry install
 # Run the application.
-CMD ["poetry", "run", "python", "-m", "src"]
+CMD ["poetry", "run", "python", "-m", "api"]

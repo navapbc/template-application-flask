@@ -4,7 +4,7 @@
 
 Run `make format` to run all of the formatters.
 
-When we run migrations via alembic, we autorun the formatters on the generated files. See [alembic.ini](/app/src/db/migrations/alembic.ini) for configuration.
+When we run migrations via alembic, we autorun the formatters on the generated files. See [alembic.ini](/app/api/db/migrations/alembic.ini) for configuration.
 
 ### Isort
 [isort](https://pycqa.github.io/isort/) is used to sort our Python imports. Configuration options can be found in [pyproject.toml - tool.isort](/app/pyproject.toml)

@@ -12,7 +12,7 @@ This is the API layer. It includes a few separate components:
 ```text
 root
 ├── app
-│   └── src
+│   └── api
 │       └── auth                Authentication code for API
 │       └── db
 │           └── models          DB model definitions            
@@ -68,7 +68,7 @@ Running in the native/local approach may require additional packages to be insta
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running most other components outside the container.
+Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/docker-compose.yml) file, and loaded [by a script](/app/api/util/local.py) automatically when running most other components outside the container.
 
 Any environment variables specified directly in the [docker-compose](/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
 
