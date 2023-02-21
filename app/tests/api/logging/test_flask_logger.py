@@ -1,10 +1,10 @@
 import logging
 import sys
 
+import api.logging.flask_logger as flask_logger
 import pytest
 from flask import Flask
 
-import api.logging.flask_logger as flask_logger
 from tests.lib.assertions import assert_dict_contains
 
 

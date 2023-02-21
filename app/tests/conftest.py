@@ -1,17 +1,17 @@
 import logging
 
 import _pytest.monkeypatch
+import api.adapters.db as db
+import api.app as app_entry
 import boto3
 import flask
 import flask.testing
 import moto
 import pytest
-
-import api.adapters.db as db
-import api.app as app_entry
-import tests.api.db.models.factories as factories
 from api.db import models
 from api.util.local import load_local_env_vars
+
+import tests.api.db.models.factories as factories
 from tests.lib import db_testing
 
 logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ def db_session(db_client: db.DBClient) -> db.Session:
 
 
 @pytest.fixture
-def factories_db_session(monkeypatch, db_session) -> db.Session:
+def enable_factory_create(monkeypatch, db_session) -> db.Session:
     monkeypatch.setattr(factories, "_db_session", db_session)
     logger.info("set factories db_session to %s", db_session)
     return db_session

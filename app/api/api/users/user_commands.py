@@ -2,13 +2,13 @@ import logging
 import os.path as path
 from typing import Optional
 
-import click
-
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
 import api.services.users as user_service
-from api.api.users.user_blueprint import user_blueprint
+import click
 from api.util.datetime_util import utcnow
+
+from api.api.users.user_blueprint import user_blueprint
 
 logger = logging.getLogger(__name__)
 

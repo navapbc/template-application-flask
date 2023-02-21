@@ -1,10 +1,9 @@
 import logging
 import re
 
-import pytest
-
 import api.logging
 import api.logging.formatters as formatters
+import pytest
 
 
 def _init_test_logger(

@@ -20,7 +20,7 @@ def truncate_user(db_session: db.Session):
 
 
 @pytest.fixture
-def prepopulated_users(factories_db_session) -> list[User]:
+def prepopulated_users(enable_factory_create) -> list[User]:
     return [
         UserFactory.create(first_name="Jon", last_name="Doe", is_active=True),
         UserFactory.create(first_name="Jane", last_name="Doe", is_active=False),

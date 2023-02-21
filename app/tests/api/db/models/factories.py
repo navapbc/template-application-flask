@@ -10,14 +10,13 @@ https://factoryboy.readthedocs.io/en/latest/ for more information.
 from datetime import datetime
 from typing import Optional
 
+import api.adapters.db as db
+import api.db.models.user_models as user_models
+import api.util.datetime_util as datetime_util
 import factory
 import factory.fuzzy
 import faker
 from sqlalchemy.orm import scoped_session
-
-import api.adapters.db as db
-import api.db.models.user_models as user_models
-import api.util.datetime_util as datetime_util
 
 _db_session: Optional[db.Session] = None
 
@@ -25,7 +24,7 @@ fake = faker.Faker()
 
 
 def get_db_session() -> db.Session:
-    # _db_session is only set in the pytest fixture `factories_db_session`
+    # _db_session is only set in the pytest fixture `enable_factory_create`
     # so that tests do not unintentionally write to the database.
     if _db_session is None:
         raise Exception(
@@ -36,7 +35,7 @@ def get_db_session() -> db.Session:
             not persist the generated model.
 
             If running tests that actually need data in the DB, pull in the
-            `factories_db_session` fixture to initialize the db_session.
+            `enable_factory_create` fixture to initialize the db_session.
             """
         )
 

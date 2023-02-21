@@ -5,7 +5,6 @@ from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError
-
 from api.db.migrations.run import alembic_cfg
 
 

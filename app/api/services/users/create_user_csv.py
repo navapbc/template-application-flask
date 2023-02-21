@@ -2,10 +2,9 @@ import csv
 import logging
 from dataclasses import asdict, dataclass
 
-from smart_open import open as smart_open
-
 import api.adapters.db as db
 from api.db.models.user_models import User
+from smart_open import open as smart_open
 
 logger = logging.getLogger(__name__)
 

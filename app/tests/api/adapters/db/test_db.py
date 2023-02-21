@@ -1,12 +1,11 @@
 import logging  # noqa: B1
 from itertools import product
 
-import pytest
-from sqlalchemy import text
-
 import api.adapters.db as db
+import pytest
 from api.adapters.db.client import get_connection_parameters, make_connection_uri, verify_ssl
 from api.adapters.db.config import DbConfig, get_db_config
+from sqlalchemy import text
 
 
 class DummyConnectionInfo:

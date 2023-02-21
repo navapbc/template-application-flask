@@ -41,10 +41,9 @@ Example:
 from functools import wraps
 from typing import Any, Callable, Concatenate, ParamSpec, TypeVar
 
-from flask import Flask, current_app
-
 import api.adapters.db as db
 from api.adapters.db.client import DBClient
+from flask import Flask, current_app
 
 _FLASK_EXTENSION_KEY = "db"
 

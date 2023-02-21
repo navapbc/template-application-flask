@@ -4,11 +4,10 @@ from operator import attrgetter
 from typing import TypedDict
 
 import apiflask
-from sqlalchemy import orm
-
 from api.adapters.db import Session
 from api.db.models.user_models import Role, User
 from api.services.users.create_user import RoleParams
+from sqlalchemy import orm
 
 
 class PatchUserParams(TypedDict, total=False):

@@ -1,8 +1,7 @@
 import pytest
+from api.auth.api_key_auth import API_AUTH_USER, verify_token
 from apiflask import HTTPError
 from flask import g
-
-from api.auth.api_key_auth import API_AUTH_USER, verify_token
 
 
 def test_verify_token_success(app, api_auth_token):

@@ -1,9 +1,8 @@
 import logging
 from typing import Optional
 
-from pydantic import Field
-
 from api.util.env_config import PydanticBaseEnvConfig
+from pydantic import Field
 
 logger = logging.getLogger(__name__)
 
