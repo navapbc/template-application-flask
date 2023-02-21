@@ -176,16 +176,13 @@ format-check:
 
 lint: lint-py
 
-lint-py: lint-flake lint-mypy lint-poetry-version
+lint-py: lint-flake lint-mypy
 
 lint-flake:
 	$(PY_RUN_CMD) flake8 --format=$(FLAKE8_FORMAT) api tests
 
 lint-mypy:
 	$(PY_RUN_CMD) mypy --show-error-codes $(MYPY_FLAGS) api $(MYPY_POSTPROC)
-
-lint-poetry-version: ## Check poetry version
-	grep --quiet 'lock-version = "1.1"' poetry.lock
 
 lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 	$(PY_RUN_CMD) bandit -c pyproject.toml -r . --number 3 --skip B101 -ll -x ./.venv
