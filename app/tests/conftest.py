@@ -6,7 +6,6 @@ import flask
 import flask.testing
 import moto
 import pytest
-import sqlalchemy
 
 import api.adapters.db as db
 import api.app as app_entry
@@ -63,19 +62,6 @@ def db_client(monkeypatch_session) -> db.DBClient:
     with db_testing.create_isolated_db(monkeypatch_session) as db_client:
         models.metadata.create_all(bind=db_client.get_connection())
         yield db_client
-
-
-@pytest.fixture
-def empty_schema(monkeypatch) -> db.DBClient:
-    """
-    Create a test schema, if it doesn't already exist, and drop it after the
-    test completes.
-
-    This is similar to the db fixture but does not create any tables in the
-    schema. This is used by migration tests.
-    """
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        yield db
 
 
 @pytest.fixture
