@@ -14,7 +14,9 @@ from tests.api.db.models.factories import UserFactory
 
 @pytest.fixture
 def prepopulate_user_table(enable_factory_create, db_session: db.Session) -> list[User]:
-    # First make sure the table is empty
+    # First make sure the table is empty, as other tests may have inserted data
+    # and this test expects a clean slate (unlike most tests that are designed to
+    # be isolated from other tests)
     db_session.query(User).delete()
     return [
         UserFactory.create(first_name="Jon", last_name="Doe", is_active=True),
