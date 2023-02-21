@@ -1,11 +1,27 @@
 import logging  # noqa: B1
 
+import api.adapters.db as db
 import pytest
 from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError
 from api.db.migrations.run import alembic_cfg
+
+from tests.lib import db_testing
+
+
+@pytest.fixture
+def empty_schema(monkeypatch) -> db.DBClient:
+    """
+    Create a test schema, if it doesn't already exist, and drop it after the
+    test completes.
+
+    This is similar to the db fixture but does not create any tables in the
+    schema. This is used by migration tests.
+    """
+    with db_testing.create_isolated_db(monkeypatch) as db:
+        yield db
 
 
 def test_only_single_head_revision_in_migrations():

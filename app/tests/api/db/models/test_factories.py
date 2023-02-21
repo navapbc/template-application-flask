@@ -5,21 +5,6 @@ import pytest
 from api.db.models.user_models import User
 
 from tests.api.db.models.factories import RoleFactory, UserFactory
-from tests.lib import db_testing
-
-
-@pytest.fixture
-def empty_schema(monkeypatch) -> db.DBClient:
-    """
-    Create a test schema, if it doesn't already exist, and drop it after the
-    test completes.
-
-    This is similar to the db fixture but does not create any tables in the
-    schema. This is used by migration tests.
-    """
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        yield db
-
 
 user_params = {
     "first_name": "Alvin",
