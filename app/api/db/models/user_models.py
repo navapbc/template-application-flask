@@ -28,13 +28,15 @@ class User(Base, IdMixin, TimestampMixin):
     date_of_birth: date = Column(Date, nullable=False)
     is_active: bool = Column(Boolean, nullable=False)
 
-    roles: list["Role"] = relationship("Role", back_populates="user", order_by="Role.type")
+    roles: list["Role"] = relationship(
+        "Role", back_populates="user", cascade="all, delete", order_by="Role.type"
+    )
 
 
 class Role(Base, TimestampMixin):
     __tablename__ = "role"
     user_id: Mapped[UUID] = Column(
-        postgresql.UUID(as_uuid=True), ForeignKey("user.id"), primary_key=True
+        postgresql.UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
     )
 
     # Set native_enum=False to use store enum values as VARCHAR/TEXT
