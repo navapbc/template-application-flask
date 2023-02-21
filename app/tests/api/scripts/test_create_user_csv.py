@@ -13,12 +13,12 @@ from tests.api.db.models.factories import UserFactory
 
 
 @pytest.fixture
-def truncate_user(db_session: db.Session):
+def truncate_user_table(db_session: db.Session):
     db_session.query(User).delete()
 
 
 @pytest.fixture
-def prepopulated_users(enable_factory_create) -> list[User]:
+def prepopulate_user_table(enable_factory_create) -> list[User]:
     return [
         UserFactory.create(first_name="Jon", last_name="Doe", is_active=True),
         UserFactory.create(first_name="Jane", last_name="Doe", is_active=False),
@@ -43,9 +43,9 @@ def tmp_s3_folder(mock_s3_bucket):
     ],
 )
 def test_create_user_csv(
-    truncate_user,
+    truncate_user_table,
+    prepopulate_user_table: list[User],
     cli_runner: flask.testing.FlaskCliRunner,
-    prepopulated_users: list[User],
     dir: str,
 ):
     cli_runner.invoke(args=["user", "create-csv", "--dir", dir, "--filename", "test.csv"])
