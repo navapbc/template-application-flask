@@ -17,8 +17,8 @@ def empty_schema(monkeypatch) -> db.DBClient:
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
 
-    This is similar to the db fixture but does not create any tables in the
-    schema. This is used by migration tests.
+    This is similar to what the db_client fixture does but does not create any tables in the
+    schema.
     """
     with db_testing.create_isolated_db(monkeypatch) as db:
         yield db

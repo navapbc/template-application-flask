@@ -54,7 +54,7 @@ def db_client(monkeypatch_session) -> db.DBClient:
     Creates an isolated database for the test session.
 
     Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a db.DB instance that can be used to
+    using SQLAlchemy, then returns a db.DBClient instance that can be used to
     get connections or sessions to this database schema. The schema is dropped
     after the test suite session completes.
     """
@@ -66,13 +66,22 @@ def db_client(monkeypatch_session) -> db.DBClient:
 
 @pytest.fixture
 def db_session(db_client: db.DBClient) -> db.Session:
-    # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
+    """
+    Returns a database session connected to the schema used for the test session.
+    """
     with db_client.get_session() as session:
         yield session
 
 
 @pytest.fixture
 def enable_factory_create(monkeypatch, db_session) -> db.Session:
+    """
+    Allows the create method of factories to be called. By default, the create
+    throws an exception to prevent accidental creation of database objects for tests
+    that do not need persistence. This fixture only allows the create method to be
+    called for the current test. Each test that needs to call Factory.create should pull in
+    this fixture.
+    """
     monkeypatch.setattr(factories, "_db_session", db_session)
     logger.info("set factories db_session to %s", db_session)
     return db_session
