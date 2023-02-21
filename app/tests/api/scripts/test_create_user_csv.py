@@ -9,9 +9,7 @@ from api.db.models.user_models import User
 from pytest_lazyfixture import lazy_fixture
 from smart_open import open as smart_open
 
-import tests.api.db.models.factories as factories
 from tests.api.db.models.factories import UserFactory
-from tests.lib import db_testing
 
 
 @pytest.fixture
