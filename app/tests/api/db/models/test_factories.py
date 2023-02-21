@@ -1,9 +1,9 @@
 from datetime import date, datetime
 
-import api.adapters.db as db
 import pytest
-from api.db.models.user_models import User
 
+import api.adapters.db as db
+from api.db.models.user_models import User
 from tests.api.db.models.factories import RoleFactory, UserFactory
 
 user_params = {

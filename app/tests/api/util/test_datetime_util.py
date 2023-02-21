@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 
 import pytest
 import pytz
+
 from api.util.datetime_util import adjust_timezone
 
 

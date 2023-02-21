@@ -1,8 +1,8 @@
-from api.db.models import user_models
 from apiflask import fields
 from marshmallow import fields as marshmallow_fields
 
 from api.api.schemas import request_schema
+from api.db.models import user_models
 
 
 class RoleSchema(request_schema.OrderedSchema):

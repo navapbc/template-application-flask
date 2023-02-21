@@ -2,13 +2,13 @@ import os
 import os.path as path
 import re
 
-import api.adapters.db as db
 import flask.testing
 import pytest
-from api.db.models.user_models import User
 from pytest_lazyfixture import lazy_fixture
 from smart_open import open as smart_open
 
+import api.adapters.db as db
+from api.db.models.user_models import User
 from tests.api.db.models.factories import UserFactory
 
 

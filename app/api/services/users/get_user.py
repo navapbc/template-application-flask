@@ -1,7 +1,8 @@
 import apiflask
+from sqlalchemy import orm
+
 from api.adapters.db import Session
 from api.db.models.user_models import User
-from sqlalchemy import orm
 
 
 # TODO: separate controller and service concerns

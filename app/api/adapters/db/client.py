@@ -15,8 +15,9 @@ from typing import Any
 import psycopg2
 import sqlalchemy
 import sqlalchemy.pool as pool
-from api.adapters.db.config import DbConfig, get_db_config
 from sqlalchemy.orm import session
+
+from api.adapters.db.config import DbConfig, get_db_config
 
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.

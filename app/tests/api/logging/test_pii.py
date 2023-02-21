@@ -1,5 +1,6 @@
-import api.logging.pii as pii
 import pytest
+
+import api.logging.pii as pii
 
 
 @pytest.mark.parametrize(

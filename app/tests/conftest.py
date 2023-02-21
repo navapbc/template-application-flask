@@ -1,17 +1,17 @@
 import logging
 
 import _pytest.monkeypatch
-import api.adapters.db as db
-import api.app as app_entry
 import boto3
 import flask
 import flask.testing
 import moto
 import pytest
+
+import api.adapters.db as db
+import api.app as app_entry
+import tests.api.db.models.factories as factories
 from api.db import models
 from api.util.local import load_local_env_vars
-
-import tests.api.db.models.factories as factories
 from tests.lib import db_testing
 
 logger = logging.getLogger(__name__)

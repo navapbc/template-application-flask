@@ -2,18 +2,18 @@ import logging
 import os
 from typing import Optional
 
-import api.adapters.db as db
-import api.adapters.db.flask_db as flask_db
-import api.logging
-import api.logging.flask_logger as flask_logger
-from api.auth.api_key_auth import User, get_app_security_scheme
 from apiflask import APIFlask
 from flask import g
 from werkzeug.exceptions import Unauthorized
 
+import api.adapters.db as db
+import api.adapters.db.flask_db as flask_db
+import api.logging
+import api.logging.flask_logger as flask_logger
 from api.api.healthcheck import healthcheck_blueprint
 from api.api.schemas import response_schema
 from api.api.users import user_blueprint
+from api.auth.api_key_auth import User, get_app_security_scheme
 
 logger = logging.getLogger(__name__)
 

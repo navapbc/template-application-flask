@@ -2,9 +2,9 @@ import json
 import logging
 import re
 
-import api.logging.formatters as formatters
 import pytest
 
+import api.logging.formatters as formatters
 from tests.lib.assertions import assert_dict_contains
 
 

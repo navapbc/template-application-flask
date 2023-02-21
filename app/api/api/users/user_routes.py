@@ -3,14 +3,13 @@ from typing import Any
 
 import api.adapters.db as db
 import api.adapters.db.flask_db as flask_db
-import api.services.users as user_service
-import api.services.users as users
-from api.auth.api_key_auth import api_key_auth
-from api.db.models.user_models import User
-
 import api.api.response as response
 import api.api.users.user_schemas as user_schemas
+import api.services.users as user_service
+import api.services.users as users
 from api.api.users.user_blueprint import user_blueprint
+from api.auth.api_key_auth import api_key_auth
+from api.db.models.user_models import User
 
 logger = logging.getLogger(__name__)
 

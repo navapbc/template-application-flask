@@ -1,8 +1,9 @@
-import api.adapters.db as db
-import api.adapters.db.flask_db as flask_db
 import pytest
 from flask import Flask, current_app
 from sqlalchemy import text
+
+import api.adapters.db as db
+import api.adapters.db.flask_db as flask_db
 
 
 # Define an isolated example Flask app fixture specific to this test module
