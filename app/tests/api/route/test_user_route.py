@@ -27,7 +27,7 @@ def base_request():
 
 @pytest.fixture
 def created_user(client, api_auth_token, base_request):
-    response = client.post("/v1/user", json=base_request, headers={"X-Auth": api_auth_token})
+    response = client.post("/v1/users", json=base_request, headers={"X-Auth": api_auth_token})
     return response.get_json()["data"]
 
 
@@ -44,7 +44,7 @@ def test_create_and_get_user(client, base_request, api_auth_token, roles):
         **base_request,
         "roles": roles,
     }
-    post_response = client.post("/v1/user", json=request, headers={"X-Auth": api_auth_token})
+    post_response = client.post("/v1/users", json=request, headers={"X-Auth": api_auth_token})
     post_response_data = post_response.get_json()["data"]
     expected_response = {
         **request,
@@ -60,7 +60,7 @@ def test_create_and_get_user(client, base_request, api_auth_token, roles):
 
     # Get the user
     user_id = post_response.get_json()["data"]["id"]
-    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
 
     assert get_response.status_code == 200
 
@@ -117,7 +117,7 @@ test_create_user_bad_request_data = [
 
 @pytest.mark.parametrize("request_data,expected_response_data", test_create_user_bad_request_data)
 def test_create_user_bad_request(client, api_auth_token, request_data, expected_response_data):
-    response = client.post("/v1/user", json=request_data, headers={"X-Auth": api_auth_token})
+    response = client.post("/v1/users", json=request_data, headers={"X-Auth": api_auth_token})
     assert response.status_code == 422
 
     response_data = response.get_json()["detail"]["json"]
@@ -128,7 +128,7 @@ def test_patch_user(client, api_auth_token, created_user):
     user_id = created_user["id"]
     patch_request = {"first_name": fake.first_name()}
     patch_response = client.patch(
-        f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
+        f"/v1/users/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
     patch_response_data = patch_response.get_json()["data"]
     expected_response_data = {
@@ -140,7 +140,7 @@ def test_patch_user(client, api_auth_token, created_user):
     assert patch_response.status_code == 200
     assert patch_response_data == expected_response_data
 
-    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
     get_response_data = get_response.get_json()["data"]
 
     assert get_response_data == expected_response_data
@@ -154,13 +154,13 @@ def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, u
         "roles": initial_roles,
     }
     created_user = client.post(
-        "/v1/user", json=post_request, headers={"X-Auth": api_auth_token}
+        "/v1/users", json=post_request, headers={"X-Auth": api_auth_token}
     ).get_json()["data"]
     user_id = created_user["id"]
 
     patch_request = {"roles": updated_roles}
     patch_response = client.patch(
-        f"/v1/user/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
+        f"/v1/users/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
     patch_response_data = patch_response.get_json()["data"]
     expected_response_data = {
@@ -172,16 +172,16 @@ def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, u
     assert patch_response.status_code == 200
     assert patch_response_data == expected_response_data
 
-    get_response = client.get(f"/v1/user/{user_id}", headers={"X-Auth": api_auth_token})
+    get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
     get_response_data = get_response.get_json()["data"]
 
     assert get_response_data == expected_response_data
 
 
 test_unauthorized_data = [
-    pytest.param("post", "/v1/user", get_base_request(), id="post"),
-    pytest.param("get", f"/v1/user/{uuid.uuid4()}", None, id="get"),
-    pytest.param("patch", f"/v1/user/{uuid.uuid4()}", {}, id="patch"),
+    pytest.param("post", "/v1/users", get_base_request(), id="post"),
+    pytest.param("get", f"/v1/users/{uuid.uuid4()}", None, id="get"),
+    pytest.param("patch", f"/v1/users/{uuid.uuid4()}", {}, id="patch"),
 ]
 
 
@@ -205,7 +205,7 @@ test_not_found_data = [
 @pytest.mark.parametrize("method,body", test_not_found_data)
 def test_not_found(client, api_auth_token, method, body):
     user_id = uuid.uuid4()
-    url = f"/v1/user/{user_id}"
+    url = f"/v1/users/{user_id}"
     response = getattr(client, method)(url, json=body, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404

@@ -33,6 +33,19 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
+FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
+
+##################################################
+# Local Development Environment Setup
+##################################################
+
+setup-local:
+	# Configure poetry to use virtualenvs in the project directory
+	poetry config virtualenvs.in-project true
+
+	# Install dependencies
+	poetry install --no-root
+
 ##################################################
 # API Build & Run
 ##################################################
@@ -46,7 +59,6 @@ start:
 run-logs: start
 	docker-compose logs --follow --no-color $(APP_NAME)
 
-
 init: build init-db
 
 clean-volumes: ## Remove project docker volumes (which includes the DB state)
@@ -56,13 +68,6 @@ stop:
 	docker-compose down
 
 check: format-check lint test
-
-# Set init-db as pre-requisite since there seems to be a race condition
-# where the DB can't yet receive connections if it's starting from a 
-# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
-openapi-spec: init-db ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml --output ./openapi.yml
-
 
 ##################################################
 # DB & migrations
@@ -168,11 +173,21 @@ lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 
 
 ##################################################
-# Scripts
+# CLI Commands
 ##################################################
 
-create-user-csv:
-	$(PY_RUN_CMD) create-user-csv
+cmd: ## Run Flask app CLI command (Run `make cli args="--help"` to see list of CLI commands)
+	$(FLASK_CMD) $(args)
+
+cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cli-user-create-csv args="--help"` to see the command's options)
+	$(FLASK_CMD) user create-csv $(args)
+
+# Set init-db as pre-requisite since there seems to be a race condition
+# where the DB can't yet receive connections if it's starting from a 
+# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
+openapi-spec: init-db ## Generate OpenAPI spec
+	$(FLASK_CMD) spec --format yaml --output ./openapi.yml
+
 
 ##################################################
 # Miscellaneous Utilities
@@ -184,10 +199,3 @@ login: start ## Start shell in running container
 # Pauses for 5 seconds
 sleep-5:
 	sleep 5
-
-setup-local:
-	# Configure poetry to use virtualenvs in the project directory
-	poetry config virtualenvs.in-project true
-
-	# Install dependencies
-	poetry install --no-root

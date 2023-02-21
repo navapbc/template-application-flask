@@ -2,9 +2,10 @@ import logging
 
 import _pytest.monkeypatch
 import boto3
+import flask
+import flask.testing
 import moto
 import pytest
-import sqlalchemy
 
 import api.adapters.db as db
 import api.app as app_entry
@@ -53,7 +54,7 @@ def db_client(monkeypatch_session) -> db.DBClient:
     Creates an isolated database for the test session.
 
     Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a db.DB instance that can be used to
+    using SQLAlchemy, then returns a db.DBClient instance that can be used to
     get connections or sessions to this database schema. The schema is dropped
     after the test suite session completes.
     """
@@ -63,73 +64,27 @@ def db_client(monkeypatch_session) -> db.DBClient:
         yield db_client
 
 
-@pytest.fixture(scope="function")
-def isolated_db(monkeypatch) -> db.DBClient:
-    """
-    Creates an isolated database for the test function.
-
-    Creates a new empty PostgreSQL schema, creates all tables in the new schema
-    using SQLAlchemy, then returns a db.DB instance that can be used to
-    get connections or sessions to this database schema. The schema is dropped
-    after the test function completes.
-
-    This is similar to the db fixture except the scope of the schema is the
-    individual test rather the test session.
-    """
-
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        models.metadata.create_all(bind=db.get_connection())
-        yield db
-
-
 @pytest.fixture
-def empty_schema(monkeypatch) -> db.DBClient:
+def db_session(db_client: db.DBClient) -> db.Session:
     """
-    Create a test schema, if it doesn't already exist, and drop it after the
-    test completes.
-
-    This is similar to the db fixture but does not create any tables in the
-    schema. This is used by migration tests.
+    Returns a database session connected to the schema used for the test session.
     """
-    with db_testing.create_isolated_db(monkeypatch) as db:
-        yield db
-
-
-@pytest.fixture
-def test_db_session(db_client: db.DBClient) -> db.Session:
-    # Based on https://docs.sqlalchemy.org/en/13/orm/session_transaction.html#joining-a-session-into-an-external-transaction-such-as-for-test-suites
-    with db_client.get_connection() as connection:
-        trans = connection.begin()
-
-        # Rather than call db.get_session() to create a new session with a new connection,
-        # create a session bound to the existing connection that has a transaction manually start.
-        # This allows the transaction to be rolled back after the test completes.
-        with db.Session(bind=connection, autocommit=False, expire_on_commit=False) as session:
-            session.begin_nested()
-
-            @sqlalchemy.event.listens_for(session, "after_transaction_end")
-            def restart_savepoint(session, transaction):
-                if transaction.nested and not transaction._parent.nested:
-                    session.begin_nested()
-
-            yield session
-
-        trans.rollback()
-
-
-@pytest.fixture
-def factories_db_session(monkeypatch, test_db_session) -> db.Session:
-    monkeypatch.setattr(factories, "_db_session", test_db_session)
-    logger.info("set factories db_session to %s", test_db_session)
-    return test_db_session
-
-
-@pytest.fixture
-def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.Session:
-    with isolated_db.get_session() as session:
-        monkeypatch.setattr(factories, "_db_session", session)
-        logger.info("set factories db_session to %s", session)
+    with db_client.get_session() as session:
         yield session
+
+
+@pytest.fixture
+def enable_factory_create(monkeypatch, db_session) -> db.Session:
+    """
+    Allows the create method of factories to be called. By default, the create
+    throws an exception to prevent accidental creation of database objects for tests
+    that do not need persistence. This fixture only allows the create method to be
+    called for the current test. Each test that needs to call Factory.create should pull in
+    this fixture.
+    """
+    monkeypatch.setattr(factories, "_db_session", db_session)
+    logger.info("set factories db_session to %s", db_session)
+    return db_session
 
 
 ####################
@@ -140,13 +95,18 @@ def isolated_db_factories_session(monkeypatch, isolated_db: db.DBClient) -> db.S
 # Make app session scoped so the database connection pool is only created once
 # for the test session. This speeds up the tests.
 @pytest.fixture(scope="session")
-def app():
+def app(db_client) -> flask.Flask:
     return app_entry.create_app()
 
 
 @pytest.fixture
-def client(app):
+def client(app: flask.Flask) -> flask.testing.FlaskClient:
     return app.test_client()
+
+
+@pytest.fixture
+def cli_runner(app: flask.Flask) -> flask.testing.CliRunner:
+    return app.test_cli_runner()
 
 
 @pytest.fixture

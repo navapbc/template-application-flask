@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 
 def join_list(joining_list: Optional[list], join_txt: str = "\n") -> str:
@@ -12,17 +12,3 @@ def join_list(joining_list: Optional[list], join_txt: str = "\n") -> str:
         return ""
 
     return join_txt.join(joining_list)
-
-
-def blank_for_null(value: Optional[Any]) -> str:
-    """
-    Utility to make a string blank if its null
-
-    Functionally equivalent to
-
-    ```"" if value is None else str(value)```
-    """
-    # If a value is blank
-    if value is None:
-        return ""
-    return str(value)

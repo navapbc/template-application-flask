@@ -37,6 +37,7 @@ bandit = "^1.7.4"
 
 [tool.poetry.group.dev.dependencies]
 pytest-watch = "^4.2.0"
+pytest-lazy-fixture = "^0.6.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -46,7 +47,6 @@ build-backend = "poetry.core.masonry.api"
 db-migrate-up = "api.db.migrations.run:up"
 db-migrate-down = "api.db.migrations.run:down"
 db-migrate-down-all = "api.db.migrations.run:downall"
-create-user-csv = "api.scripts.create_user_csv:main"
 
 [tool.black]
 line-length = 100

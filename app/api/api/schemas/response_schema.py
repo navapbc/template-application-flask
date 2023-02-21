@@ -1,6 +1,6 @@
 from apiflask import fields
 
-from api.route.schemas import request_schema
+from api.api.schemas import request_schema
 
 
 class ValidationErrorSchema(request_schema.OrderedSchema):

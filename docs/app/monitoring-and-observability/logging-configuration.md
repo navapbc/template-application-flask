@@ -12,7 +12,7 @@ We have two separate ways of formatting the logs which are controlled by the `LO
 
 ```json
 {
-    "name": "api.route.healthcheck",
+    "name": "api.api.healthcheck",
     "levelname": "INFO",
     "funcName": "healthcheck_get",
     "created": "1663261542.0465896",
