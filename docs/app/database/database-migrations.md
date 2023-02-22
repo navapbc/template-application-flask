@@ -31,7 +31,7 @@ $ make db-upgrade
 <details>
     <summary>Example: Adding a new column to an existing table:</summary>
 
-1. Manually update the database models with the changes ([example_models.py](/app/api/db/models/example_models.py) in this example)
+1. Manually update the database models with the changes ([example_models.py](/app/src/db/models/example_models.py) in this example)
 ```python
 class ExampleTable(Base):
     ...
