@@ -3,8 +3,8 @@ import contextlib
 import logging
 import uuid
 
-import api.adapters.db as db
-from api.adapters.db.config import get_db_config
+import src.adapters.db as db
+from src.adapters.db.config import get_db_config
 
 logger = logging.getLogger(__name__)
 

@@ -31,12 +31,13 @@ make setup-local
 
 ## Run the application
 
-1. In your terminal, `cd` to the app directory of this repo.
+1. In your terminal, `cd` to the `app` directory of this repo.
 2. Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed & running.
-3. Run `make init start` to build the image and start the container.
-4. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
-5. Run `make run-logs` to see the logs of the running API container
-6. Run `make stop` when you are done to delete the container.
+3. Run `make setup-local` to copy over `.env.example` to `.env`
+4. Run `make init start` to build the image and start the container.
+5. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
+6. Run `make run-logs` to see the logs of the running API container
+7. Run `make stop` when you are done to delete the container.
 
 ## Next steps
 
