@@ -13,9 +13,9 @@ RUN apt-get update \
     postgresql
 
 # Install poetry, the package manager - https://python-poetry.org
-# We use --no-cache-dir here because the pip caches normally, and if 
+# We use --no-cache-dir here because the pip caches normally, and if
 # we don't cache, it will reduce the overall image size
-# The version is pinned so that there is a known good configuration 
+# The version is pinned so that there is a known good configuration
 # that we have better control over vs a range that can be used
 RUN pip install --no-cache-dir poetry==1.3.1
 
@@ -38,7 +38,7 @@ USER ${RUN_USER}
 ######################
 FROM base as dev
 
-# Runtime arguement for what user will the bulk of this stage run as
+# Runtime argument for what user will the bulk of this stage run as
 ARG RUN_USER
 
 # In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
@@ -72,7 +72,7 @@ CMD ["poetry", "run", "python", "-m", "api"]
 # the production stage below
 FROM base as release-build
 
-# Runtime arguement for what user will the bulk of this stage run as
+# Runtime argument for what user will the bulk of this stage run as
 ARG RUN_USER
 
 # In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
@@ -108,7 +108,7 @@ RUN poetry build --format wheel && poetry run pip install 'dist/template_applica
 # Now copy over just the installed components into the final image
 FROM scratch as release
 
-# Runtime arguement for what user will the bulk of this stage run as
+# Runtime argument for what user will the bulk of this stage run as
 ARG RUN_USER
 
 # In between ARG RUN_USER and USER ${RUN_USER}, the user is still root
@@ -125,12 +125,7 @@ COPY --from=release-build /etc/passwd /etc/group /etc/
 # from the previous step
 COPY --from=release-build /app/.venv /app/.venv
 
-COPY --from=release-build /usr/share/ca-certificates/* /usr/share/ca-certificates/
 COPY --from=release-build /usr/local/bin/python* /usr/local/bin/
-
-# Include etc files that link to /usr/local/lib/
-COPY --from=release-build /etc/ld.so.conf /etc/ld.so.cache /etc/
-COPY --from=release-build /etc/ld.so.conf.d/ /etc/ld.so.conf.d/
 
 # Include required libs
 COPY --from=release-build /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
