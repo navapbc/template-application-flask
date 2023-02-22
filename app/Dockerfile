@@ -63,7 +63,7 @@ ENV HOST=0.0.0.0
 RUN poetry install
 
 # Run the application.
-CMD ["poetry", "run", "python", "-m", "api"]
+CMD ["poetry", "run", "python", "-m", "src"]
 
 #####################
 ## Release Builder ##
