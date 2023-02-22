@@ -2,7 +2,7 @@
 
 See [Technical Overview](./technical-overview.md) for details on the technologies used.
 
-Each endpoint is configured in the [openapi.yml](/app/openapi.yml) file which provides basic request validation. Each endpoint specifies an `operationId` that maps to a function defined in the code that will handle the request.
+Each endpoint is configured in the [openapi.generated.yml](/app/openapi.generated.yml) file which provides basic request validation. Each endpoint specifies an `operationId` that maps to a function defined in the code that will handle the request.
 
 To make handling a request easier, an [ApiContext](/app/src/util/api_context.py) exists which will fetch the DB session, request body, and current user. This can be used like so:
 ```py
@@ -28,10 +28,10 @@ For more complex usages, it is recommended you put the implementation into a sep
 
 # Swagger
 
-The Swagger UI  can be reached locally at [http://localhost:8080/docs](http://localhost:8080/docs) when running the API. The UI is based on the [openapi.yml](/app/openapi.yml) file.
+The Swagger UI  can be reached locally at [http://localhost:8080/docs](http://localhost:8080/docs) when running the API. The UI is based on the [openapi.generated.yml](/app/openapi.generated.yml) file.
 ![Swagger UI](/docs/app/images/swagger-ui.png)
 
-Each of the endpoints you've described in your openapi.yml file will appear here, organized based on their defined tags. For any endpoints with authentication added, you can add your authentication information by selecting `Authorize` in the top right.
+Each of the endpoints you've described in your openapi.generated.yml file will appear here, organized based on their defined tags. For any endpoints with authentication added, you can add your authentication information by selecting `Authorize` in the top right.
 ![Swagger Auth](/docs/app/images/swagger-auth.png)
 
 All model schemas defined can be found at the bottom of the UI.
