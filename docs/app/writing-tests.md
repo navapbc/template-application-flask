@@ -16,7 +16,7 @@ For this project specifically:
 
 - All tests live under `app/tests/`
 - Under `tests/`, the organization mirrors the source code structure
-  - The tests for `app/api/route/` are found at `app/test/api/route/`
+  - The tests for `app/src/route/` are found at `app/test/api/route/`
 - Create `__init__.py` files for each directory. This helps [avoid name
   conflicts when pytest is resolving
   tests](https://docs.pytest.org/en/stable/goodpractices.html#tests-outside-application-code).
@@ -66,7 +66,7 @@ They can be imported into tests from the path `tests.helpers`, for example,
 
 To facilitate easier setup of test data, most database models have factories via
 [factory_boy](https://factoryboy.readthedocs.io/) in
-`app/api/db/models/factories.py`.
+`app/src/db/models/factories.py`.
 
 There are a few different ways of [using the
 factories](https://factoryboy.readthedocs.io/en/stable/#using-factories), termed

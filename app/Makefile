@@ -10,15 +10,15 @@ APP_NAME := main-app
 # Note that you can also change the LOG_FORMAT env var to switch
 # between JSON & human readable format. This is left in place
 # in the event JSON is output from a process we don't log.
-DECODE_LOG := 2>&1 | python3 -u api/logging/util/decodelog.py
+DECODE_LOG := 2>&1 | python3 -u src/logging/util/decodelog.py
 
 # A few commands need adjustments if they're run in CI, specify those here
 # TODO - when CI gets hooked up, actually test this.
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
- FLAKE8_FORMAT := '::warning file=api/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+ FLAKE8_FORMAT := '::warning file=src/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
  MYPY_FLAGS := --no-pretty
- MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=api\/\1,line=\2,col=\3::\4/"
+ MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=src\/\1,line=\2,col=\3::\4/"
 else
  FLAKE8_FORMAT := default
 endif
@@ -33,6 +33,19 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
+FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
+
+##################################################
+# Local Development Environment Setup
+##################################################
+
+setup-local:
+	# Configure poetry to use virtualenvs in the project directory
+	poetry config virtualenvs.in-project true
+
+	# Install dependencies
+	poetry install --no-root
+
 ##################################################
 # API Build & Run
 ##################################################
@@ -46,7 +59,6 @@ start:
 run-logs: start
 	docker-compose logs --follow --no-color $(APP_NAME)
 
-
 init: build init-db
 
 clean-volumes: ## Remove project docker volumes (which includes the DB state)
@@ -56,13 +68,6 @@ stop:
 	docker-compose down
 
 check: format-check lint test
-
-# Set init-db as pre-requisite since there seems to be a race condition
-# where the DB can't yet receive connections if it's starting from a 
-# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
-openapi-spec: init-db ## Generate OpenAPI spec
-	$(PY_RUN_CMD) flask spec --format yaml --output ./openapi.yml
-
 
 ##################################################
 # DB & migrations
@@ -87,7 +92,7 @@ db-recreate: clean-docker-volumes init-db
 # DB Migrations
 #########################
 
-alembic_config := ./api/db/migrations/alembic.ini
+alembic_config := ./src/db/migrations/alembic.ini
 alembic_cmd := $(PY_RUN_CMD) alembic --config $(alembic_config)
 
 db-upgrade: ## Apply pending migrations to db
@@ -134,7 +139,7 @@ test-watch:
 	$(PY_RUN_CMD) pytest-watch --clear $(args)
 
 test-coverage:
-	$(PY_RUN_CMD) coverage run --branch --source=api -m pytest -m "not audit" $(args)
+	$(PY_RUN_CMD) coverage run --branch --source=src -m pytest -m "not audit" $(args)
 	$(PY_RUN_CMD) coverage report
 
 test-coverage-report: ## Open HTML test coverage report
@@ -146,36 +151,43 @@ test-coverage-report: ## Open HTML test coverage report
 ##################################################
 
 format:
-	$(PY_RUN_CMD) isort --atomic api tests
-	$(PY_RUN_CMD) black api tests
+	$(PY_RUN_CMD) isort --atomic src tests
+	$(PY_RUN_CMD) black src tests
 
 format-check:
-	$(PY_RUN_CMD) isort --atomic --check-only api tests
-	$(PY_RUN_CMD) black --check api tests
+	$(PY_RUN_CMD) isort --atomic --check-only src tests
+	$(PY_RUN_CMD) black --check src tests
 
 lint: lint-py
 
-lint-py: lint-flake lint-mypy lint-poetry-version
+lint-py: lint-flake lint-mypy
 
 lint-flake:
-	$(PY_RUN_CMD) flake8 --format=$(FLAKE8_FORMAT) api tests
+	$(PY_RUN_CMD) flake8 --format=$(FLAKE8_FORMAT) src tests
 
 lint-mypy:
-	$(PY_RUN_CMD) mypy --show-error-codes $(MYPY_FLAGS) api $(MYPY_POSTPROC)
-
-lint-poetry-version: ## Check poetry version
-	grep --quiet 'lock-version = "1.1"' poetry.lock
+	$(PY_RUN_CMD) mypy --show-error-codes $(MYPY_FLAGS) src $(MYPY_POSTPROC)
 
 lint-security: # https://bandit.readthedocs.io/en/latest/index.html
 	$(PY_RUN_CMD) bandit -c pyproject.toml -r . --number 3 --skip B101 -ll -x ./.venv
 
 
 ##################################################
-# Scripts
+# CLI Commands
 ##################################################
 
-create-user-csv:
-	$(PY_RUN_CMD) create-user-csv
+cmd: ## Run Flask app CLI command (Run `make cli args="--help"` to see list of CLI commands)
+	$(FLASK_CMD) $(args)
+
+cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cli-user-create-csv args="--help"` to see the command's options)
+	$(FLASK_CMD) user create-csv $(args)
+
+# Set init-db as pre-requisite since there seems to be a race condition
+# where the DB can't yet receive connections if it's starting from a 
+# clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
+openapi-spec: init-db ## Generate OpenAPI spec
+	$(FLASK_CMD) spec --format yaml --output ./openapi.yml
+
 
 ##################################################
 # Miscellaneous Utilities
@@ -187,10 +199,3 @@ login: start ## Start shell in running container
 # Pauses for 5 seconds
 sleep-5:
 	sleep 5
-
-setup-local:
-	# Configure poetry to use virtualenvs in the project directory
-	poetry config virtualenvs.in-project true
-
-	# Install dependencies
-	poetry install --no-root
