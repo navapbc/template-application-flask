@@ -207,7 +207,7 @@ cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cl
 # where the DB can't yet receive connections if it's starting from a
 # clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
 openapi-spec: init-db ## Generate OpenAPI spec
-	$(FLASK_CMD) spec --format yaml --output ./openapi.yml
+	$(FLASK_CMD) spec --format yaml --output ./openapi.generated.yml
 
 
 
