@@ -6,8 +6,7 @@ from uuid import UUID
 
 from sqlalchemy import TIMESTAMP, Column, MetaData, inspect
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import declarative_mixin
+from sqlalchemy.orm import as_declarative, declarative_mixin
 from sqlalchemy.sql.functions import now as sqlnow
 
 from src.util import datetime_util

@@ -13,7 +13,7 @@ authors = ["Nava Engineering <engineering@navapbc.com>"]
 ## https://github.com/python-poetry/poetry/issues/2094
 [tool.poetry.dependencies]
 python = "^3.10"
-SQLAlchemy = {extras = ["mypy"], version = "1.4.46"}
+SQLAlchemy = {extras = ["mypy"], version = "2.0"}
 alembic = "1.9.1"
 psycopg2-binary = "2.9.5"
 python-dotenv = "0.21.0"
@@ -23,7 +23,7 @@ boto3 = "1.26.49"
 smart-open = "6.3.0"
 pytz = "2022.7"
 APIFlask = "1.2.1"
-marshmallow-dataclass = {extras = ["enum", "union"], version = "8.5.11"}
+marshmallow-dataclass = {extras = ["enum","union"], version = "8.5.11"}
 marshmallow = "3.19.0"
 
 [tool.poetry.group.dev]
@@ -113,10 +113,12 @@ disallow_untyped_defs = false
 filterwarnings = [
   "ignore::DeprecationWarning:botocore.*",
   "ignore::DeprecationWarning:apispec.*",
-  "ignore::DeprecationWarning:certifi.*"] # pytest-watch errors if the closing bracket is on it's own line
+  "ignore::DeprecationWarning:certifi.*"
+] # pytest-watch errors if the closing bracket is on it's own line
 
 markers = [
-  "audit: mark a test as a security audit log test, to be run isolated from other tests"]
+  "audit: mark a test as a security audit log test, to be run isolated from other tests"
+]
 
 [tool.coverage.run]
 omit = ["src/db/migrations/*.py"]
