@@ -13,7 +13,7 @@ authors = ["Nava Engineering <engineering@navapbc.com>"]
 ## https://github.com/python-poetry/poetry/issues/2094
 [tool.poetry.dependencies]
 python = "^3.10"
-SQLAlchemy = {extras = ["mypy"], version = "2.0"}
+SQLAlchemy = {extras = ["mypy"], version = "1.4.7"}
 alembic = "1.9.1"
 psycopg2-binary = "2.9.5"
 python-dotenv = "0.21.0"
