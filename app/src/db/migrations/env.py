@@ -15,7 +15,7 @@ from src.util.local import load_local_env_vars  # noqa: E402 isort:skip
 
 load_local_env_vars()
 
-from src.adapters.db.client import make_connection_uri  # noqa: E402 isort:skip
+from src.adapters.db.engine.postgres_engine import make_connection_uri  # noqa: E402 isort:skip
 from src.adapters.db.config import get_db_config  # noqa: E402 isort:skip
 from src.db.models import metadata  # noqa: E402 isort:skip
 import src.logging  # noqa: E402 isort:skip

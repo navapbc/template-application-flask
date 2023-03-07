@@ -9,7 +9,7 @@ To use this module with Flask, use the flask_db module.
 Usage:
     import src.adapters.db as db
 
-    db_client = db.init()
+    db_client = db.init(PostgresEngine())
 
     # non-ORM style usage
     with db_client.get_connection() as conn:

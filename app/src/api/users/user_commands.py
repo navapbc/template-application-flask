@@ -16,7 +16,7 @@ user_blueprint.cli.help = "User commands"
 
 
 @user_blueprint.cli.command("create-csv", help="Create a CSV of all users and their roles")
-@flask_db.with_db_session
+@flask_db.with_db_session()
 @click.option(
     "--dir",
     default=".",
