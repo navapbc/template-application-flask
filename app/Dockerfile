@@ -27,7 +27,7 @@ ARG RUN_USER
 # we will be storing the application in the image. This runs when the user is not root
 RUN : "${RUN_USER:?RUN_USER and RUN_UID need to be set and non-empty.}" && \
     [ "${RUN_USER}" = "root" ] || \
-    (useradd -mU --home "/home/${RUN_USER}" --uid ${RUN_UID} "${RUN_USER}" \
+    (useradd --create-home --create --user-group --home "/home/${RUN_USER}" --uid ${RUN_UID} "${RUN_USER}" \
     && mkdir /app \
     && chown -R ${RUN_UID} "/home/${RUN_USER}" /app)
 
