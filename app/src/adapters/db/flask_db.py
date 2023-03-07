@@ -1,7 +1,7 @@
 """
 This module has functionality to extend Flask with a database client.
 
-To initialize this flask extension, call init_app() with an instance
+To initialize this flask extension, call register_db_client() with an instance
 of a Flask app and an instance of a DBClient.
 
 Example:
@@ -10,7 +10,7 @@ Example:
 
     db_client = db.init(PostgresEngine())
     app = APIFlask(__name__)
-    flask_db.init_app(db_client, app)
+    flask_db.register_db_client(db_client, app)
 
 Then, in a request handler, use the with_db_session decorator to get a
 new database session that lasts for the duration of the request.
@@ -49,7 +49,7 @@ from src.adapters.db.client import DBClient
 _DEFAULT_FLASK_EXTENSION_KEY = "db"
 
 
-def init_app(
+def register_db_client(
     db_client: DBClient, app: Flask, client_name: str = _DEFAULT_FLASK_EXTENSION_KEY
 ) -> None:
     """Initialize the Flask app.
@@ -70,7 +70,7 @@ def get_db(app: Flask, client_name: str = _DEFAULT_FLASK_EXTENSION_KEY) -> DBCli
 
     Use this in request handlers to access the database from the active Flask app.
 
-    Specify the same client_name as used in init_app to get the correct client
+    Specify the same client_name as used in register_db_client to get the correct client
 
     Example:
         from flask import current_app
