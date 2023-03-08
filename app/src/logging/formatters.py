@@ -8,11 +8,41 @@ See https://docs.python.org/3/library/logging.html#formatter-objects
 """
 import json
 import logging
-from datetime import datetime
-
-from pydantic.json import pydantic_encoder
+from datetime import date, datetime
+from decimal import Decimal
+from enum import Enum
+from typing import Any
+from uuid import UUID
 
 import src.logging.decodelog as decodelog
+
+
+def json_encoder(obj: Any) -> Any:
+    """
+    Handle conversion of various types when logs
+    are serialized into JSON. If not specified
+    will attempt to convert using str() on the object
+    """
+
+    match obj:
+        case str() | int() | float() | bool() | None:
+            return obj
+        case datetime() | date():
+            return obj.isoformat()
+        case Decimal():
+            return str(obj)
+        case Enum():
+            return obj.value
+        case UUID():
+            return str(obj)
+        case Exception():
+            return str(obj)
+        case set():
+            # The JSON library will handle
+            # iterating over and potentially calling this again
+            return list(obj)
+        case _:
+            return str(obj)
 
 
 class JsonFormatter(logging.Formatter):
@@ -23,7 +53,7 @@ class JsonFormatter(logging.Formatter):
         # see https://github.com/python/cpython/blob/main/Lib/logging/__init__.py#L690-L720
         super().format(record)
 
-        return json.dumps(record.__dict__, separators=(",", ":"), default=pydantic_encoder)
+        return json.dumps(record.__dict__, separators=(",", ":"), default=json_encoder)
 
 
 HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH = decodelog.DEFAULT_MESSAGE_WIDTH
