@@ -6,12 +6,14 @@ be used used during development.
 
 See https://docs.python.org/3/library/logging.html#formatter-objects
 """
-
+import pydantic
+import pydantic.json
 import json
 import logging
 from datetime import datetime
 
 import src.logging.decodelog as decodelog
+
 
 
 class JsonFormatter(logging.Formatter):
@@ -21,7 +23,12 @@ class JsonFormatter(logging.Formatter):
         # logging.Formatter.format adds the `message` attribute to the LogRecord
         # see https://github.com/python/cpython/blob/main/Lib/logging/__init__.py#L690-L720
         super().format(record)
-        return json.dumps(record.__dict__, separators=(",", ":"))
+
+        x = json.dumps(record.__dict__, separators=(",", ":"), default=pydantic.json.pydantic_encoder)
+        print("*"*50)
+        print(record.__dict__)
+        return x
+
 
 
 HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH = decodelog.DEFAULT_MESSAGE_WIDTH

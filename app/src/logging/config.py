@@ -57,6 +57,7 @@ def configure_logging() -> logging.Logger:
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+    logging.getLogger("src.services").setLevel(logging.ERROR)
 
     return logging.root
 
