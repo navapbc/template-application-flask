@@ -26,7 +26,7 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
-    db_client = db.init_postgres_client()
+    db_client = db.PostgresDBClient()
     with db_client.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:

@@ -8,14 +8,21 @@ import sqlalchemy
 import sqlalchemy.pool as pool
 
 from src.adapters.db.client import DBClient
-from src.adapters.db.config import DbConfig, get_db_config
+from src.adapters.db.config import DBConfig, get_db_config
 
 logger = logging.getLogger(__name__)
 
 
 class PostgresDBClient(DBClient):
-    def __init__(self) -> None:
-        self.db_config = get_db_config()
+    """
+    An implementation of a DBClient for connecting to a Postgres DB
+    as configured by parameters passed in from the db_config
+    """
+
+    def __init__(self, db_config: DBConfig | None = None) -> None:
+        if not db_config:
+            db_config = get_db_config()
+        self.db_config = db_config
         super().__init__()
 
         if self.db_config.check_connection_on_init:
@@ -73,7 +80,7 @@ class PostgresDBClient(DBClient):
             #     have_all_migrations_run(engine)
 
 
-def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:
+def get_connection_parameters(db_config: DBConfig) -> dict[str, Any]:
     connect_args = {}
     environment = os.getenv("ENVIRONMENT")
     if not environment:
@@ -94,7 +101,7 @@ def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:
     )
 
 
-def make_connection_uri(config: DbConfig) -> str:
+def make_connection_uri(config: DBConfig) -> str:
     """Construct PostgreSQL connection URI
 
     More details at:
@@ -140,7 +147,3 @@ def verify_ssl(connection_info: Any) -> None:
         )
     else:
         logger.warning("database connection is not using SSL")
-
-
-def init_postgres_client() -> DBClient:
-    return PostgresDBClient()

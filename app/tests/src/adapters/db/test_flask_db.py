@@ -11,7 +11,7 @@ import src.adapters.db.flask_db as flask_db
 @pytest.fixture
 def example_app() -> Flask:
     app = Flask(__name__)
-    db_client = db.init_postgres_client()
+    db_client = db.PostgresDBClient()
     flask_db.register_db_client(db_client, app)
     return app
 
@@ -38,7 +38,7 @@ def test_with_db_session(example_app: Flask):
 
 
 def test_with_db_session_not_default_name(example_app: Flask):
-    db_client = db.init_postgres_client()
+    db_client = db.PostgresDBClient()
     flask_db.register_db_client(db_client, example_app, client_name="something_else")
 
     @example_app.route("/hello")

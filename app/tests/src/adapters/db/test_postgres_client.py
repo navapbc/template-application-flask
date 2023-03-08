@@ -3,12 +3,12 @@ from itertools import product
 
 import pytest
 
-from src.adapters.db.config import DbConfig, get_db_config
-from src.adapters.db.postgres_client import (
+from src.adapters.db.clients.postgres_client import (
     get_connection_parameters,
     make_connection_uri,
     verify_ssl,
 )
+from src.adapters.db.config import DBConfig, get_db_config
 
 
 class DummyConnectionInfo:
@@ -64,7 +64,7 @@ def test_make_connection_uri(username_password_port, expected):
     username, password, port = username_password_port
     assert (
         make_connection_uri(
-            DbConfig(
+            DBConfig(
                 host="localhost",
                 name="dbname",
                 username=username,
