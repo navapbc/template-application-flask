@@ -11,7 +11,8 @@ src.logging.pii for more information.
 Usage:
     import src.logging
 
-    src.logging.init("program name")
+    with src.logging.Log("program name"):
+        ...
 
 Once the module has been initialized, the standard logging module can be
 used to log messages:
@@ -36,11 +37,17 @@ logger = logging.getLogger(__name__)
 _original_argv = tuple(sys.argv)
 
 
-def init(program_name: str) -> logging.Logger:
-    root_logger = config.configure_logging()
+class Log:
+    def __init__(self, program_name: str) -> None:
+        self.program_name = program_name
+        self.root_logger, self.stream_handler = config.configure_logging()
+        log_program_info(self.program_name)
 
-    log_program_info(program_name)
-    return root_logger
+    def __enter__(self) -> logging.Logger:
+        return self.root_logger
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.root_logger.removeHandler(self.stream_handler)
 
 
 def log_program_info(program_name: str) -> None:

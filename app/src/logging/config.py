@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Tuple
 
 import src.logging.audit
 import src.logging.formatters as formatters
@@ -7,6 +8,8 @@ import src.logging.pii as pii
 from src.util.env_config import PydanticBaseEnvConfig
 
 logger = logging.getLogger(__name__)
+
+is_initialized = False
 
 
 class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
@@ -24,14 +27,13 @@ class LoggingConfig(PydanticBaseEnvConfig):
         env_nested_delimiter = "__"
 
 
-def configure_logging() -> logging.Logger:
+def configure_logging() -> Tuple[logging.Logger, logging.Handler]:
     """Configure logging for the application.
 
     Configures the root module logger to log to stdout.
     Adds a PII mask filter to the root logger.
     Also configures log levels third party packages.
     """
-
     config = LoggingConfig()
 
     # Loggers can be configured using config functions defined
@@ -46,6 +48,7 @@ def configure_logging() -> logging.Logger:
     formatter = get_formatter(config)
     console_handler.setFormatter(formatter)
     console_handler.addFilter(pii.mask_pii)
+    logging.root.removeHandler(console_handler)
     logging.root.addHandler(console_handler)
     logging.root.setLevel(config.level)
 
@@ -57,9 +60,8 @@ def configure_logging() -> logging.Logger:
     logging.getLogger("werkzeug").setLevel(logging.WARN)
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
-    logging.getLogger("src.services").setLevel(logging.ERROR)
 
-    return logging.root
+    return logging.root, console_handler
 
 
 def get_formatter(config: LoggingConfig) -> logging.Formatter:

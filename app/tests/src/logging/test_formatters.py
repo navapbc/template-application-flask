@@ -29,6 +29,7 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
         "foo": "bar",
     }
     assert_dict_contains(json_record, expected)
+    logger.removeHandler(console_handler)
 
 
 def test_human_readable_formatter(capsys: pytest.CaptureFixture):
@@ -47,3 +48,4 @@ def test_human_readable_formatter(capsys: pytest.CaptureFixture):
         rest
         == "  test_human_readable_formatter       \x1b[0m test_human_readable_formatter \x1b[31mWARNING \x1b[0m \x1b[31mhello interpolated_string                         \x1b[0m \x1b[34mfoo=bar\x1b[0m\n"
     )
+    logger.removeHandler(console_handler)

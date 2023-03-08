@@ -17,7 +17,7 @@ from tests.lib import db_testing
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def env_vars():
     load_local_env_vars()
 
@@ -83,7 +83,6 @@ def enable_factory_create(monkeypatch, db_session) -> db.Session:
     this fixture.
     """
     monkeypatch.setattr(factories, "_db_session", db_session)
-    logger.info("set factories db_session to %s", db_session)
     return db_session
 
 
