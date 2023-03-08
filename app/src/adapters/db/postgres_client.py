@@ -7,16 +7,13 @@ import psycopg2
 import sqlalchemy
 import sqlalchemy.pool as pool
 
+from src.adapters.db.client import DBClient
 from src.adapters.db.config import DbConfig, get_db_config
-from src.adapters.db.engine.db_engine import DbEngine
 
 logger = logging.getLogger(__name__)
 
 
-
-class PostgresEngine(DbEngine):
-
-
+class PostgresDBClient(DBClient):
     def __init__(self) -> None:
         self.db_config = get_db_config()
         super().__init__()
@@ -143,3 +140,7 @@ def verify_ssl(connection_info: Any) -> None:
         )
     else:
         logger.warning("database connection is not using SSL")
+
+
+def init_postgres_client() -> DBClient:
+    return PostgresDBClient()

@@ -4,7 +4,7 @@ from itertools import product
 import pytest
 
 from src.adapters.db.config import DbConfig, get_db_config
-from src.adapters.db.engine.postgres_engine import (
+from src.adapters.db.postgres_client import (
     get_connection_parameters,
     make_connection_uri,
     verify_ssl,

@@ -7,12 +7,11 @@ This module also contains lower level connection related functions such as
 make_connection_uri that can be used outside of the application context such as for
 database migrations.
 """
+import abc
 import logging
 
 import sqlalchemy
 from sqlalchemy.orm import session
-
-from src.adapters.db.engine.db_engine import DbEngine
 
 # Re-export the Connection type that is returned by the get_connection() method
 # to be used for type hints.
@@ -25,17 +24,25 @@ Session = session.Session
 logger = logging.getLogger(__name__)
 
 
-class DBClient:
+class DBClient(abc.ABC, metaclass=abc.ABCMeta):
     """Database connection manager.
 
     This class is used to manage database connections for the Flask app.
     It has methods for getting a new connection or session object.
     """
 
-    _db_engine: DbEngine
+    _engine: sqlalchemy.engine.Engine
 
-    def __init__(self, db_engine: DbEngine) -> None:
-        self._db_engine = db_engine
+    def __init__(self) -> None:
+        self._engine = self._configure_engine()
+
+    @abc.abstractmethod
+    def _configure_engine(self) -> sqlalchemy.engine.Engine:
+        raise NotImplementedError()
+
+    @abc.abstractmethod
+    def check_db_connection(self) -> None:
+        raise NotImplementedError()
 
     def get_connection(self) -> Connection:
         """Return a new database connection object.
@@ -46,7 +53,7 @@ class DBClient:
             with db.get_connection() as conn:
                 conn.execute(...)
         """
-        return self._db_engine.get_connection()
+        return self._engine.connect()
 
     def get_session(self) -> Session:
         """Return a new session object.
@@ -64,8 +71,4 @@ class DBClient:
                 # session is automatically committed here
                 # or rolled back if an exception is raised
         """
-        return self._db_engine.get_session()
-
-
-def init(db_engine: DbEngine) -> DBClient:
-    return DBClient(db_engine)
+        return Session(bind=self._engine, expire_on_commit=False, autocommit=False)

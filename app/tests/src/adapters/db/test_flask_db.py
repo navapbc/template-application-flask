@@ -4,7 +4,6 @@ from sqlalchemy import text
 
 import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
-from src.adapters.db.engine.postgres_engine import PostgresEngine
 
 
 # Define an isolated example Flask app fixture specific to this test module
@@ -12,7 +11,7 @@ from src.adapters.db.engine.postgres_engine import PostgresEngine
 @pytest.fixture
 def example_app() -> Flask:
     app = Flask(__name__)
-    db_client = db.init(PostgresEngine())
+    db_client = db.init_postgres_client()
     flask_db.register_db_client(db_client, app)
     return app
 
@@ -39,7 +38,7 @@ def test_with_db_session(example_app: Flask):
 
 
 def test_with_db_session_not_default_name(example_app: Flask):
-    db_client = db.init(PostgresEngine())
+    db_client = db.init_postgres_client()
     flask_db.register_db_client(db_client, example_app, client_name="something_else")
 
     @example_app.route("/hello")

@@ -10,7 +10,6 @@ import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
 import src.logging
 import src.logging.flask_logger as flask_logger
-from src.adapters.db.engine.postgres_engine import PostgresEngine
 from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
@@ -25,7 +24,7 @@ def create_app() -> APIFlask:
     root_logger = src.logging.init(__package__)
     flask_logger.init_app(root_logger, app)
 
-    db_client = db.init(PostgresEngine())
+    db_client = db.init_postgres_client()
     flask_db.register_db_client(db_client, app)
 
     configure_app(app)

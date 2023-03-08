@@ -8,7 +8,7 @@ Example:
     import src.adapters.db as db
     import src.adapters.db.flask_db as flask_db
 
-    db_client = db.init(PostgresEngine())
+    db_client = db.init_postgres_client()
     app = APIFlask(__name__)
     flask_db.register_db_client(db_client, app)
 
