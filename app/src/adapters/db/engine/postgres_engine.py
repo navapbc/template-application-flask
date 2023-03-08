@@ -13,11 +13,18 @@ from src.adapters.db.engine.db_engine import DbEngine
 logger = logging.getLogger(__name__)
 
 
+
 class PostgresEngine(DbEngine):
+
+
     def __init__(self) -> None:
         self.db_config = get_db_config()
+        super().__init__()
 
-    def build_engine(self) -> sqlalchemy.engine.Engine:
+        if self.db_config.check_connection_on_init:
+            self.check_db_connection()
+
+    def _configure_engine(self) -> sqlalchemy.engine.Engine:
         # We want to be able to control the connection parameters for each
         # connection because for IAM authentication with RDS, short-lived tokens are
         # used as the password, and so we potentially need to generate a fresh token
@@ -45,31 +52,28 @@ class PostgresEngine(DbEngine):
             # json_serializer=lambda o: json.dumps(o, default=pydantic.json.pydantic_encoder),
         )
 
-    def check_db_connection(self, conn: sqlalchemy.engine.Connection) -> None:
-        conn_info = conn.connection.dbapi_connection.info  # type: ignore
+    def check_db_connection(self) -> None:
+        with self.get_connection() as conn:
+            conn_info = conn.connection.dbapi_connection.info  # type: ignore
 
-        logger.info(
-            "connected to postgres db",
-            extra={
-                "dbname": conn_info.dbname,
-                "user": conn_info.user,
-                "host": conn_info.host,
-                "port": conn_info.port,
-                "options": conn_info.options,
-                "dsn_parameters": conn_info.dsn_parameters,
-                "protocol_version": conn_info.protocol_version,
-                "server_version": conn_info.server_version,
-            },
-        )
-        verify_ssl(conn_info)
+            logger.info(
+                "connected to postgres db",
+                extra={
+                    "dbname": conn_info.dbname,
+                    "user": conn_info.user,
+                    "host": conn_info.host,
+                    "port": conn_info.port,
+                    "options": conn_info.options,
+                    "dsn_parameters": conn_info.dsn_parameters,
+                    "protocol_version": conn_info.protocol_version,
+                    "server_version": conn_info.server_version,
+                },
+            )
+            verify_ssl(conn_info)
 
-        # TODO add check_migrations_current to config
-        # if check_migrations_current:
-        #     have_all_migrations_run(engine)
-
-    @property
-    def check_connection_on_init(self) -> bool:
-        return self.db_config.check_connection_on_init
+            # TODO add check_migrations_current to config
+            # if check_migrations_current:
+            #     have_all_migrations_run(engine)
 
 
 def get_connection_parameters(db_config: DbConfig) -> dict[str, Any]:

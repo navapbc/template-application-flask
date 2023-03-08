@@ -33,17 +33,9 @@ class DBClient:
     """
 
     _db_engine: DbEngine
-    _engine: sqlalchemy.engine.Engine
 
     def __init__(self, db_engine: DbEngine) -> None:
         self._db_engine = db_engine
-        self._engine = db_engine.build_engine()
-
-        # Try connecting to the database immediately upon initialization
-        # so that we can fail fast if the database is not available.
-        # Checking the db connection on db init is disabled in tests.
-        if db_engine.check_connection_on_init:
-            self.check_db_connection()
 
     def get_connection(self) -> Connection:
         """Return a new database connection object.
@@ -54,7 +46,7 @@ class DBClient:
             with db.get_connection() as conn:
                 conn.execute(...)
         """
-        return self._engine.connect()
+        return self._db_engine.get_connection()
 
     def get_session(self) -> Session:
         """Return a new session object.
@@ -72,13 +64,7 @@ class DBClient:
                 # session is automatically committed here
                 # or rolled back if an exception is raised
         """
-        return Session(bind=self._engine, expire_on_commit=False, autocommit=False)
-
-    def check_db_connection(self) -> None:
-        """Check that we can connect to the database and log some info about the connection."""
-        logger.info("connecting to db")
-        with self.get_connection() as conn:
-            self._db_engine.check_db_connection(conn)
+        return self._db_engine.get_session()
 
 
 def init(db_engine: DbEngine) -> DBClient:
