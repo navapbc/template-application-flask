@@ -4,7 +4,7 @@ import logging
 import uuid
 
 import src.adapters.db as db
-from src.adapters.db.config import get_db_config
+from src.adapters.db.clients.postgres_config import get_db_config
 
 logger = logging.getLogger(__name__)
 

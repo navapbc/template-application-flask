@@ -8,7 +8,7 @@ from src.adapters.db.clients.postgres_client import (
     make_connection_uri,
     verify_ssl,
 )
-from src.adapters.db.config import DBConfig, get_db_config
+from src.adapters.db.clients.postgres_config import PostgresDBConfig, get_db_config
 
 
 class DummyConnectionInfo:
@@ -64,7 +64,7 @@ def test_make_connection_uri(username_password_port, expected):
     username, password, port = username_password_port
     assert (
         make_connection_uri(
-            DBConfig(
+            PostgresDBConfig(
                 host="localhost",
                 name="dbname",
                 username=username,

@@ -8,7 +8,7 @@ from src.util.env_config import PydanticBaseEnvConfig
 logger = logging.getLogger(__name__)
 
 
-class DBConfig(PydanticBaseEnvConfig):
+class PostgresDBConfig(PydanticBaseEnvConfig):
     check_connection_on_init: bool = Field(True, env="DB_CHECK_CONNECTION_ON_INIT")
     host: str = Field("localhost", env="DB_HOST")
     name: str = Field("main-db", env="POSTGRES_DB")
@@ -19,8 +19,8 @@ class DBConfig(PydanticBaseEnvConfig):
     hide_sql_parameter_logs: bool = Field(True, env="HIDE_SQL_PARAMETER_LOGS")
 
 
-def get_db_config() -> DBConfig:
-    db_config = DBConfig()
+def get_db_config() -> PostgresDBConfig:
+    db_config = PostgresDBConfig()
 
     logger.info(
         "Constructed database configuration",

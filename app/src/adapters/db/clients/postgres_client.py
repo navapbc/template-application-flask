@@ -8,7 +8,7 @@ import sqlalchemy
 import sqlalchemy.pool as pool
 
 from src.adapters.db.client import DBClient
-from src.adapters.db.config import DBConfig, get_db_config
+from src.adapters.db.clients.postgres_config import PostgresDBConfig, get_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +19,15 @@ class PostgresDBClient(DBClient):
     as configured by parameters passed in from the db_config
     """
 
-    def __init__(self, db_config: DBConfig | None = None) -> None:
+    def __init__(self, db_config: PostgresDBConfig | None = None) -> None:
         if not db_config:
             db_config = get_db_config()
-        self.db_config = db_config
-        super().__init__()
+        self._engine = self._configure_engine(db_config)
 
-        if self.db_config.check_connection_on_init:
+        if db_config.check_connection_on_init:
             self.check_db_connection()
 
-    def _configure_engine(self) -> sqlalchemy.engine.Engine:
+    def _configure_engine(self, db_config: PostgresDBConfig) -> sqlalchemy.engine.Engine:
         # We want to be able to control the connection parameters for each
         # connection because for IAM authentication with RDS, short-lived tokens are
         # used as the password, and so we potentially need to generate a fresh token
@@ -37,7 +36,7 @@ class PostgresDBClient(DBClient):
         # For more details on building connection pools, see the docs:
         # https://docs.sqlalchemy.org/en/13/core/pooling.html#constructing-a-pool
         def get_conn() -> Any:
-            return psycopg2.connect(**get_connection_parameters(self.db_config))
+            return psycopg2.connect(**get_connection_parameters(db_config))
 
         conn_pool = pool.QueuePool(get_conn, max_overflow=10, pool_size=20, timeout=3)
 
@@ -51,7 +50,7 @@ class PostgresDBClient(DBClient):
             # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
             # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#psycopg2-fast-execution-helpers
             executemany_mode="batch",
-            hide_parameters=self.db_config.hide_sql_parameter_logs,
+            hide_parameters=db_config.hide_sql_parameter_logs,
             # TODO: Don't think we need this as we aren't using JSON columns, but keeping for reference
             # json_serializer=lambda o: json.dumps(o, default=pydantic.json.pydantic_encoder),
         )
@@ -80,7 +79,7 @@ class PostgresDBClient(DBClient):
             #     have_all_migrations_run(engine)
 
 
-def get_connection_parameters(db_config: DBConfig) -> dict[str, Any]:
+def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
     connect_args = {}
     environment = os.getenv("ENVIRONMENT")
     if not environment:
@@ -101,7 +100,7 @@ def get_connection_parameters(db_config: DBConfig) -> dict[str, Any]:
     )
 
 
-def make_connection_uri(config: DBConfig) -> str:
+def make_connection_uri(config: PostgresDBConfig) -> str:
     """Construct PostgreSQL connection URI
 
     More details at:

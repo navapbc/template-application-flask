@@ -29,16 +29,11 @@ class DBClient(abc.ABC, metaclass=abc.ABCMeta):
 
     This class is used to manage database connections for the Flask app.
     It has methods for getting a new connection or session object.
+
+    A derived class must initialize _engine in the __init__ function
     """
 
     _engine: sqlalchemy.engine.Engine
-
-    def __init__(self) -> None:
-        self._engine = self._configure_engine()
-
-    @abc.abstractmethod
-    def _configure_engine(self) -> sqlalchemy.engine.Engine:
-        raise NotImplementedError()
 
     @abc.abstractmethod
     def check_db_connection(self) -> None:
