@@ -24,8 +24,8 @@ def create_app() -> APIFlask:
     root_logger = src.logging.init(__package__)
     flask_logger.init_app(root_logger, app)
 
-    db_client = db.init()
-    flask_db.init_app(db_client, app)
+    db_client = db.PostgresDBClient()
+    flask_db.register_db_client(db_client, app)
 
     configure_app(app)
     register_blueprints(app)

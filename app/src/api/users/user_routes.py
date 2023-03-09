@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 @user_blueprint.input(user_schemas.UserSchema)
 @user_blueprint.output(user_schemas.UserSchema, status_code=201)
 @user_blueprint.auth_required(api_key_auth)
-@flask_db.with_db_session
+@flask_db.with_db_session()
 def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> dict:
     """
     POST /v1/users
@@ -35,7 +35,7 @@ def user_post(db_session: db.Session, user_params: users.CreateUserParams) -> di
 @user_blueprint.input(user_schemas.UserSchema(partial=True))
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-@flask_db.with_db_session
+@flask_db.with_db_session()
 def user_patch(
     db_session: db.Session, user_id: str, patch_user_params: users.PatchUserParams
 ) -> dict:
@@ -47,7 +47,7 @@ def user_patch(
 @user_blueprint.get("/v1/users/<uuid:user_id>")
 @user_blueprint.output(user_schemas.UserSchema)
 @user_blueprint.auth_required(api_key_auth)
-@flask_db.with_db_session
+@flask_db.with_db_session()
 def user_get(db_session: db.Session, user_id: str) -> dict:
     user = user_service.get_user(db_session, user_id)
     logger.info("Successfully fetched user", extra=get_user_log_params(user))
