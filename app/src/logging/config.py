@@ -1,6 +1,5 @@
 import logging
 import sys
-from typing import Tuple
 
 import src.logging.audit
 import src.logging.formatters as formatters
@@ -27,7 +26,7 @@ class LoggingConfig(PydanticBaseEnvConfig):
         env_nested_delimiter = "__"
 
 
-def configure_logging() -> Tuple[logging.Logger, logging.Handler]:
+def configure_logging() -> logging.Handler:
     """Configure logging for the application.
 
     Configures the root module logger to log to stdout.
@@ -61,7 +60,7 @@ def configure_logging() -> Tuple[logging.Logger, logging.Handler]:
     logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
     logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
 
-    return logging.root, console_handler
+    return console_handler
 
 
 def get_formatter(config: LoggingConfig) -> logging.Formatter:

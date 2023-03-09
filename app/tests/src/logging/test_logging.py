@@ -11,8 +11,8 @@ import src.logging.formatters as formatters
 def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
     caplog.set_level(logging.DEBUG)
     monkeypatch.setenv("LOG_FORMAT", "human-readable")
-    with src.logging.Log("test_logging") as log:
-        yield log
+    with src.logging.Log("test_logging"):
+        yield
 
 
 @pytest.mark.parametrize(

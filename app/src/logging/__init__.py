@@ -39,15 +39,14 @@ _original_argv = tuple(sys.argv)
 
 class Log:
     def __init__(self, program_name: str) -> None:
-        self.program_name = program_name
-        self.root_logger, self.stream_handler = config.configure_logging()
-        log_program_info(self.program_name)
+        self.stream_handler = config.configure_logging()
+        log_program_info(program_name)
 
-    def __enter__(self) -> logging.Logger:
-        return self.root_logger
+    def __enter__(self) -> None:
+        return None
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        self.root_logger.removeHandler(self.stream_handler)
+        logging.root.removeHandler(self.stream_handler)
 
 
 def log_program_info(program_name: str) -> None:
