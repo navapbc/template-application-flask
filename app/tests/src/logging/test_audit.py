@@ -31,8 +31,8 @@ def init_audit_hook():
 
 
 test_audit_hook_data = [
-    # pytest.param(eval, ("1+1", None, None), [{"msg": "exec"}], id="eval"), TODO - can't serialize exec
-    # pytest.param(exec, ("1+1", None, None), [{"msg": "exec"}], id="exec"), TODO - can't serialize exec
+    pytest.param(eval, ("1+1", None, None), [{"msg": "exec"}], id="eval"),
+    pytest.param(exec, ("1+1", None, None), [{"msg": "exec"}], id="exec"),
     pytest.param(
         open,
         ("/dev/null", "w"),
