@@ -22,6 +22,7 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
     decimal_field = Decimal("12.34567")
     uuid_field = uuid4()
     set_field = {uuid4(), uuid4()}
+    list_field = [1, 2, 3, 4]
     exception_field = ValueError("my exception message")
     logger.warning(
         "hello %s",
@@ -36,6 +37,7 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
             "decimal_field": decimal_field,
             "uuid_field": uuid_field,
             "set_field": set_field,
+            "list_field": list_field,
             "exception_field": exception_field,
         },
     )
@@ -60,6 +62,7 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
         "decimal_field": str(decimal_field),
         "uuid_field": str(uuid_field),
         "set_field": [str(u) for u in set_field],
+        "list_field": list_field,
         "exception_field": str(exception_field),
     }
     assert_dict_contains(json_record, expected)

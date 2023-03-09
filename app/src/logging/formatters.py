@@ -24,24 +24,39 @@ def json_encoder(obj: Any) -> Any:
     will attempt to convert using str() on the object
     """
 
+    # This is the equivalent of many isinstance(obj, <type>) checks
     match obj:
-        case str() | int() | float() | bool() | None:
+        case str() | int() | float() | bool() | list() | None:
+            # JSONEncoder handles these properly already:
+            # https://docs.python.org/3/library/json.html#json.JSONEncoder
             return obj
         case datetime() | date():
             return obj.isoformat()
-        case Decimal():
+        case Decimal() | UUID() | Exception():
+            # The fallback below would do this,
+            # but making it explicit that these
+            # types are supported for logging.
             return str(obj)
         case Enum():
             return obj.value
-        case UUID():
-            return str(obj)
-        case Exception():
-            return str(obj)
         case set():
             # The JSON library will handle
             # iterating over and potentially calling this again
             return list(obj)
         case _:
+            """
+            The recommended approach from the JSON docs
+            is to call the default method from JSONEncoder
+            to allow it to error anything not defined, we
+            choose not to do that as we want to give a best
+            effort for every value to be serialized for the logs
+            https://docs.python.org/3/library/json.html
+
+            If a field you are trying to log doesn't make sense
+            to format as a string then please add it above, but be
+            aware that the format needs to be parseable by whatever
+            tools you are using to ingest logs and metrics.
+            """
             return str(obj)
 
 
