@@ -27,7 +27,7 @@ config = context.config
 logger = logging.getLogger("migrations")
 
 # Initialize logging
-with src.logging.Log("migrations"):
+with src.logging.init("migrations"):
 
     if not config.get_main_option("sqlalchemy.url"):
         uri = make_connection_uri(get_db_config())

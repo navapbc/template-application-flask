@@ -11,10 +11,38 @@ import logging
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any
+from typing import Any, Callable, Type
 from uuid import UUID
 
 import src.logging.decodelog as decodelog
+
+
+# identity returns unmodified value
+def identity(obj: Any) -> Any:
+    return obj
+
+
+# Mapping of types to functions for conversion
+# when writing logs to JSON
+ENCODERS_BY_TYPE: dict[Type[Any], Callable[[Any], Any]] = {
+    # JSONEncoder handles these properly already:
+    # https://docs.python.org/3/library/json.html#json.JSONEncoder
+    str: identity,
+    int: identity,
+    float: identity,
+    bool: identity,
+    list: identity,
+    datetime: lambda d: d.isoformat(),
+    date: lambda d: d.isoformat(),
+    Enum: lambda e: e.value,
+    set: lambda s: list(s),
+    # The fallback below would do these,
+    # but making it explicit that these
+    # types are supported for logging.
+    Decimal: str,
+    UUID: str,
+    Exception: str,
+}
 
 
 def json_encoder(obj: Any) -> Any:
@@ -24,40 +52,23 @@ def json_encoder(obj: Any) -> Any:
     will attempt to convert using str() on the object
     """
 
-    # This is the equivalent of many isinstance(obj, <type>) checks
-    match obj:
-        case str() | int() | float() | bool() | list() | None:
-            # JSONEncoder handles these properly already:
-            # https://docs.python.org/3/library/json.html#json.JSONEncoder
-            return obj
-        case datetime() | date():
-            return obj.isoformat()
-        case Decimal() | UUID() | Exception():
-            # The fallback below would do this,
-            # but making it explicit that these
-            # types are supported for logging.
-            return str(obj)
-        case Enum():
-            return obj.value
-        case set():
-            # The JSON library will handle
-            # iterating over and potentially calling this again
-            return list(obj)
-        case _:
-            """
-            The recommended approach from the JSON docs
-            is to call the default method from JSONEncoder
-            to allow it to error anything not defined, we
-            choose not to do that as we want to give a best
-            effort for every value to be serialized for the logs
-            https://docs.python.org/3/library/json.html
+    _type = type(obj)
+    encode = ENCODERS_BY_TYPE.get(_type, str)
 
-            If a field you are trying to log doesn't make sense
-            to format as a string then please add it above, but be
-            aware that the format needs to be parseable by whatever
-            tools you are using to ingest logs and metrics.
-            """
-            return str(obj)
+    """
+    The recommended approach from the JSON docs
+    is to call the default method from JSONEncoder
+    to allow it to error anything not defined, we
+    choose not to do that as we want to give a best
+    effort for every value to be serialized for the logs
+    https://docs.python.org/3/library/json.html
+
+    If a field you are trying to log doesn't make sense
+    to format as a string then please add it above, but be
+    aware that the format needs to be parseable by whatever
+    tools you are using to ingest logs and metrics.
+    """
+    return encode(obj)
 
 
 class JsonFormatter(logging.Formatter):

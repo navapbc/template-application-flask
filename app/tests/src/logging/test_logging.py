@@ -11,7 +11,7 @@ import src.logging.formatters as formatters
 def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
     caplog.set_level(logging.DEBUG)
     monkeypatch.setenv("LOG_FORMAT", "human-readable")
-    with src.logging.Log("test_logging"):
+    with src.logging.init("test_logging"):
         yield
 
 
@@ -26,7 +26,7 @@ def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expecte
     caplog.set_level(logging.DEBUG)
     monkeypatch.setenv("LOG_FORMAT", log_format)
 
-    with src.logging.Log("test_logging"):
+    with src.logging.init("test_logging"):
 
         records = caplog.records
         assert len(records) == 2
