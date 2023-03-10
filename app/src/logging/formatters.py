@@ -11,14 +11,16 @@ import logging
 from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
-from typing import Any, Callable, Type
+from typing import Any, Callable, Type, TypeVar
 from uuid import UUID
 
 import src.logging.decodelog as decodelog
 
+T = TypeVar("T")
 
-# identity returns unmodified value
-def identity(obj: Any) -> Any:
+
+# identity returns an unmodified object
+def identity(obj: T) -> T:
     return obj
 
 

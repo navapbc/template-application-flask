@@ -63,10 +63,13 @@ class LoggingContext(ContextManager[None]):
         log_program_info(program_name)
 
     def __enter__(self) -> None:
-        return None
+        pass
 
     def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
         # Remove the console handler to stop logs from being sent to stdout
+        # This is useful in the test suite, since multiple tests may initialize
+        # separate duplicate handlers. This allows for easier cleanup for each
+        # of those tests.
         logging.root.removeHandler(self.console_handler)
 
     def _configure_logging(self) -> None:
