@@ -1,6 +1,9 @@
 import json
 import logging
 import re
+from datetime import datetime
+from decimal import Decimal
+from uuid import uuid4
 
 import pytest
 
@@ -14,9 +17,33 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
     console_handler.setFormatter(formatters.JsonFormatter())
     logger.addHandler(console_handler)
 
-    logger.warning("hello %s", "interpolated_string", extra={"foo": "bar"})
+    datetime_now = datetime.now()
+    date_now = datetime_now.date()
+    decimal_field = Decimal("12.34567")
+    uuid_field = uuid4()
+    set_field = {uuid4(), uuid4()}
+    list_field = [1, 2, 3, 4]
+    exception_field = ValueError("my exception message")
+    logger.warning(
+        "hello %s",
+        "interpolated_string",
+        extra={
+            "foo": "bar",
+            "int_field": 5,
+            "bool_field": True,
+            "none_field": None,
+            "datetime_field": datetime_now,
+            "date_field": date_now,
+            "decimal_field": decimal_field,
+            "uuid_field": uuid_field,
+            "set_field": set_field,
+            "list_field": list_field,
+            "exception_field": exception_field,
+        },
+    )
 
     json_record = json.loads(capsys.readouterr().err)
+
     expected = {
         "name": "test_json_formatter",
         "message": "hello interpolated_string",
@@ -27,8 +54,19 @@ def test_json_formatter(capsys: pytest.CaptureFixture):
         "module": "test_formatters",
         "funcName": "test_json_formatter",
         "foo": "bar",
+        "int_field": 5,
+        "bool_field": True,
+        "none_field": None,
+        "datetime_field": datetime_now.isoformat(),
+        "date_field": date_now.isoformat(),
+        "decimal_field": str(decimal_field),
+        "uuid_field": str(uuid_field),
+        "set_field": [str(u) for u in set_field],
+        "list_field": list_field,
+        "exception_field": str(exception_field),
     }
     assert_dict_contains(json_record, expected)
+    logger.removeHandler(console_handler)
 
 
 def test_human_readable_formatter(capsys: pytest.CaptureFixture):
@@ -47,3 +85,4 @@ def test_human_readable_formatter(capsys: pytest.CaptureFixture):
         rest
         == "  test_human_readable_formatter       \x1b[0m test_human_readable_formatter \x1b[31mWARNING \x1b[0m \x1b[31mhello interpolated_string                         \x1b[0m \x1b[34mfoo=bar\x1b[0m\n"
     )
+    logger.removeHandler(console_handler)

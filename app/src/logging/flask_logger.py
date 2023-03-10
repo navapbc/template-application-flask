@@ -42,6 +42,7 @@ def init_app(app_logger: logging.Logger, app: flask.Flask) -> None:
 
         flask_logger.init_app(logger, app)
     """
+
     # Need to add filters to each of the handlers rather than to the logger itself, since
     # messages are passed directly to the ancestor loggers’ handlers bypassing any filters
     # set on the ancestors.

@@ -7,19 +7,12 @@ import src.logging
 import src.logging.formatters as formatters
 
 
-def _init_test_logger(
-    caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch, log_format="human-readable"
-):
-    caplog.set_level(logging.DEBUG)
-    monkeypatch.setenv("LOG_FORMAT", log_format)
-    src.logging.init("test_logging")
-
-
 @pytest.fixture
 def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
-    _init_test_logger(caplog, monkeypatch)
-    yield
-    logging.root.handlers.clear()
+    caplog.set_level(logging.DEBUG)
+    monkeypatch.setenv("LOG_FORMAT", "human-readable")
+    with src.logging.init("test_logging"):
+        yield
 
 
 @pytest.mark.parametrize(
@@ -31,18 +24,20 @@ def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.Monke
 )
 def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expected_formatter):
     caplog.set_level(logging.DEBUG)
-    _init_test_logger(caplog, monkeypatch, log_format)
+    monkeypatch.setenv("LOG_FORMAT", log_format)
 
-    records = caplog.records
-    assert len(records) == 2
-    assert re.match(
-        r"^start test_logging: \w+ [0-9.]+ \w+, hostname \S+, pid \d+, user \d+\(\w+\)$",
-        records[0].message,
-    )
-    assert re.match(r"^invoked as:", records[1].message)
+    with src.logging.init("test_logging"):
 
-    formatter_types = [type(handler.formatter) for handler in logging.root.handlers]
-    assert expected_formatter in formatter_types
+        records = caplog.records
+        assert len(records) == 2
+        assert re.match(
+            r"^start test_logging: \w+ [0-9.]+ \w+, hostname \S+, pid \d+, user \d+\(\w+\)$",
+            records[0].message,
+        )
+        assert re.match(r"^invoked as:", records[1].message)
+
+        formatter_types = [type(handler.formatter) for handler in logging.root.handlers]
+        assert expected_formatter in formatter_types
 
 
 def test_log_exception(init_test_logger, caplog):
