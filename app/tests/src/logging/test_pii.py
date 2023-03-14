@@ -1,4 +1,5 @@
 import pytest
+
 import src.logging.pii as pii
 
 
@@ -23,5 +24,5 @@ import src.logging.pii as pii
         ({"a": "x", "b": "999000000"}, "{'a': 'x', 'b': '*********'}"),
     ],
 )
-def test_mask_pii_private_function(input, expected):
+def test_mask_pii(input, expected):
     assert pii._mask_pii(input) == expected
