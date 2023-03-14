@@ -85,10 +85,7 @@ def test_log_exception(init_test_logger, caplog):
         pytest.param(
             ("%s %s", "text", "123456789"),
             None,
-            {
-                "msg": "%s %s",
-                "message": "text *********",
-            },
+            {"message": "text *********"},
             id="pii in interpolation args",
         ),
     ],
