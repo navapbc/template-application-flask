@@ -2,34 +2,33 @@
 
 [[package]]
 name = "alembic"
-version = "1.10.2"
+version = "1.8.1"
 description = "A database migration tool for SQLAlchemy."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "alembic-1.10.2-py3-none-any.whl", hash = "sha256:8b48368f6533c064b39c024e1daba15ae7f947eac84185c28c06bbe1301a5497"},
-    {file = "alembic-1.10.2.tar.gz", hash = "sha256:457eafbdc0769d855c2c92cbafe6b7f319f916c80cf4ed02b8f394f38b51b89d"},
+    {file = "alembic-1.8.1-py3-none-any.whl", hash = "sha256:0a024d7f2de88d738d7395ff866997314c837be6104e90c5724350313dee4da4"},
+    {file = "alembic-1.8.1.tar.gz", hash = "sha256:cd0b5e45b14b706426b833f06369b9a6d5ee03f826ec3238723ce8caaf6e5ffa"},
 ]
 
 [package.dependencies]
 Mako = "*"
 SQLAlchemy = ">=1.3.0"
-typing-extensions = ">=4"
 
 [package.extras]
 tz = ["python-dateutil"]
 
 [[package]]
 name = "apiflask"
-version = "1.2.3"
+version = "1.2.1"
 description = "A lightweight web API framework based on Flask and marshmallow-code projects."
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "APIFlask-1.2.3-py3-none-any.whl", hash = "sha256:d9a719c987cd936fb6fd85f8fef372909c954cd7e43033f089f52bb8db3de232"},
-    {file = "APIFlask-1.2.3.tar.gz", hash = "sha256:64f6c83120283d3eec72516c66c542ea61779f59e557a1522b62368122b37e8f"},
+    {file = "APIFlask-1.2.1-py3-none-any.whl", hash = "sha256:71452cb2dee41053f8cd1e7dd7d976ba9deb54f1a76845e375c1ca5af3c7c794"},
+    {file = "APIFlask-1.2.1.tar.gz", hash = "sha256:505431a2c61ec3fc7e8fdb81f653d09c1ccec5b1e4e94f878f730af70a31be54"},
 ]
 
 [package.dependencies]
@@ -1889,4 +1888,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "00df430fa14202d5f805289dc6e8f70cf443efce7c034c41800314b6f852e2f0"
+content-hash = "6ae14b9733063f5fc94041afe1cf4bffee2f421487890f7bec6a626033f9deba"

@@ -58,6 +58,7 @@ def test_verify_ssl_not_in_use(caplog):
             "postgresql://localhost:5432/dbname?options=-csearch_path=public",
             "postgresql://localhost/dbname?options=-csearch_path=public",
         ],
+        strict=True,
     ),
 )
 def test_make_connection_uri(username_password_port, expected):
