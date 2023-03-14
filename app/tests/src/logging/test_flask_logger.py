@@ -12,9 +12,14 @@ from tests.lib.assertions import assert_dict_contains
 @pytest.fixture
 def logger():
     logger = logging.getLogger("src")
+    before_level = logger.level
+
     logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler(sys.stdout))
-    return logger
+    handler = logging.StreamHandler(sys.stdout)
+    logger.addHandler(handler)
+    yield logger
+    logger.setLevel(before_level)
+    logger.removeHandler(handler)
 
 
 @pytest.fixture

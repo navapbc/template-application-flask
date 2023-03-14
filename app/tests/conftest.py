@@ -17,8 +17,28 @@ from tests.lib import db_testing
 logger = logging.getLogger(__name__)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def env_vars():
+    """
+    Default environment variables for tests to be
+    based on the local.env file. These get set once
+    before all tests run. As "session" is the highest
+    scope, this will run before any other explicit fixtures
+    in a test.
+
+    See: https://docs.pytest.org/en/6.2.x/fixture.html#autouse-order
+
+    To set a different environment variable for a test,
+    use the monkeypatch fixture, for example:
+
+    ```py
+    def test_example(monkeypatch):
+        monkeypatch.setenv("LOG_LEVEL", "debug")
+    ```
+
+    Several monkeypatch fixtures exists below for different
+    scope levels.
+    """
     load_local_env_vars()
 
 
@@ -83,7 +103,6 @@ def enable_factory_create(monkeypatch, db_session) -> db.Session:
     this fixture.
     """
     monkeypatch.setattr(factories, "_db_session", db_session)
-    logger.info("set factories db_session to %s", db_session)
     return db_session
 
 

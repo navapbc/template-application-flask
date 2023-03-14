@@ -200,9 +200,6 @@ def test_repeated_audit_logs(
     for _ in range(1000):
         open(tmp_path / "repeated-audit-logs", "w")
 
-    for r in caplog.records:
-        print(r.__dict__["msg"], r.__dict__["count"])
-
     expected_records = [
         {"msg": "open", "count": 1},
         {"msg": "open", "count": 2},

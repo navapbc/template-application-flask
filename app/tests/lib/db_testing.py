@@ -4,7 +4,7 @@ import logging
 import uuid
 
 import src.adapters.db as db
-from src.adapters.db.config import get_db_config
+from src.adapters.db.clients.postgres_config import get_db_config
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
-    db_client = db.init()
+    db_client = db.PostgresDBClient()
     with db_client.get_connection() as conn:
         _create_schema(conn, schema_name)
         try:
