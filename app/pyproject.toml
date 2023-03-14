@@ -13,16 +13,16 @@ authors = ["Nava Engineering <engineering@navapbc.com>"]
 ## https://github.com/python-poetry/poetry/issues/2094
 [tool.poetry.dependencies]
 python = "^3.10"
-SQLAlchemy = {extras = ["mypy"], version = "1.4.7"}
-alembic = "1.9.1"
-psycopg2-binary = "2.9.5"
-python-dotenv = "0.21.0"
-pydantic = "1.10.4"
-botocore = "1.29.49"
-boto3 = "1.26.49"
+SQLAlchemy = {extras = ["mypy"], version = "1.4.41"}
+alembic = "1.10.2"
+psycopg2-binary = "2.9.3"
+python-dotenv = "1.0.0"
+pydantic = "1.10.6"
+botocore = "1.29.90"
+boto3 = "1.26.90"
 smart-open = "6.3.0"
-pytz = "2022.7"
-APIFlask = "1.2.1"
+pytz = "2022.7.1"
+APIFlask = "1.2.3"
 marshmallow-dataclass = {extras = ["enum","union"], version = "8.5.11"}
 marshmallow = "3.19.0"
 
