@@ -1,5 +1,5 @@
 import pytest
-
+import logging
 import src.logging.pii as pii
 
 
@@ -24,5 +24,39 @@ import src.logging.pii as pii
         ({"a": "x", "b": "999000000"}, "{'a': 'x', 'b': '*********'}"),
     ],
 )
-def test_mask_pii(input, expected):
+def test_mask_pii_private_function(input, expected):
     assert pii._mask_pii(input) == expected
+
+
+@pytest.mark.parametrize(
+    "args,extra,expected",
+    [
+        (
+            ("pii",),
+            {"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"},
+            {
+                "msg": "pii",
+                "foo": "bar",
+                "tin": "*********",
+                "dashed-ssn": "*********",
+            },
+        ),
+        (
+            ("%s %s", "text", "123456789"),
+            None,
+            {
+                "msg": "%s %s",
+                "message": "text *********",
+            },
+        ),
+    ],
+)
+def test_mask_pii_in_log_record(
+    init_test_logger, caplog: pytest.LogCaptureFixture, args, extra, expected
+):
+    logger = logging.getLogger(__name__)
+
+    logger.info(*args, extra=extra)
+
+    assert len(caplog.records) == 1
+    assert_dict_contains(caplog.records[0].__dict__, expected)
