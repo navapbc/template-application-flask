@@ -5,6 +5,7 @@ import pytest
 
 import src.logging
 import src.logging.formatters as formatters
+from tests.lib.assertions import assert_dict_contains
 
 
 @pytest.fixture
@@ -61,11 +62,38 @@ def test_log_exception(init_test_logger, caplog):
     assert last_record.__dict__["key2"] == "value2"
 
 
-def test_mask_pii(init_test_logger, caplog: pytest.LogCaptureFixture):
+@pytest.mark.parametrize(
+    "args,extra,expected",
+    [
+        pytest.param(
+            ("ssn: 123456789",),
+            None,
+            {"message": "ssn: *********"},
+            id="pii in msg",
+        ),
+        pytest.param(
+            ("pii",),
+            {"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"},
+            {
+                "message": "pii",
+                "foo": "bar",
+                "tin": "*********",
+                "dashed-ssn": "*********",
+            },
+            id="pii in extra",
+        ),
+        pytest.param(
+            ("%s %s", "text", "123456789"),
+            None,
+            {"message": "text *********"},
+            id="pii in interpolation args",
+        ),
+    ],
+)
+def test_mask_pii(init_test_logger, caplog: pytest.LogCaptureFixture, args, extra, expected):
     logger = logging.getLogger(__name__)
 
-    logger.info("pii", extra={"foo": "bar", "tin": "123456789", "dashed-ssn": "123-45-6789"})
+    logger.info(*args, extra=extra)
 
     assert len(caplog.records) == 1
-    assert caplog.records[0].__dict__["tin"] == "*********"
-    assert caplog.records[0].__dict__["dashed-ssn"] == "*********"
+    assert_dict_contains(caplog.records[0].__dict__, expected)
