@@ -8,6 +8,7 @@ from werkzeug.exceptions import Unauthorized
 
 import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
+from src.db.models.user_models import sync_lookup_tables
 import src.logging
 import src.logging.flask_logger as flask_logger
 from src.api.healthcheck import healthcheck_blueprint
@@ -26,6 +27,8 @@ def create_app() -> APIFlask:
 
     db_client = db.PostgresDBClient()
     flask_db.register_db_client(db_client, app)
+    sync_lookup_tables(db_client)
+        
 
     configure_app(app)
     register_blueprints(app)

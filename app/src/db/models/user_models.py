@@ -3,19 +3,59 @@ import logging
 from datetime import date
 from typing import Optional
 from uuid import UUID
-
+from typing import Any, Type
 from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Text
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, relationship
-
+import sqlalchemy.types as types
 from src.db.models.base import Base, IdMixin, TimestampMixin
+import src.adapters.db as db
 
 logger = logging.getLogger(__name__)
 
+class LookupEnum(types.TypeDecorator):
 
-class RoleType(str, enum.Enum):
+    impl = Text
+    cache_ok = True
+
+    def __init__(self, enum_type: Type[enum.StrEnum], *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self.enum_type = enum_type
+
+
+    def process_bind_param(self, value: Optional[Any], dialect: Any) -> Optional[str]:
+        if value is None:
+            return None
+        
+        print(type(value))
+        if not isinstance(value, self.enum_type):
+            raise Exception("Must be a str enum")
+        
+        return value.value
+
+    def process_result_value(self, value: Optional[str], dialect: Any) -> Optional[Any]:
+        # TODO - fix the typing on the return
+        if value is None:
+            return None
+        
+        return self.enum_type(value)
+    
+    
+class RoleType(enum.StrEnum):
     USER = "USER"
     ADMIN = "ADMIN"
+    THIRD_PARTY = "third_party"
+
+
+class LkRole(Base, TimestampMixin):
+    __tablename__ = "lk_role"
+    role_id: str = Column(Text, primary_key=True)
+    description: str = Column(Text, nullable=False)
+
+    def __init__(self, role_type: RoleType):
+        self.role_id = role_type.value
+        self.description = role_type.name
+
 
 
 class User(Base, IdMixin, TimestampMixin):
@@ -49,5 +89,22 @@ class Role(Base, TimestampMixin):
     # (See https://github.com/sqlalchemy/alembic/issues/363)
     #
     # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
-    type: RoleType = Column(Enum(RoleType, native_enum=False), primary_key=True)
+    type: RoleType = Column(LookupEnum(RoleType), ForeignKey("lk_role.role_id"), primary_key=True)
     user: User = relationship(User, back_populates="roles")
+
+
+
+def sync_role_lookup(db_session: db.Session):
+    # TODO - consider how we might remove values
+    for role in RoleType:
+        instance = db_session.merge(LkRole(role))
+        if db_session.is_modified(instance):
+            print(f"Updated {role.value}")
+
+    
+
+
+
+def sync_lookup_tables(db_client: db.DBClient):
+    with db_client.get_session() as db_session, db_session.begin():
+        sync_role_lookup(db_session)

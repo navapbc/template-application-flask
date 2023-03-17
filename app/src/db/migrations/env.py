@@ -4,6 +4,7 @@ from typing import Any
 
 import sqlalchemy
 from alembic import context
+from src.db.models.user_models import LookupEnum
 
 # Alembic cli seems to reset the path on load causing issues with local module imports.
 # Workaround is to force set the path to the current run directory (top level src folder)
@@ -59,6 +60,16 @@ with src.logging.init("migrations"):
         else:
             return True
 
+    def render_item(type_, obj, autogen_context):
+        # Alembic tries to set the type of the column as LookupEnum
+        # despite it being derived from the Text column, so force
+        # it to be Text during it's generation process
+        if type_ == "type" and isinstance(obj, LookupEnum):
+            return "sa.Text()"
+        
+        # False means to use the default processing
+        return False
+
     def run_migrations_offline() -> None:
         """Run migrations in 'offline' mode.
 
@@ -80,6 +91,7 @@ with src.logging.init("migrations"):
             dialect_opts={"paramstyle": "named"},
             include_schemas=False,
             include_object=include_object,
+            render_item=render_item,
             compare_type=True,
         )
 
@@ -103,6 +115,7 @@ with src.logging.init("migrations"):
                 target_metadata=target_metadata,
                 include_schemas=False,
                 include_object=include_object,
+                render_item=render_item,
                 compare_type=True,
             )
             with context.begin_transaction():
