@@ -34,9 +34,22 @@ from typing import Any, Optional
 
 
 def mask_pii(record: logging.LogRecord) -> bool:
+    # Loop through all entries in the record's __dict__
+    # attribute and mask any things that look like PII.
+    # We will mask positional args separately below.
     record.__dict__ |= {
-        key: _mask_pii_for_key(key, value) for key, value in record.__dict__.items()
+        key: _mask_pii_for_key(key, value)
+        for key, value in record.__dict__.items()
+        if key != "args"  # Handle positional "args" separately
     }
+
+    # record.__dict__["args"] will contain positional arguments to logging calls.
+    # For example, a call like logger.info("%s %s", "foo", "bar") will result in a LogRecord
+    # with record.__dict__["args"] == ("foo", "bar")
+    # We want to mask the PII on each argument separately rather than trying to do a PII regex
+    # match on the entire args tuple.
+    args = record.__dict__["args"]
+    record.__dict__["args"] = tuple(map(_mask_pii, args))
     return True
 
 
