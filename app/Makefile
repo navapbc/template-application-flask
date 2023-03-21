@@ -206,6 +206,8 @@ cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cl
 # Set init-db as pre-requisite since there seems to be a race condition
 # where the DB can't yet receive connections if it's starting from a
 # clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
+# If this is failing, make sure the file has permissions set to rw for all
+# chmod 666 ./openapi.generated.yml
 openapi-spec: init-db ## Generate OpenAPI spec
 	$(FLASK_CMD) spec --format yaml --output ./openapi.generated.yml
 
