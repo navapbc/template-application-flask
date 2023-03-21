@@ -21,7 +21,17 @@ A very simple [docker-compose.yml](/docker-compose.yml) has been included to sup
 
 3. If you are using an M1 mac, you will need to install postgres as well: `brew install postgresql` (The psycopg2-binary is built from source on M1 macs which requires the postgres executable to be present)
 
-4. You'll also need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+4. You'll also need a container runtime ([Colima](https://github.com/abiosoft/colima) and Docker CLI. You can install both of these with:
+
+   ```bash
+   brew install colima docker
+   ```
+
+   After you finish installing, you'll want to start the docker daemon with
+
+   ```bash
+   colima start
+   ```
 
 ## Setup
 
@@ -32,12 +42,11 @@ make setup-local
 ## Run the application
 
 1. In your terminal, `cd` to the `app` directory of this repo.
-2. Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed & running.
-3. Run `make setup-local` to copy over `.env.example` to `.env`
-4. Run `make init start` to build the image and start the container.
-5. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
-6. Run `make run-logs` to see the logs of the running API container
-7. Run `make stop` when you are done to delete the container.
+2. Run `make setup-local` to copy over `.env.example` to `.env`
+3. Run `make init start` to build the image and start the container.
+4. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
+5. Run `make run-logs` to see the logs of the running API container
+6. Run `make stop` when you are done to delete the container.
 
 ## Next steps
 
