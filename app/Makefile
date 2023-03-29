@@ -182,6 +182,9 @@ cmd: ## Run Flask app CLI command (Run `make cli args="--help"` to see list of C
 cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cli-user-create-csv args="--help"` to see the command's options)
 	$(FLASK_CMD) user create-csv $(args)
 
+cmd-migrate:
+	$(FLASK_CMD) user migrate-db-up
+
 # Set init-db as pre-requisite since there seems to be a race condition
 # where the DB can't yet receive connections if it's starting from a 
 # clean state (e.g. after make stop, make clean-volumes, make openapi-spec)

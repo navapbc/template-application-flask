@@ -45,6 +45,7 @@ class RoleType(enum.StrEnum):
     USER = "USER"
     ADMIN = "ADMIN"
     THIRD_PARTY = "third_party"
+    FOURTH_VALUE = "fourth"
 
 
 class LkRole(Base, TimestampMixin):
@@ -102,9 +103,5 @@ def sync_role_lookup(db_session: db.Session):
             print(f"Updated {role.value}")
 
     
-
-
-
-def sync_lookup_tables(db_client: db.DBClient):
-    with db_client.get_session() as db_session, db_session.begin():
-        sync_role_lookup(db_session)
+def sync_all(db_session: db.Session):
+    sync_role_lookup(db_session)
