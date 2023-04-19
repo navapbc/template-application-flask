@@ -12,13 +12,19 @@ APP_NAME := main-app
 # in the event JSON is output from a process we don't log.
 DECODE_LOG := 2>&1 | python3 -u src/logging/util/decodelog.py
 
+# Required for CI flags below to work properly
+SHELL = /bin/bash -o pipefail
+
 # A few commands need adjustments if they're run in CI, specify those here
-# TODO - when CI gets hooked up, actually test this.
+# Make sure the path of the file mirrors the path to the app, or these flags will
+# not work as expected in GitHub
+## FLAKE8_FORMAT will show any findings in the "Files Changed" tab of the PR
+## MYPY_POSTPROC will show any findings in the "Files Changed" tab of the PR
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
- FLAKE8_FORMAT := '::warning file=src/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+ FLAKE8_FORMAT := '::warning file=app/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
  MYPY_FLAGS := --no-pretty
- MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=src\/\1,line=\2,col=\3::\4/"
+ MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=app\/\1,line=\2,col=\3::\4/"
 else
  FLAKE8_FORMAT := default
 endif
@@ -183,7 +189,7 @@ cmd-user-create-csv: ## Create a CSV of the useres in the database (Run `make cl
 	$(FLASK_CMD) user create-csv $(args)
 
 # Set init-db as pre-requisite since there seems to be a race condition
-# where the DB can't yet receive connections if it's starting from a 
+# where the DB can't yet receive connections if it's starting from a
 # clean state (e.g. after make stop, make clean-volumes, make openapi-spec)
 openapi-spec: init-db ## Generate OpenAPI spec
 	$(FLASK_CMD) spec --format yaml --output ./openapi.generated.yml
