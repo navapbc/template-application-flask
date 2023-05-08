@@ -27,11 +27,8 @@ services:
 
     container_name: main-app
 
-    # Load environment variables for local development
-    env_file: ./app/local.env
-    # NOTE: These values take precedence if the same value is specified in the env_file.
     environment:
-      # The env_file defines DB_HOST=localhost for accessing a non-dockerized database. 
+      # The code defines DB_HOST=localhost for accessing a non-dockerized database.
       # In the docker-compose, we tell the app to use the dockerized database service 
       - DB_HOST=main-db
     ports:

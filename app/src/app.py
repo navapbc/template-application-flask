@@ -18,13 +18,13 @@ from src.auth.api_key_auth import User, get_app_security_scheme
 logger = logging.getLogger(__name__)
 
 
-def create_app() -> APIFlask:
+def create_app(config) -> APIFlask:
     app = APIFlask(__name__)
 
-    src.logging.init(__package__)
+    src.logging.init(__package__, config.logging)
     flask_logger.init_app(logging.root, app)
 
-    db_client = db.PostgresDBClient()
+    db_client = db.PostgresDBClient(config.database)
     flask_db.register_db_client(db_client, app)
 
     configure_app(app)

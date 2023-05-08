@@ -1,4 +1,6 @@
 import logging
+import os
+import uuid
 
 import _pytest.monkeypatch
 import boto3
@@ -6,10 +8,13 @@ import flask
 import flask.testing
 import moto
 import pytest
+import pydantic.types
 
 import src.adapters.db as db
+from src.adapters.db.clients.postgres_config import PostgresDBConfig
 import src.app as app_entry
 import tests.src.db.models.factories as factories
+import src.config
 from src.db import models
 from src.util.local import load_local_env_vars
 from tests.lib import db_testing
@@ -69,7 +74,26 @@ def monkeypatch_module():
 
 
 @pytest.fixture(scope="session")
-def db_client(monkeypatch_session) -> db.DBClient:
+def config() -> src.config.RootConfig:
+    schema_name = f"test_schema_{uuid.uuid4().int}"
+
+    config = src.config.load("local")
+    config.database.db_schema = schema_name
+
+    # Allow host to be overridden when running in docker-compose.
+    if "DB_HOST" in os.environ:
+        config.database.host = os.environ["DB_HOST"]
+
+    return config
+
+
+@pytest.fixture(scope="session")
+def db_config(config) -> PostgresDBConfig:
+    return config.database
+
+
+@pytest.fixture(scope="session")
+def db_client(monkeypatch_session, db_config) -> db.DBClient:
     """
     Creates an isolated database for the test session.
 
@@ -79,7 +103,7 @@ def db_client(monkeypatch_session) -> db.DBClient:
     after the test suite session completes.
     """
 
-    with db_testing.create_isolated_db(monkeypatch_session) as db_client:
+    with db_testing.create_isolated_db(db_config) as db_client:
         models.metadata.create_all(bind=db_client.get_connection())
         yield db_client
 
@@ -114,8 +138,8 @@ def enable_factory_create(monkeypatch, db_session) -> db.Session:
 # Make app session scoped so the database connection pool is only created once
 # for the test session. This speeds up the tests.
 @pytest.fixture(scope="session")
-def app(db_client) -> flask.Flask:
-    return app_entry.create_app()
+def app(db_client, config) -> flask.Flask:
+    return app_entry.create_app(config)
 
 
 @pytest.fixture

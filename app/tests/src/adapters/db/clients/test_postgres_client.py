@@ -8,7 +8,7 @@ from src.adapters.db.clients.postgres_client import (
     make_connection_uri,
     verify_ssl,
 )
-from src.adapters.db.clients.postgres_config import PostgresDBConfig, get_db_config
+from src.adapters.db.clients.postgres_config import PostgresDBConfig
 
 
 class DummyConnectionInfo:
@@ -47,7 +47,7 @@ def test_verify_ssl_not_in_use(caplog):
     "username_password_port,expected",
     zip(
         # Test all combinations of username, password, and port
-        product(["testuser", ""], ["testpass", None], ["5432", ""]),
+        product(["testuser", ""], ["testpass", None], [5432, None]),
         [
             "postgresql://testuser:testpass@localhost:5432/dbname?options=-csearch_path=public",
             "postgresql://testuser:testpass@localhost/dbname?options=-csearch_path=public",

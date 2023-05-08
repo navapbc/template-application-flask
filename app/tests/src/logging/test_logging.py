@@ -5,29 +5,30 @@ import pytest
 
 import src.logging
 import src.logging.formatters as formatters
+from src.logging.config import LoggingConfig, LoggingFormat
 from tests.lib.assertions import assert_dict_contains
 
 
 @pytest.fixture
 def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
     caplog.set_level(logging.DEBUG)
-    monkeypatch.setenv("LOG_FORMAT", "human-readable")
-    with src.logging.init("test_logging"):
+    logging_config = LoggingConfig(format=LoggingFormat.human_readable)
+    with src.logging.init("test_logging", logging_config):
         yield
 
 
 @pytest.mark.parametrize(
     "log_format,expected_formatter",
     [
-        ("human-readable", formatters.HumanReadableFormatter),
+        ("human_readable", formatters.HumanReadableFormatter),
         ("json", formatters.JsonFormatter),
     ],
 )
 def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expected_formatter):
     caplog.set_level(logging.DEBUG)
-    monkeypatch.setenv("LOG_FORMAT", log_format)
+    logging_config = LoggingConfig(format=log_format)
 
-    with src.logging.init("test_logging"):
+    with src.logging.init("test_logging", logging_config):
 
         records = caplog.records
         assert len(records) == 2

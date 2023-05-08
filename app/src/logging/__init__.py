@@ -28,5 +28,5 @@ Example:
 import src.logging.config as config
 
 
-def init(program_name: str) -> config.LoggingContext:
-    return config.LoggingContext(program_name)
+def init(program_name: str, logging_config: config.LoggingConfig) -> config.LoggingContext:
+    return config.LoggingContext(program_name, logging_config)
