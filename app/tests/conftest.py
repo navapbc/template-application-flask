@@ -7,14 +7,14 @@ import boto3
 import flask
 import flask.testing
 import moto
-import pytest
 import pydantic.types
+import pytest
 
 import src.adapters.db as db
-from src.adapters.db.clients.postgres_config import PostgresDBConfig
 import src.app as app_entry
-import tests.src.db.models.factories as factories
 import src.config
+import tests.src.db.models.factories as factories
+from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.db import models
 from src.util.local import load_local_env_vars
 from tests.lib import db_testing

@@ -10,8 +10,8 @@
 
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.app_config import AppConfig
-from src.logging.config import LoggingConfig
 from src.config import RootConfig
+from src.logging.config import LoggingConfig
 
 
 def default_config():

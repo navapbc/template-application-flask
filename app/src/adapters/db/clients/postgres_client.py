@@ -8,7 +8,7 @@ import sqlalchemy
 import sqlalchemy.pool as pool
 
 from src.adapters.db.client import DBClient
-from src.adapters.db.clients.postgres_config import PostgresDBConfig, get_db_config
+from src.adapters.db.clients.postgres_config import PostgresDBConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,7 @@ class PostgresDBClient(DBClient):
     as configured by parameters passed in from the db_config
     """
 
-    def __init__(self, db_config: PostgresDBConfig | None = None) -> None:
-        if not db_config:
-            db_config = get_db_config()
+    def __init__(self, db_config: PostgresDBConfig) -> None:
         self._engine = self._configure_engine(db_config)
 
         if db_config.check_connection_on_init:
@@ -82,17 +80,17 @@ class PostgresDBClient(DBClient):
 def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
     connect_args = {}
     environment = os.getenv("ENVIRONMENT")
-    if not environment:
-        raise Exception("ENVIRONMENT is not set")
-
-    if environment != "local":
-        connect_args["sslmode"] = "require"
+    # if not environment:
+    #     raise Exception("ENVIRONMENT is not set")
+    #
+    # if environment != "local":
+    #     connect_args["sslmode"] = "require"
 
     return dict(
         host=db_config.host,
         dbname=db_config.name,
         user=db_config.username,
-        password=db_config.password,
+        password=db_config.password.get_secret_value(),
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,

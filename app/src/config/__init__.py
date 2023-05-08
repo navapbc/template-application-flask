@@ -11,7 +11,6 @@ from src.app_config import AppConfig
 from src.logging.config import LoggingConfig
 from src.util.env_config import PydanticBaseEnvConfig
 
-
 logger = logging.getLogger(__name__)
 
 
