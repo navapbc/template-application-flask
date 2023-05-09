@@ -11,8 +11,6 @@ import os
 import src.app
 import src.config
 import src.logging
-from src.app_config import AppConfig
-from src.util.local import load_local_env_vars
 
 logger = logging.getLogger(__package__)
 
@@ -40,10 +38,17 @@ def main() -> None:
     if config.app.environment == "local":
         # If python files are changed, the app will auto-reload
         # Note this doesn't have the OpenAPI yaml file configured at the moment
-        app.run(host=host, port=port, use_reloader=True, reloader_type="stat")
+        app.run(
+            host=host,
+            port=port,
+            debug=True,
+            load_dotenv=False,
+            use_reloader=True,
+            reloader_type="stat",
+        )
     else:
         # Don't enable the reloader if non-local
-        app.run(host=host, port=port)
+        app.run(host=host, port=port, load_dotenv=False)
 
 
 main()

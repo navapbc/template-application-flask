@@ -22,9 +22,9 @@ class RootConfig(PydanticBaseEnvConfig):
 
 def load(environment_name, environ=None) -> RootConfig:
     """Load the configuration for the given environment name."""
-    logger.info("loading configuration", extra={"environment": environment_name})
+    logger.debug("loading configuration", extra={"environment": environment_name})
     module = importlib.import_module(name=".env." + environment_name, package=__package__)
-    config = module.config
+    config = module.config.copy(deep=True)
 
     if environ:
         config.override_from_environment(environ)

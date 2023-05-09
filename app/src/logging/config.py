@@ -94,7 +94,6 @@ class LoggingContext(ContextManager[None]):
         Adds a PII mask filter to the root logger.
         Also configures log levels third party packages.
         """
-        # config = LoggingConfig()  # TODO inject
 
         # Loggers can be configured using config functions defined
         # in logging.config or by directly making calls to the main API

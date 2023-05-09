@@ -28,7 +28,7 @@ COPY . /srv
 
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
-ENV HOST=0.0.0.0
+ENV APP_HOST=0.0.0.0
 
 # Install application dependencies.
 # https://python-poetry.org/docs/basic-usage/#installing-dependencies

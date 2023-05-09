@@ -25,6 +25,6 @@ class PydanticBaseEnvConfig(BaseModel):
             env_var_name = field.field_info.extra.get("env", prefix + name)
             for key in (env_var_name, env_var_name.lower(), env_var_name.upper()):
                 if key in environ:
-                    logging.info("override from environment", extra={"key": key})
+                    # logging.debug("override from environment", extra={"key": key})
                     setattr(self, field.name, environ[key])
                     break
