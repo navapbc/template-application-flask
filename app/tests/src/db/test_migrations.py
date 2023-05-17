@@ -1,4 +1,5 @@
 import logging  # noqa: B1
+import uuid
 
 import pytest
 from alembic import command
@@ -7,12 +8,20 @@ from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError
 
 import src.adapters.db as db
+from src.adapters.db.clients.postgres_client import make_connection_uri
 from src.db.migrations.run import alembic_cfg
 from tests.lib import db_testing
 
 
 @pytest.fixture
-def empty_schema(monkeypatch) -> db.DBClient:
+def empty_db_config(db_config):
+    empty_db_config = db_config.copy()
+    empty_db_config.db_schema = f"test_schema_{uuid.uuid4().int}"
+    return empty_db_config
+
+
+@pytest.fixture
+def empty_schema(empty_db_config) -> db.DBClient:
     """
     Create a test schema, if it doesn't already exist, and drop it after the
     test completes.
@@ -20,7 +29,7 @@ def empty_schema(monkeypatch) -> db.DBClient:
     This is similar to what the db_client fixture does but does not create any tables in the
     schema.
     """
-    with db_testing.create_isolated_db(monkeypatch) as db_client:
+    with db_testing.create_isolated_db(empty_db_config) as db_client:
         yield db_client
 
 
@@ -47,8 +56,12 @@ def test_only_single_head_revision_in_migrations():
         )
 
 
-def test_db_setup_via_alembic_migration(empty_schema, caplog: pytest.LogCaptureFixture):
+def test_db_setup_via_alembic_migration(empty_db_config, empty_schema, caplog: pytest.LogCaptureFixture):
     caplog.set_level(logging.INFO)  # noqa: B1
+
+    uri = make_connection_uri(empty_db_config)
+    alembic_cfg.set_main_option("sqlalchemy.url", uri.replace("%", "%%"))
+
     command.upgrade(alembic_cfg, "head")
     # Verify the migration ran by checking the logs
     assert "Running upgrade" in caplog.text

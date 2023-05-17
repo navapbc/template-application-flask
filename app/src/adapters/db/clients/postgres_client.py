@@ -1,5 +1,4 @@
 import logging
-import os
 import urllib.parse
 from typing import Any
 
@@ -78,14 +77,6 @@ class PostgresDBClient(DBClient):
 
 
 def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
-    connect_args = {}
-    environment = os.getenv("ENVIRONMENT")
-    # if not environment:
-    #     raise Exception("ENVIRONMENT is not set")
-    #
-    # if environment != "local":
-    #     connect_args["sslmode"] = "require"
-
     return dict(
         host=db_config.host,
         dbname=db_config.name,
@@ -94,7 +85,7 @@ def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,
-        **connect_args,
+        sslmode=db_config.sslmode,
     )
 
 
@@ -107,7 +98,7 @@ def make_connection_uri(config: PostgresDBConfig) -> str:
     host = config.host
     db_name = config.name
     username = config.username
-    password = urllib.parse.quote(config.password) if config.password else None
+    password = urllib.parse.quote(config.password.get_secret_value()) if config.password else None
     schema = config.db_schema
     port = config.port
 
@@ -120,10 +111,7 @@ def make_connection_uri(config: PostgresDBConfig) -> str:
     elif password:
         netloc_parts.append(f":{password}@")
 
-    netloc_parts.append(host)
-
-    if port:
-        netloc_parts.append(f":{port}")
+    netloc_parts.append(f"{host}:{port}")
 
     netloc = "".join(netloc_parts)
 

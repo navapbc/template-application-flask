@@ -34,7 +34,7 @@ class LoggingConfig(PydanticBaseEnvConfig):
     human_readable_formatter: HumanReadableFormatterConfig = HumanReadableFormatterConfig()
 
     @pydantic.validator("level")
-    def valid_level(cls, v):
+    def valid_level(cls, v):  # noqa: B902
         value = logging.getLevelName(v)
         if not isinstance(value, int):
             raise ValueError("invalid logging level %s" % v)

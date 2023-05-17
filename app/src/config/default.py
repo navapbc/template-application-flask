@@ -11,7 +11,7 @@
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.app_config import AppConfig
 from src.config import RootConfig
-from src.logging.config import LoggingConfig
+from src.logging.config import LoggingConfig, LoggingFormat
 
 
 def default_config():
@@ -19,7 +19,7 @@ def default_config():
         app=AppConfig(),
         database=PostgresDBConfig(),
         logging=LoggingConfig(
-            format="json",
+            format=LoggingFormat.json,
             level="INFO",
             enable_audit=True,
         ),

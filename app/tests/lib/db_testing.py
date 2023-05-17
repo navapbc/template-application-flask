@@ -1,10 +1,6 @@
 """Helper functions for testing database code."""
 import contextlib
 import logging
-import os
-import uuid
-
-import pydantic.types
 
 import src.adapters.db as db
 from src.adapters.db.clients.postgres_config import PostgresDBConfig

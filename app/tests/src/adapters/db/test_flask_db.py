@@ -37,8 +37,8 @@ def test_with_db_session(example_app: Flask):
     assert response.get_json() == {"data": "hello, world"}
 
 
-def test_with_db_session_not_default_name(example_app: Flask):
-    db_client = db.PostgresDBClient()
+def test_with_db_session_not_default_name(example_app: Flask, db_config):
+    db_client = db.PostgresDBClient(db_config)
     flask_db.register_db_client(db_client, example_app, client_name="something_else")
 
     @example_app.route("/hello")

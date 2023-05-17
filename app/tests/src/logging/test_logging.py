@@ -26,7 +26,7 @@ def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.Monke
 )
 def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expected_formatter):
     caplog.set_level(logging.DEBUG)
-    logging_config = LoggingConfig(format=log_format)
+    logging_config = LoggingConfig(format=log_format, enable_audit=False)
 
     with src.logging.init("test_logging", logging_config):
 

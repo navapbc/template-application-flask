@@ -2,6 +2,7 @@ import logging  # noqa: B1
 from itertools import product
 
 import pytest
+from pydantic.types import SecretStr
 
 from src.adapters.db.clients.postgres_client import (
     get_connection_parameters,
@@ -47,16 +48,16 @@ def test_verify_ssl_not_in_use(caplog):
     "username_password_port,expected",
     zip(
         # Test all combinations of username, password, and port
-        product(["testuser", ""], ["testpass", None], [5432, None]),
+        product(["testuser", ""], ["testpass", None], [5432, 5433]),
         [
             "postgresql://testuser:testpass@localhost:5432/dbname?options=-csearch_path=public",
-            "postgresql://testuser:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://testuser:testpass@localhost:5433/dbname?options=-csearch_path=public",
             "postgresql://testuser@localhost:5432/dbname?options=-csearch_path=public",
-            "postgresql://testuser@localhost/dbname?options=-csearch_path=public",
+            "postgresql://testuser@localhost:5433/dbname?options=-csearch_path=public",
             "postgresql://:testpass@localhost:5432/dbname?options=-csearch_path=public",
-            "postgresql://:testpass@localhost/dbname?options=-csearch_path=public",
+            "postgresql://:testpass@localhost:5433/dbname?options=-csearch_path=public",
             "postgresql://localhost:5432/dbname?options=-csearch_path=public",
-            "postgresql://localhost/dbname?options=-csearch_path=public",
+            "postgresql://localhost:5433/dbname?options=-csearch_path=public",
         ],
     ),
 )
@@ -77,23 +78,15 @@ def test_make_connection_uri(username_password_port, expected):
     )
 
 
-def test_get_connection_parameters_require_environment(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.delenv("ENVIRONMENT")
-    db_config = get_db_config()
-    with pytest.raises(Exception, match="ENVIRONMENT is not set"):
-        get_connection_parameters(db_config)
-
-
-def test_get_connection_parameters(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.setenv("ENVIRONMENT", "production")
-    db_config = get_db_config()
+def test_get_connection_parameters():
+    db_config = PostgresDBConfig(host="test1", password=SecretStr("test_password_123"))
     conn_params = get_connection_parameters(db_config)
 
     assert conn_params == dict(
-        host=db_config.host,
+        host="test1",
         dbname=db_config.name,
         user=db_config.username,
-        password=db_config.password,
+        password="test_password_123",
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,
