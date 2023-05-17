@@ -12,15 +12,20 @@ class PydanticBaseEnvConfig(BaseModel):
     Similar to Pydantic's BaseSettings class, but we implement our own method to override from the
     environment so that it can be run later, after an instance was constructed."""
 
+    meta_overridden: list = []
+
     class Config:
         validate_assignment = True
 
     def override_from_environment(self, environ: Mapping[str, str], prefix: str = "") -> None:
         """Recursively override field values from the given environment variable mapping."""
         for name, field in self.__fields__.items():
-            if field.is_complex():
+            value = getattr(self, name)
+            if isinstance(value, BaseModel):
                 # Nested models must be instances of this class too.
-                getattr(self, name).override_from_environment(environ, prefix=name + "_")
+                if not isinstance(value, PydanticBaseEnvConfig):
+                    raise TypeError("nested models must be instances of PydanticBaseEnvConfig")
+                value.override_from_environment(environ, prefix=name + "_")
                 continue
 
             env_var_name = field.field_info.extra.get("env", prefix + name)
@@ -28,4 +33,5 @@ class PydanticBaseEnvConfig(BaseModel):
                 if key in environ:
                     # logging.debug("override from environment", extra={"key": key})
                     setattr(self, field.name, environ[key])
+                    self.meta_overridden.append((field.name, key))
                     break

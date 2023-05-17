@@ -21,9 +21,6 @@ def main() -> None:
     app = src.app.create_app(config)
     logger.info("loaded configuration", extra={"config": config})
 
-    all_configs = src.config.load_all()
-    logger.info("loaded all", extra={"all_configs": all_configs})
-
     environment = config.app.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be

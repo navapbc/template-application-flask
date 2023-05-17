@@ -11,6 +11,10 @@ services:
     container_name: main-db
 
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
+    environment:
+      POSTGRES_DB: main-db
+      POSTGRES_USER: local_db_user
+      POSTGRES_PASSWORD: secret123
     ports:
       - "5432:5432"
     volumes:
