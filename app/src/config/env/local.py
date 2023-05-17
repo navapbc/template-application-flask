@@ -6,8 +6,9 @@
 
 import pydantic.types
 
-from .. import default
 from src.logging.config import LoggingFormat
+
+from .. import default
 
 config = default.default_config()
 

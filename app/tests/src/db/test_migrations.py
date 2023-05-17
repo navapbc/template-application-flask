@@ -56,7 +56,9 @@ def test_only_single_head_revision_in_migrations():
         )
 
 
-def test_db_setup_via_alembic_migration(empty_db_config, empty_schema, caplog: pytest.LogCaptureFixture):
+def test_db_setup_via_alembic_migration(
+    empty_db_config, empty_schema, caplog: pytest.LogCaptureFixture
+):
     caplog.set_level(logging.INFO)  # noqa: B1
 
     uri = make_connection_uri(empty_db_config)

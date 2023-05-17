@@ -11,14 +11,9 @@ from alembic import context
 # See database migrations section in `./database/database-migrations.md` for details about running migrations.
 sys.path.insert(0, ".")  # noqa: E402
 
-# Load env vars before anything further
-from src.util.local import load_local_env_vars  # noqa: E402 isort:skip
-
-load_local_env_vars()
-
 from src.adapters.db.clients.postgres_client import make_connection_uri  # noqa: E402 isort:skip
 from src.db.models import metadata  # noqa: E402 isort:skip
-import src.config
+import src.config  # noqa: E402 isort:skip
 import src.logging  # noqa: E402 isort:skip
 
 # this is the Alembic Config object, which provides
@@ -27,7 +22,9 @@ config = context.config
 
 logger = logging.getLogger("migrations")
 
-root_config = src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
+root_config = src.config.load(
+    environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ
+)
 
 # Initialize logging
 with src.logging.init("migrations", root_config.logging):

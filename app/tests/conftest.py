@@ -4,10 +4,8 @@ import uuid
 
 import _pytest.monkeypatch
 import boto3
-import flask
 import flask.testing
 import moto
-import pydantic.types
 import pytest
 
 import src.adapters.db as db
@@ -16,35 +14,9 @@ import src.config
 import tests.src.db.models.factories as factories
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.db import models
-from src.util.local import load_local_env_vars
 from tests.lib import db_testing
 
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def env_vars():
-    """
-    Default environment variables for tests to be
-    based on the local.env file. These get set once
-    before all tests run. As "session" is the highest
-    scope, this will run before any other explicit fixtures
-    in a test.
-
-    See: https://docs.pytest.org/en/6.2.x/fixture.html#autouse-order
-
-    To set a different environment variable for a test,
-    use the monkeypatch fixture, for example:
-
-    ```py
-    def test_example(monkeypatch):
-        monkeypatch.setenv("LOG_LEVEL", "debug")
-    ```
-
-    Several monkeypatch fixtures exists below for different
-    scope levels.
-    """
-    load_local_env_vars()
 
 
 ####################
