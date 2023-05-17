@@ -33,7 +33,7 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
-FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
+FLASK_CMD := $(PY_RUN_CMD) flask --app=src.__main__:create_app
 
 ##################################################
 # Local Development Environment Setup

@@ -8,6 +8,8 @@
 import logging
 import os
 
+from apiflask import APIFlask
+
 import src.app
 import src.config
 import src.logging
@@ -15,9 +17,16 @@ import src.logging
 logger = logging.getLogger(__package__)
 
 
-def main() -> None:
-    config = src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
+def load_config() -> src.config.RootConfig:
+    return src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
 
+
+def create_app() -> APIFlask:
+    return src.app.create_app(load_config())
+
+
+def main() -> None:
+    config = load_config()
     app = src.app.create_app(config)
     logger.info("loaded configuration", extra={"config": config})
 
