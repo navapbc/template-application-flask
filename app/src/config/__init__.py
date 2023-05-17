@@ -5,7 +5,7 @@
 import importlib
 import logging
 import pathlib
-from typing import Optional, Mapping
+from typing import Mapping, Optional
 
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.app_config import AppConfig
