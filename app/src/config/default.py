@@ -14,7 +14,7 @@ from src.config import RootConfig
 from src.logging.config import LoggingConfig, LoggingFormat
 
 
-def default_config():
+def default_config() -> RootConfig:
     return RootConfig(
         app=AppConfig(),
         database=PostgresDBConfig(),

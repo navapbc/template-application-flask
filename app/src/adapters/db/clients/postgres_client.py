@@ -81,7 +81,7 @@ def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
         host=db_config.host,
         dbname=db_config.name,
         user=db_config.username,
-        password=db_config.password.get_secret_value(),
+        password=db_config.password.get_secret_value() if db_config.password else None,
         port=db_config.port,
         options=f"-c search_path={db_config.db_schema}",
         connect_timeout=3,

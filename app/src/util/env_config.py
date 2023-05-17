@@ -1,4 +1,5 @@
 import logging
+from typing import Mapping
 
 from pydantic import BaseModel
 
@@ -14,7 +15,7 @@ class PydanticBaseEnvConfig(BaseModel):
     class Config:
         validate_assignment = True
 
-    def override_from_environment(self, environ, prefix=""):
+    def override_from_environment(self, environ: Mapping[str, str], prefix: str = "") -> None:
         """Recursively override field values from the given environment variable mapping."""
         for name, field in self.__fields__.items():
             if field.is_complex():

@@ -14,11 +14,12 @@ from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
 from src.auth.api_key_auth import User, get_app_security_scheme
+from src.config import RootConfig
 
 logger = logging.getLogger(__name__)
 
 
-def create_app(config) -> APIFlask:
+def create_app(config: RootConfig) -> APIFlask:
     app = APIFlask(__name__)
 
     src.logging.init(__package__, config.logging)

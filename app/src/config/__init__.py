@@ -5,6 +5,7 @@
 import importlib
 import logging
 import pathlib
+from typing import Optional, Mapping
 
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.app_config import AppConfig
@@ -20,7 +21,7 @@ class RootConfig(PydanticBaseEnvConfig):
     logging: LoggingConfig
 
 
-def load(environment_name, environ=None) -> RootConfig:
+def load(environment_name: str, environ: Optional[Mapping[str, str]] = None) -> RootConfig:
     """Load the configuration for the given environment name."""
     logger.debug("loading configuration", extra={"environment": environment_name})
     module = importlib.import_module(name=".env." + environment_name, package=__package__)
