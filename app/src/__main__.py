@@ -21,10 +21,6 @@ def load_config() -> src.config.RootConfig:
     return src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
 
 
-def create_app() -> APIFlask:
-    return src.app.create_app(load_config())
-
-
 def main() -> None:
     config = load_config()
     app = src.app.create_app(config)
@@ -36,6 +32,9 @@ def main() -> None:
     # accessed from outside the container. See Dockerfile
     host = config.app.host
     port = config.app.port
+
+    if __name__ != "main":
+        return app
 
     logger.info(
         "Running API Application", extra={"environment": environment, "host": host, "port": port}
