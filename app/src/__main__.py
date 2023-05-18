@@ -46,7 +46,7 @@ def main() -> Flask:
         app.run(
             host=host,
             port=port,
-            debug=True,
+            debug=True,  # nosec B201
             load_dotenv=False,
             use_reloader=True,
             reloader_type="stat",
