@@ -8,8 +8,6 @@
 import logging
 import os
 
-from apiflask import APIFlask
-
 import src.app
 import src.config
 import src.logging
