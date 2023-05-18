@@ -8,6 +8,8 @@
 import logging
 import os
 
+from flask import Flask
+
 import src.app
 import src.config
 import src.logging
@@ -19,7 +21,7 @@ def load_config() -> src.config.RootConfig:
     return src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
 
 
-def main() -> None:
+def main() -> Flask:
     config = load_config()
     app = src.app.create_app(config)
     logger.info("loaded configuration", extra={"config": config})
@@ -52,6 +54,8 @@ def main() -> None:
     else:
         # Don't enable the reloader if non-local
         app.run(host=host, port=port, load_dotenv=False)
+
+    return app
 
 
 main()
