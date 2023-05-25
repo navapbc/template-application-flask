@@ -15,16 +15,16 @@ DECODE_LOG := 2>&1 | python3 -u src/logging/util/decodelog.py
 # Required for CI flags below to work properly
 SHELL = /bin/bash -o pipefail
 
-# A few commands need adjustments if they're run in CI, specify those here
-# Make sure the path of the file mirrors the path to the app, or these flags will
-# not work as expected in GitHub
-## FLAKE8_FORMAT will show any findings in the "Files Changed" tab of the PR
-## MYPY_POSTPROC will show any findings in the "Files Changed" tab of the PR
+# The APP_DIR variable is the path from the root of the repository to this Makefile.
+# This variable is used to display errors from Flake8 and MyPy in the 'Files Changed'
+# section of a pull request. If this is set to the incorrect value, you won't be able
+# to see the errors on the correct files in that section
+APP_DIR = app
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
- FLAKE8_FORMAT := '::warning file=app/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+ FLAKE8_FORMAT := '::warning file=$(APP_DIR)/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
  MYPY_FLAGS := --no-pretty
- MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=app\/\1,line=\2,col=\3::\4/"
+ MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=$(APP_DIR)\/\1,line=\2,col=\3::\4/"
 else
  FLAKE8_FORMAT := default
 endif
