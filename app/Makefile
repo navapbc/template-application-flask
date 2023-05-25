@@ -19,7 +19,7 @@ SHELL = /bin/bash -o pipefail
 # This variable is used to display errors from Flake8 and MyPy in the 'Files Changed'
 # section of a pull request. If this is set to the incorrect value, you won't be able
 # to see the errors on the correct files in that section
-APP_DIR = app
+APP_DIR := app
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
  FLAKE8_FORMAT := '::warning file=$(APP_DIR)/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
