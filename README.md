@@ -25,7 +25,6 @@ git clone --single-branch --branch main --depth 1 git@github.com:navapbc/templat
 
 cp -r \
   template-application-flask/.github \
-  template-application-flask/bin \
   template-application-flask/docs \
   template-application-flask/app \
   template-application-flask/docker-compose.yml \
