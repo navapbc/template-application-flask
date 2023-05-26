@@ -12,13 +12,16 @@ from flask import Flask
 
 import src.app
 import src.config
+import src.config.load
 import src.logging
 
 logger = logging.getLogger(__package__)
 
 
 def load_config() -> src.config.RootConfig:
-    return src.config.load(environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ)
+    return src.config.load.load(
+        environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ
+    )
 
 
 def main() -> Flask:
@@ -33,7 +36,7 @@ def main() -> Flask:
     host = config.app.host
     port = config.app.port
 
-    if __name__ != "main":
+    if __name__ != "__main__":
         return app
 
     logger.info(

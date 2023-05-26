@@ -11,6 +11,7 @@ import pytest
 import src.adapters.db as db
 import src.app as app_entry
 import src.config
+import src.config.load
 import tests.src.db.models.factories as factories
 from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.db import models
@@ -49,7 +50,7 @@ def monkeypatch_module():
 def config() -> src.config.RootConfig:
     schema_name = f"test_schema_{uuid.uuid4().int}"
 
-    config = src.config.load("local")
+    config = src.config.load.load("local")
     config.database.db_schema = schema_name
 
     # Allow host to be overridden when running in docker-compose.
