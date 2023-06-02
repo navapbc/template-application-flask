@@ -37,7 +37,7 @@ The [src.logging.flask_logger](../../../app/src/logging/flask_logger.py) module 
 
 ## PII Masking
 
-The src.logging.pii](../../../app/src/logging/pii.py) module defines a filter that applies to all logs that automatically masks data fields that look like social security numbers.
+The [src.logging.pii](../../../app/src/logging/pii.py) module defines a filter that applies to all logs that automatically masks data fields that look like social security numbers.
 
 ## Audit Logging
 
