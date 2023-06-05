@@ -1,0 +1,43 @@
+#
+# Multi-environment configuration expressed in Python.
+#
+
+import importlib
+import logging
+import pathlib
+from typing import Mapping, Optional
+
+from src.config import RootConfig
+
+logger = logging.getLogger(__name__)
+
+
+def load(environment_name: str, environ: Optional[Mapping[str, str]] = None) -> RootConfig:
+    """Load the configuration for the given environment name."""
+    logger.debug("loading configuration", extra={"environment": environment_name})
+    module = importlib.import_module(name=".env." + environment_name, package=__package__)
+    config = module.config.copy(deep=True)
+
+    if environment_name == "local":
+        # Load overrides from local_override.py in the same directory, if it exists.
+        try:
+            module = importlib.import_module(name=".env.local_override", package=__package__)
+            config = module.config.copy(deep=True)
+        except ImportError:
+            pass
+
+    if environ:
+        config.override_from_environment(environ)
+    config.app.environment = environment_name
+
+    return config
+
+
+def load_all() -> dict[str, RootConfig]:
+    """Load all environment configurations, to ensure they are valid. Used in tests."""
+    directory = pathlib.Path(__file__).parent / "env"
+    return {
+        item.stem: load(str(item.stem))
+        for item in directory.glob("*.py")
+        if "override" not in item.stem
+    }

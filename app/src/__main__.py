@@ -6,39 +6,59 @@
 # https://docs.python.org/3/library/__main__.html
 
 import logging
+import os
+
+from flask import Flask
 
 import src.app
+import src.config
+import src.config.load
 import src.logging
-from src.app_config import AppConfig
-from src.util.local import load_local_env_vars
 
 logger = logging.getLogger(__package__)
 
 
-def main() -> None:
-    load_local_env_vars()
-    app_config = AppConfig()
+def load_config() -> src.config.RootConfig:
+    return src.config.load.load(
+        environment_name=os.getenv("ENVIRONMENT", "local"), environ=os.environ
+    )
 
-    app = src.app.create_app()
 
-    environment = app_config.environment
+def main() -> Flask:
+    config = load_config()
+    app = src.app.create_app(config)
+    logger.info("loaded configuration", extra={"config": config})
+
+    environment = config.app.environment
 
     # When running in a container, the host needs to be set to 0.0.0.0 so that the app can be
     # accessed from outside the container. See Dockerfile
-    host = app_config.host
-    port = app_config.port
+    host = config.app.host
+    port = config.app.port
+
+    if __name__ != "__main__":
+        return app
 
     logger.info(
         "Running API Application", extra={"environment": environment, "host": host, "port": port}
     )
 
-    if app_config.environment == "local":
+    if config.app.environment == "local":
         # If python files are changed, the app will auto-reload
         # Note this doesn't have the OpenAPI yaml file configured at the moment
-        app.run(host=host, port=port, use_reloader=True, reloader_type="stat")
+        app.run(
+            host=host,
+            port=port,
+            debug=True,  # nosec B201
+            load_dotenv=False,
+            use_reloader=True,
+            reloader_type="stat",
+        )
     else:
         # Don't enable the reloader if non-local
-        app.run(host=host, port=port)
+        app.run(host=host, port=port, load_dotenv=False)
+
+    return app
 
 
 main()

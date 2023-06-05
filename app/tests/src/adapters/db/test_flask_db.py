@@ -9,9 +9,9 @@ import src.adapters.db.flask_db as flask_db
 # Define an isolated example Flask app fixture specific to this test module
 # to avoid dependencies on any project-specific fixtures in conftest.py
 @pytest.fixture
-def example_app() -> Flask:
+def example_app(config) -> Flask:
     app = Flask(__name__)
-    db_client = db.PostgresDBClient()
+    db_client = db.PostgresDBClient(config.database)
     flask_db.register_db_client(db_client, app)
     return app
 
@@ -37,8 +37,8 @@ def test_with_db_session(example_app: Flask):
     assert response.get_json() == {"data": "hello, world"}
 
 
-def test_with_db_session_not_default_name(example_app: Flask):
-    db_client = db.PostgresDBClient()
+def test_with_db_session_not_default_name(example_app: Flask, db_config):
+    db_client = db.PostgresDBClient(db_config)
     flask_db.register_db_client(db_client, example_app, client_name="something_else")
 
     @example_app.route("/hello")

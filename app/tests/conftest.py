@@ -1,45 +1,23 @@
 import logging
+import os
+import uuid
 
 import _pytest.monkeypatch
 import boto3
-import flask
 import flask.testing
 import moto
 import pytest
 
 import src.adapters.db as db
 import src.app as app_entry
+import src.config
+import src.config.load
 import tests.src.db.models.factories as factories
+from src.adapters.db.clients.postgres_config import PostgresDBConfig
 from src.db import models
-from src.util.local import load_local_env_vars
 from tests.lib import db_testing
 
 logger = logging.getLogger(__name__)
-
-
-@pytest.fixture(scope="session", autouse=True)
-def env_vars():
-    """
-    Default environment variables for tests to be
-    based on the local.env file. These get set once
-    before all tests run. As "session" is the highest
-    scope, this will run before any other explicit fixtures
-    in a test.
-
-    See: https://docs.pytest.org/en/6.2.x/fixture.html#autouse-order
-
-    To set a different environment variable for a test,
-    use the monkeypatch fixture, for example:
-
-    ```py
-    def test_example(monkeypatch):
-        monkeypatch.setenv("LOG_LEVEL", "debug")
-    ```
-
-    Several monkeypatch fixtures exists below for different
-    scope levels.
-    """
-    load_local_env_vars()
 
 
 ####################
@@ -69,7 +47,26 @@ def monkeypatch_module():
 
 
 @pytest.fixture(scope="session")
-def db_client(monkeypatch_session) -> db.DBClient:
+def config() -> src.config.RootConfig:
+    schema_name = f"test_schema_{uuid.uuid4().int}"
+
+    config = src.config.load.load("local")
+    config.database.db_schema = schema_name
+
+    # Allow host to be overridden when running in docker-compose.
+    if "DB_HOST" in os.environ:
+        config.database.host = os.environ["DB_HOST"]
+
+    return config
+
+
+@pytest.fixture(scope="session")
+def db_config(config) -> PostgresDBConfig:
+    return config.database
+
+
+@pytest.fixture(scope="session")
+def db_client(monkeypatch_session, db_config) -> db.DBClient:
     """
     Creates an isolated database for the test session.
 
@@ -79,7 +76,7 @@ def db_client(monkeypatch_session) -> db.DBClient:
     after the test suite session completes.
     """
 
-    with db_testing.create_isolated_db(monkeypatch_session) as db_client:
+    with db_testing.create_isolated_db(db_config) as db_client:
         models.metadata.create_all(bind=db_client.get_connection())
         yield db_client
 
@@ -114,8 +111,8 @@ def enable_factory_create(monkeypatch, db_session) -> db.Session:
 # Make app session scoped so the database connection pool is only created once
 # for the test session. This speeds up the tests.
 @pytest.fixture(scope="session")
-def app(db_client) -> flask.Flask:
-    return app_entry.create_app()
+def app(db_client, config) -> flask.Flask:
+    return app_entry.create_app(config)
 
 
 @pytest.fixture

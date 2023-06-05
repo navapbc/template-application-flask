@@ -16,9 +16,9 @@ DECODE_LOG := 2>&1 | python3 -u src/logging/util/decodelog.py
 # TODO - when CI gets hooked up, actually test this.
 ifdef CI
  DOCKER_EXEC_ARGS := -T -e CI -e PYTEST_ADDOPTS="--color=yes"
- FLAKE8_FORMAT := '::warning file=src/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
+ FLAKE8_FORMAT := '::warning file=app/%(path)s,line=%(row)d,col=%(col)d::%(path)s:%(row)d:%(col)d: %(code)s %(text)s'
  MYPY_FLAGS := --no-pretty
- MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=src\/\1,line=\2,col=\3::\4/"
+ MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=app\/\1,line=\2,col=\3::\4/"
 else
  FLAKE8_FORMAT := default
 endif
@@ -33,7 +33,7 @@ else
 PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
-FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
+FLASK_CMD := $(PY_RUN_CMD) flask --app=src.__main__:main
 
 ##################################################
 # Local Development Environment Setup

@@ -1,9 +1,12 @@
+import enum
 import logging
 import os
 import platform
 import pwd
 import sys
 from typing import Any, ContextManager, cast
+
+import pydantic
 
 import src.logging.audit
 import src.logging.formatters as formatters
@@ -15,15 +18,27 @@ logger = logging.getLogger(__name__)
 _original_argv = tuple(sys.argv)
 
 
+class LoggingFormat(str, enum.Enum):
+    json = "json"
+    human_readable = "human_readable"
+
+
 class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
     message_width: int = formatters.HUMAN_READABLE_FORMATTER_DEFAULT_MESSAGE_WIDTH
 
 
 class LoggingConfig(PydanticBaseEnvConfig):
-    format = "json"
-    level = "INFO"
-    enable_audit = True
-    human_readable_formatter = HumanReadableFormatterConfig()
+    format: LoggingFormat = LoggingFormat.json
+    level: str = "INFO"
+    enable_audit: bool = True
+    human_readable_formatter: HumanReadableFormatterConfig = HumanReadableFormatterConfig()
+
+    @pydantic.validator("level")
+    def valid_level(cls, v: str) -> str:  # noqa: B902
+        value = logging.getLevelName(v)
+        if not isinstance(value, int):
+            raise ValueError("invalid logging level %s" % v)
+        return v
 
     class Config:
         env_prefix = "log_"
@@ -58,8 +73,8 @@ class LoggingContext(ContextManager[None]):
     and calling this multiple times before exit would result in duplicate logs.
     """
 
-    def __init__(self, program_name: str) -> None:
-        self._configure_logging()
+    def __init__(self, program_name: str, config: LoggingConfig) -> None:
+        self._configure_logging(config)
         log_program_info(program_name)
 
     def __enter__(self) -> None:
@@ -72,14 +87,13 @@ class LoggingContext(ContextManager[None]):
         # of those tests.
         logging.root.removeHandler(self.console_handler)
 
-    def _configure_logging(self) -> None:
+    def _configure_logging(self, config: LoggingConfig) -> None:
         """Configure logging for the application.
 
         Configures the root module logger to log to stdout.
         Adds a PII mask filter to the root logger.
         Also configures log levels third party packages.
         """
-        config = LoggingConfig()
 
         # Loggers can be configured using config functions defined
         # in logging.config or by directly making calls to the main API
@@ -112,7 +126,7 @@ def get_formatter(config: LoggingConfig) -> logging.Formatter:
     The formatter is determined by the environment variable LOG_FORMAT. If the
     environment variable is not set, the JSON formatter is used by default.
     """
-    if config.format == "human-readable":
+    if config.format == LoggingFormat.human_readable:
         return get_human_readable_formatter(config.human_readable_formatter)
     return formatters.JsonFormatter()
 

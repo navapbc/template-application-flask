@@ -14,17 +14,18 @@ from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
 from src.auth.api_key_auth import User, get_app_security_scheme
+from src.config import RootConfig
 
 logger = logging.getLogger(__name__)
 
 
-def create_app() -> APIFlask:
+def create_app(config: RootConfig) -> APIFlask:
     app = APIFlask(__name__)
 
-    src.logging.init(__package__)
+    src.logging.init(__package__, config.logging)
     flask_logger.init_app(logging.root, app)
 
-    db_client = db.PostgresDBClient()
+    db_client = db.PostgresDBClient(config.database)
     flask_db.register_db_client(db_client, app)
 
     configure_app(app)
