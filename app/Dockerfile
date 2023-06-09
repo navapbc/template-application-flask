@@ -18,6 +18,7 @@ RUN apt-get update \
     build-essential \
     libpq-dev \
     postgresql \
+    wget \
     # Reduce the image size by clear apt cached lists
     # Complies with https://github.com/codacy/codacy-hadolint/blob/master/codacy-hadolint/docs/description/DL3009.md
     && rm -fr /var/lib/apt/lists/* \
@@ -58,11 +59,16 @@ ENV HOST=0.0.0.0
 # Run the application.
 CMD ["poetry", "run", "python", "-m", "src"]
 
-#---------------
-# Release Build
-#---------------
+#---------
+# Release
+#---------
 
-FROM base AS release-build
+FROM base AS release
+ARG RUN_USER
+USER ${RUN_USER}
+WORKDIR /app
+
+# TODO(https://github.com/navapbc/template-application-flask/issues/23) Productionize the Docker image
 
 WORKDIR /app
 
@@ -89,42 +95,9 @@ RUN poetry install --no-root --only main
 # or the application will not build
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
-
-#---------------
-# Release image
-#---------------
-
-FROM scratch AS release
-
-ARG RUN_USER
-USER ${RUN_USER}
-
-# Any required files or directories will need to be explicitly copied to
-# the release image
-COPY --from=release-build /etc/passwd /etc/group /etc/
-
-# This copies over the files generated in the application binary (python wheel)
-# from the previous step
-COPY --from=release-build /app/.venv /app/.venv
-
-COPY --from=release-build /usr/local/bin/python* /usr/local/bin/
-
-# Include required libs
-COPY --from=release-build /usr/lib/x86_64-linux-gnu/ /usr/lib/x86_64-linux-gnu/
-COPY --from=release-build /lib/* /lib/
-COPY --from=release-build /usr/local/lib/ /usr/local/lib/
-COPY --from=release-build /usr/local/include/python* /usr/local/include/
-COPY --from=release-build /lib64/* /lib64/
-COPY --from=release-build --chown=${RUN_USER} /tmp/ /tmp/
-
-# By adding the application binary path, you can run scripts defined in the
-# pyproject.toml file as a command directly
-ENV PATH="/app/.venv/bin:$PATH"
-
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
 ENV HOST=0.0.0.0
 
-# Run the application using the command defined in the scripts section
-# of pyproject.toml
-CMD ["app-start"]
+# Run the application.
+CMD ["poetry", "run", "python", "-m", "src"]
