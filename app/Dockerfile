@@ -121,6 +121,10 @@ COPY --from=release-build --chown=${RUN_USER} /tmp/ /tmp/
 # pyproject.toml file as a command directly
 ENV PATH="/app/.venv/bin:$PATH"
 
+# Set the host to 0.0.0.0 to make the server available external
+# to the Docker container that it's running in.
+ENV HOST=0.0.0.0
+
 # Run the application using the command defined in the scripts section
 # of pyproject.toml
 CMD ["app-start"]
