@@ -10,13 +10,11 @@ import logging
 import src.app
 import src.logging
 from src.app_config import AppConfig
-from src.util.local import load_local_env_vars
 
 logger = logging.getLogger(__package__)
 
 
 def main() -> None:
-    load_local_env_vars()
     app_config = AppConfig()
 
     app = src.app.create_app()

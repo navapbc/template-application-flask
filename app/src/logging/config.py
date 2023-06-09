@@ -22,7 +22,7 @@ class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
 class LoggingConfig(PydanticBaseEnvConfig):
     format = "json"
     level = "INFO"
-    enable_audit = True
+    enable_audit = False
     human_readable_formatter = HumanReadableFormatterConfig()
 
     class Config:

@@ -1,44 +1,31 @@
-# Specify current major version of docker compose.
-# See https://docs.docker.com/compose/compose-file/compose-versioning/
 version: '3'
 
 services:
 
   main-db:
-    image: postgres:14-alpine # Docs for options to the postgres server command:
-    # https://www.postgresql.org/docs/current/app-postgres.html
-
+    image: postgres:14-alpine
     container_name: main-db
-
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
-    # Load environment variables for local development. 
-    env_file: ./app/local.env
+    environment:
+      POSTGRES_PASSWORD: secret123
     ports:
       - "5432:5432"
     volumes:
       - dbdata:/var/lib/postgresql/data
 
-  # Define one service for the application.
   main-app:
-    # This service relies on building from a Dockerfile in this file directory,
-    # not on an image repository.
-    build: ./app
-    # Expose the application port for local development.
-
+    build:
+      context: ./app
+      target: dev
+      args:
+        - RUN_UID=${RUN_UID:-4000}
+        - RUN_USER=${RUN_USER:-app}
     container_name: main-app
-
-    # Load environment variables for local development
     env_file: ./app/local.env
-    # NOTE: These values take precedence if the same value is specified in the env_file.
-    environment:
-      # The env_file defines DB_HOST=localhost for accessing a non-dockerized database. 
-      # In the docker-compose, we tell the app to use the dockerized database service 
-      - DB_HOST=main-db
     ports:
       - 8080:8080
-    # Mount application directory for local development.
     volumes:
-      - ./app:/srv
+      - ./app:/app
     depends_on:
       - main-db
 
