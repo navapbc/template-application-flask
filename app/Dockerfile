@@ -65,7 +65,6 @@ CMD ["poetry", "run", "python", "-m", "src"]
 
 FROM base AS release
 ARG RUN_USER
-USER ${RUN_USER}
 WORKDIR /app
 
 # TODO(https://github.com/navapbc/template-application-flask/issues/23) Productionize the Docker image
@@ -95,9 +94,15 @@ RUN poetry install --no-root --only main
 # or the application will not build
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
+# Add project's virtual env to the PATH so we can directly run poetry scripts
+# defiend in pyproject.toml
+ENV PATH="/app/.venv/bin:$PATH"
+
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
 ENV HOST=0.0.0.0
+
+USER ${RUN_USER}
 
 # Run the application.
 CMD ["poetry", "run", "python", "-m", "src"]
