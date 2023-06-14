@@ -122,40 +122,6 @@ def generate_iam_auth_token(aws_region: str, host: str, port: int, user: str) ->
     return token
 
 
-def make_connection_uri(config: PostgresDBConfig) -> str:
-    """Construct PostgreSQL connection URI
-
-    More details at:
-    https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNSTRING
-    """
-    host = config.host
-    db_name = config.name
-    username = config.username
-    password = urllib.parse.quote(config.password) if config.password else None
-    schema = config.db_schema
-    port = config.port
-
-    netloc_parts = []
-
-    if username and password:
-        netloc_parts.append(f"{username}:{password}@")
-    elif username:
-        netloc_parts.append(f"{username}@")
-    elif password:
-        netloc_parts.append(f":{password}@")
-
-    netloc_parts.append(host)
-
-    if port:
-        netloc_parts.append(f":{port}")
-
-    netloc = "".join(netloc_parts)
-
-    uri = f"postgresql://{netloc}/{db_name}?options=-csearch_path={schema}"
-
-    return uri
-
-
 def verify_ssl(connection_info: Any) -> None:
     """Verify that the database connection is encrypted and log a warning if not."""
     if connection_info.ssl_in_use:

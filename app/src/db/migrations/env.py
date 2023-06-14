@@ -12,7 +12,6 @@ sys.path.insert(0, ".")  # noqa: E402
 
 
 import src.adapters.db as db
-from src.adapters.db.clients.postgres_client import make_connection_uri  # noqa: E402 isort:skip
 from src.adapters.db.clients.postgres_config import get_db_config  # noqa: E402 isort:skip
 from src.db.models import metadata  # noqa: E402 isort:skip
 import src.logging  # noqa: E402 isort:skip
