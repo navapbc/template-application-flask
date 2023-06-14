@@ -132,7 +132,7 @@ alembic_config := ./src/db/migrations/alembic.ini
 alembic_cmd := $(PY_RUN_CMD) alembic --config $(alembic_config)
 
 db-upgrade: ## Apply pending migrations to db
-	$(PY_RUN_CMD) db-migrate-up
+	$(PY_RUN_CMD) db-migrate
 
 db-downgrade: ## Rollback last migration in db
 	$(PY_RUN_CMD) db-migrate-down
