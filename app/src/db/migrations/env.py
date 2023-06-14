@@ -3,6 +3,7 @@ import sys
 from typing import Any
 
 import sqlalchemy
+
 from alembic import context
 
 # Alembic cli seems to reset the path on load causing issues with local module imports.

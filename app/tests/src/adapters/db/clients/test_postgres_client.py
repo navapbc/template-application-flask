@@ -1,11 +1,8 @@
-import logging  # noqa: B1
+import logging
 
 import pytest
 
-from src.adapters.db.clients.postgres_client import (
-    get_connection_parameters,
-    verify_ssl,
-)
+from src.adapters.db.clients.postgres_client import get_connection_parameters, verify_ssl
 from src.adapters.db.clients.postgres_config import get_db_config
 
 
