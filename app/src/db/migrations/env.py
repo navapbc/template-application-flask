@@ -10,9 +10,7 @@ from alembic import context
 # See database migrations section in `./database/database-migrations.md` for details about running migrations.
 sys.path.insert(0, ".")  # noqa: E402
 
-
-import src.adapters.db as db
-from src.adapters.db.clients.postgres_config import get_db_config  # noqa: E402 isort:skip
+import src.adapters.db as db  # noqa: E402 isort:skip
 from src.db.models import metadata  # noqa: E402 isort:skip
 import src.logging  # noqa: E402 isort:skip
 
