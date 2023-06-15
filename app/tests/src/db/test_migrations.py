@@ -1,7 +1,7 @@
 import logging  # noqa: B1
 
+import alembic.command as command
 import pytest
-from alembic import command
 from alembic.script import ScriptDirectory
 from alembic.script.revision import MultipleHeads
 from alembic.util.exc import CommandError

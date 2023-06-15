@@ -1,19 +1,12 @@
 import logging
-import sys
 from typing import Any
 
+import alembic.context as context
 import sqlalchemy
 
-from alembic import context
-
-# Alembic cli seems to reset the path on load causing issues with local module imports.
-# Workaround is to force set the path to the current run directory (top level src folder)
-# See database migrations section in `./database/database-migrations.md` for details about running migrations.
-sys.path.insert(0, ".")  # noqa: E402
-
-import src.adapters.db as db  # noqa: E402 isort:skip
-from src.db.models import metadata  # noqa: E402 isort:skip
-import src.logging  # noqa: E402 isort:skip
+import src.adapters.db as db
+import src.logging
+from src.db.models import metadata
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

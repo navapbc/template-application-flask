@@ -6,8 +6,9 @@ import logging
 import os
 from typing import Optional
 
+import alembic.command as command
+import alembic.script as script
 import sqlalchemy
-from alembic import command, script
 from alembic.config import Config
 from alembic.operations.ops import MigrationScript
 from alembic.runtime import migration
