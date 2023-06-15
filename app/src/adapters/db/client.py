@@ -2,10 +2,6 @@
 This module contains the DBClient class, which is used to manage database connections
 
 For usage information look at the package docstring in __init__.py
-
-This module also contains lower level connection related functions such as
-make_connection_uri that can be used outside of the application context such as for
-database migrations.
 """
 import abc
 import logging
