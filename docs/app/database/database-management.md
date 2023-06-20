@@ -1,11 +1,43 @@
-# Database Migrations
+# Database Management
 
+- [Basic operations](#basic-operations)
+  - [Initialize](#initialize)
+  - [Start](#start)
+  - [Destroy and reinitialize](#destroy-and-reinitialize)
 - [Running migrations](#running-migrations)
 - [Creating new migrations](#creating-new-migrations)
 - [Multi-head situations](#multi-head-situations)
 - [Deployment](#deployment)
   - [Removing a column](#removing-a-column)
   - [Removing a table](#removing-a-table)
+
+## Basic operations
+### Initialize
+
+When setting up the environment, `make init` will take care of building the database and running a few basic migrations. Should there be a situation where this process needs to be repeated or ran separately, the following command will accomplish this:
+
+```sh
+make init-db
+```
+
+### Start
+
+To only start the database container, run the following command:
+
+```sh
+make start-db
+```
+This command is not needed when starting the application with `make start`
+
+### Destroy and reinitialize
+
+To clean the database, use the following command:
+
+```sh
+make db-recreate
+```
+
+This will remove _all_ docker project volumes, rebuild the database volume, and run all pending migrations. Once completed, only the database container will be running. Simply run `make start` to bring up all other project containers.
 
 ## Running migrations
 
