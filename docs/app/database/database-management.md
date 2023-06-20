@@ -11,11 +11,8 @@
 ## Basic operations
 ### Initialize
 
-When setting up the environment, `make init` will take care of building the database and running a few basic migrations. Should there be a situation where this process needs to be repeated or ran separately, the following command will accomplish this:
-
-```sh
-make init-db
-```
+To start a local Postgres database container in a detached state and run any 
+pending migrations, run `make init-db`. Running `make init` will also call `init-db` automatically.
 
 ### Start
 
