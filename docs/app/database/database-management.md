@@ -11,8 +11,9 @@
 ## Basic operations
 ### Initialize
 
-To start a local Postgres database container in a detached state and run any 
-pending migrations, run `make init-db`. Running `make init` will also call `init-db` automatically.
+To start a local Postgres database container in a detached state and run any
+pending migrations, run `make init-db`. During initial setup, `init-db` is called
+automatically when running `make init`.
 
 ### Start
 
@@ -31,7 +32,9 @@ To clean the database, use the following command:
 make db-recreate
 ```
 
-This will remove _all_ docker project volumes, rebuild the database volume, and run all pending migrations. Once completed, only the database container will be running. Simply run `make start` to bring up all other project containers.
+This will remove _all_ docker project volumes, rebuild the database volume, and 
+run all pending migrations. Once completed, only the database container will be 
+running. Simply run `make start` to bring up all other project containers.
 
 ## Running migrations
 
