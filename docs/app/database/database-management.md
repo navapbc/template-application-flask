@@ -7,9 +7,6 @@
 - [Running migrations](#running-migrations)
 - [Creating new migrations](#creating-new-migrations)
 - [Multi-head situations](#multi-head-situations)
-- [Deployment](#deployment)
-  - [Removing a column](#removing-a-column)
-  - [Removing a table](#removing-a-table)
 
 ## Basic operations
 ### Initialize
