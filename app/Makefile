@@ -122,7 +122,7 @@ start-db:
 	docker-compose up --detach main-db
 
 ## Destroy current DB, setup new one
-db-recreate: clean-docker-volumes init-db
+db-recreate: clean-volumes init-db
 
 #########################
 # DB Migrations

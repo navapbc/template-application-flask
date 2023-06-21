@@ -38,7 +38,7 @@ root
 ## Information
 
 * [API Technical Overview](./technical-overview.md)
-* [Database Migrations](./database/database-migrations.md)
+* [Database Management](./database/database-management.md)
 * [Formatting and Linting](./formatting-and-linting.md)
 * [Writing Tests](./writing-tests.md)
 
