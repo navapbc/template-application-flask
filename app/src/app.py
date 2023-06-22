@@ -29,7 +29,7 @@ def create_app() -> APIFlask:
 
     configure_app(app)
     register_blueprints(app)
-    build_index_route(app)
+    register_index(app)
 
     return app
 
@@ -77,7 +77,7 @@ def get_project_root_dir() -> str:
     return os.path.join(os.path.dirname(__file__), "..")
 
 
-def build_index_route(app: APIFlask) -> None:
+def register_index(app: APIFlask) -> None:
     @app.route("/")
     def index():
         return '''
