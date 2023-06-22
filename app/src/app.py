@@ -81,7 +81,7 @@ def register_index(app: APIFlask) -> None:
     # When OpenAPI generates a definition for this route, it incorrectly
     # labels the response content type as application/json.
     @app.route("/")
-    def index():
+    def index() -> str:
         return '''
             <!Doctype html>
             <html>
