@@ -29,6 +29,8 @@ def create_app() -> APIFlask:
 
     configure_app(app)
     register_blueprints(app)
+    build_index_route(app)
+
     return app
 
 
@@ -73,3 +75,18 @@ def register_blueprints(app: APIFlask) -> None:
 
 def get_project_root_dir() -> str:
     return os.path.join(os.path.dirname(__file__), "..")
+
+
+def build_index_route(app: APIFlask) -> None:
+    @app.route("/")
+    def index():
+        return '''
+            <!Doctype html>
+            <html>
+                <head><title>Home</title></head>
+                <body>
+                    <h1>Home</h1>
+                    <p>Visit <a href="/docs">/docs</a> to view the api documentation for this project.</p>
+                </body>
+            </html>
+        '''
