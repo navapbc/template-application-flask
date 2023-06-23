@@ -82,7 +82,7 @@ def register_index(app: APIFlask) -> None:
     # labels the response content type as application/json.
     @app.route("/")
     def index() -> str:
-        return '''
+        return """
             <!Doctype html>
             <html>
                 <head><title>Home</title></head>
@@ -91,4 +91,4 @@ def register_index(app: APIFlask) -> None:
                     <p>Visit <a href="/docs">/docs</a> to view the api documentation for this project.</p>
                 </body>
             </html>
-        '''
+        """
