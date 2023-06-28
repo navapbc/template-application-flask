@@ -10,33 +10,6 @@ tags:
 - name: Health
 - name: User
 paths:
-  /:
-    get:
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    description: The message to return
-                  data: {}
-                  status_code:
-                    type: integer
-                    description: The HTTP status code
-                  warnings:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-                  errors:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/ValidationError'
-          description: Successful response
-      summary: Index
   /health:
     get:
       parameters: []
