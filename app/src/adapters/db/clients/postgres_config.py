@@ -18,7 +18,7 @@ class PostgresDBConfig(PydanticBaseEnvConfig):
     db_schema: str = Field("public", env="DB_SCHEMA")
     port: int = Field(5432, env="DB_PORT")
     hide_sql_parameter_logs: bool = Field(True, env="HIDE_SQL_PARAMETER_LOGS")
-    ssl_mode: str = Field("require", env="DB_SSL_MODE")
+    ssl_mode: str = Field("prefer", env="DB_SSL_MODE")
 
 
 def get_db_config() -> PostgresDBConfig:

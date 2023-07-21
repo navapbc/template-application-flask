@@ -6,7 +6,7 @@ import flask.testing
 import pytest
 from pytest_lazyfixture import lazy_fixture
 from smart_open import open as smart_open
-
+from sqlalchemy import delete
 import src.adapters.db as db
 from src.db.models.user_models import User
 from tests.src.db.models.factories import UserFactory
@@ -17,7 +17,7 @@ def prepopulate_user_table(enable_factory_create, db_session: db.Session) -> lis
     # First make sure the table is empty, as other tests may have inserted data
     # and this test expects a clean slate (unlike most tests that are designed to
     # be isolated from other tests)
-    db_session.query(User).delete()
+    db_session.execute(delete(User))
     return [
         UserFactory.create(first_name="Jon", last_name="Doe", is_active=True),
         UserFactory.create(first_name="Jane", last_name="Doe", is_active=False),

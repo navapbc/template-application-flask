@@ -7,7 +7,7 @@ from uuid import UUID
 from sqlalchemy import TIMESTAMP, Column, MetaData, inspect
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import declarative_mixin
+from sqlalchemy.orm import declarative_mixin, DeclarativeBase, mapped_column, Mapped
 from sqlalchemy.sql.functions import now as sqlnow
 
 from src.util import datetime_util
@@ -26,8 +26,7 @@ metadata = MetaData(
 )
 
 
-@as_declarative(metadata=metadata)
-class Base:
+class Base(DeclarativeBase):
     def _dict(self) -> dict:
         return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
@@ -62,7 +61,7 @@ class IdMixin:
     https://docs.sqlalchemy.org/en/14/orm/declarative_mixins.html
     """
 
-    id: uuid.UUID = Column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
 
 def same_as_created_at(context: Any) -> Any:
@@ -75,14 +74,14 @@ class TimestampMixin:
     https://docs.sqlalchemy.org/en/14/orm/declarative_mixins.html#mixing-in-columns
     """
 
-    created_at: datetime = Column(
+    created_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
         default=datetime_util.utcnow,
         server_default=sqlnow(),
     )
 
-    updated_at: datetime = Column(
+    updated_at: Mapped[datetime] = mapped_column(
         TIMESTAMP(timezone=True),
         nullable=False,
         default=same_as_created_at,
