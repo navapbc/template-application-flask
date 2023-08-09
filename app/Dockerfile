@@ -66,6 +66,8 @@ CMD ["poetry", "run", "python", "-m", "src"]
 FROM base AS release
 ARG RUN_USER
 
+# Gunicorn requires this workaround to create writable temporary directory in
+# our readonly root file system. https://github.com/aws/containers-roadmap/issues/736
 RUN mkdir -p /tmp
 VOLUME ["/tmp"]
 
