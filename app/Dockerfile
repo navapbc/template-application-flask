@@ -105,4 +105,4 @@ ENV HOST=0.0.0.0
 USER ${RUN_USER}
 
 # Run the application.
-CMD ["poetry", "run", "python", "-m", "src"]
+CMD ["poetry", "run", "gunicorn", "src.app:create_app()"]
