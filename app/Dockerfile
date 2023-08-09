@@ -65,7 +65,9 @@ CMD ["poetry", "run", "python", "-m", "src"]
 
 FROM base AS release
 ARG RUN_USER
-WORKDIR /app
+
+RUN mkdir -p /tmp
+VOLUME ["/tmp"]
 
 # TODO(https://github.com/navapbc/template-application-flask/issues/23) Productionize the Docker image
 
