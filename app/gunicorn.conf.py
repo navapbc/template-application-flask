@@ -16,8 +16,9 @@ from src.app_config import AppConfig
 app_config = AppConfig()
 
 bind = app_config.host + ':' + str(app_config.port)
-# Calculates the number of usable cores and doubles it.
-# The recommended number of workers per core is two.
+# Calculates the number of usable cores and doubles it. The recommended number
+# of workers per core is two. However, adjusting task resources or number of
+# workers may be necessary if they are timing out and crashingg.
 # https://docs.gunicorn.org/en/latest/design.html#how-many-workers
 workers = len(os.sched_getaffinity(0)) * 2
 threads = 4
