@@ -15,6 +15,8 @@ depends_on = None
 
 
 def upgrade():
+    # Change default privileges for future tables created by the `migrator`
+    # user to automatically be accessible by the `app` user.
     op.execute("ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO app")
 
 
