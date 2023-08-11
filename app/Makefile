@@ -36,7 +36,7 @@ endif
 ifeq "$(PY_RUN_APPROACH)" "local"
 PY_RUN_CMD := poetry run
 else
-PY_RUN_CMD := docker-compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
+PY_RUN_CMD := docker compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
 endif
 
 FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
