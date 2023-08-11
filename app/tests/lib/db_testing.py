@@ -2,6 +2,7 @@
 import contextlib
 import logging
 import uuid
+import os
 
 import src.adapters.db as db
 from src.adapters.db.clients.postgres_config import get_db_config
@@ -18,11 +19,14 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
     """
     schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
-    monkeypatch.setenv("DB_NAME", "postgres")
-    monkeypatch.setenv("DB_USER", "postgres")
-    monkeypatch.setenv("DB_PASSWORD", "secret123")
-    monkeypatch.setenv("ENVIRONMENT", "local")
     monkeypatch.setenv("DB_CHECK_CONNECTION_ON_INIT", "False")
+
+    print("XXXXXXXXXX")
+    print(os.environ.get("DB_HOST"))
+    print(os.environ.get("DB_USER"))
+    print(os.environ.get("DB_NAME"))
+    print(os.environ.get("DB_SCHEMA"))
+    print(os.environ.get("DB_PASSWORD"))
 
     # To improve test performance, don't check the database connection
     # when initializing the DB client.
