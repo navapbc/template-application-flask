@@ -8,6 +8,7 @@ services:
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     environment:
       POSTGRES_PASSWORD: secret123
+      # Set user to app to match user from template-infra (https://github.com/navapbc/template-infra)
       POSTGRES_USER: app
     ports:
       - "5432:5432"
