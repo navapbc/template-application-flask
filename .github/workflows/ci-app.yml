@@ -1,4 +1,4 @@
-name: Template API Checks
+name: CI - App
 
 on:
   push:
@@ -6,11 +6,11 @@ on:
       - main
     paths:
       - app/**
-      - .github/workflows/api-checks.yml
+      - .github/workflows/ci-app.yml
   pull_request:
     paths:
       - app/**
-      - .github/workflows/api-checks.yml
+      - .github/workflows/ci-app.yml
 
 defaults:
   run:
@@ -39,4 +39,3 @@ jobs:
         run: |
           make test-audit
           make test-coverage
-        
