@@ -43,6 +43,8 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+
       - name: Start tests
         run: |
           make test-audit
