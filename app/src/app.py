@@ -27,6 +27,7 @@ def create_app() -> APIFlask:
     db_client = db.PostgresDBClient()
     flask_db.register_db_client(db_client, app)
 
+    #
     configure_app(app)
     register_blueprints(app)
     register_index(app)
