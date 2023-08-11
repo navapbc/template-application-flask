@@ -4,7 +4,7 @@ Configuration file for the Gunicorn server used to run the application in produc
 Attributes:
     bind(str): The socket to bind. Formatted as '0.0.0.0:$PORT'.
     workers(int): The number of worker processes for handling requests.
-    threads(int): The number of worker threads for handling requests.
+    threads(int): The number of threads per worker for handling requests.
 
 For more information, see https://docs.gunicorn.org/en/stable/configure.html
 """
