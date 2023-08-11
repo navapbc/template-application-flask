@@ -1,4 +1,4 @@
-"""default table privileges
+"""create user and role tables
 
 Revision ID: 4ff1160282d1
 Revises: 3ed861176e3d
