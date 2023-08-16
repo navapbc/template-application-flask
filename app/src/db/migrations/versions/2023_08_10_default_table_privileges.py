@@ -15,10 +15,14 @@ depends_on = None
 
 
 def upgrade():
-    # Change default privileges for future tables created by the `migrator`
+    # Change default privileges for future objects created by the `migrator`
     # user to automatically be accessible by the `app` user.
     op.execute("ALTER DEFAULT PRIVILEGES GRANT ALL ON TABLES TO app")
+    op.execute("ALTER DEFAULT PRIVILEGES GRANT ALL ON SEQUENCES TO app")
+    op.execute("ALTER DEFAULT PRIVILEGES GRANT ALL ON ROUTINES TO app")
 
 
 def downgrade():
+    op.execute("ALTER DEFAULT PRIVILEGES REVOKE ALL ON ROUTINES FROM app")
+    op.execute("ALTER DEFAULT PRIVILEGES REVOKE ALL ON SEQUENCES FROM app")
     op.execute("ALTER DEFAULT PRIVILEGES REVOKE ALL ON TABLES FROM app")
