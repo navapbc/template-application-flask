@@ -13,7 +13,7 @@ cd $TEMPLATE_DIR
 cp -r \
   .github \
   .dockleconfig \
-  .hadolint \
+  .hadolint.yaml \
   app \
   docker-compose.yml \
   docs \
