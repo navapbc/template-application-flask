@@ -1,12 +1,13 @@
 # Database Management
 
-- [Basic operations](#basic-operations)
-  - [Initialize](#initialize)
-  - [Start](#start)
-  - [Destroy and reinitialize](#destroy-and-reinitialize)
-- [Running migrations](#running-migrations)
-- [Creating new migrations](#creating-new-migrations)
-- [Multi-head situations](#multi-head-situations)
+- [Database Management](#database-management)
+  - [Basic operations](#basic-operations)
+    - [Initialize](#initialize)
+    - [Start](#start)
+    - [Destroy and reinitialize](#destroy-and-reinitialize)
+  - [Running migrations](#running-migrations)
+  - [Creating new migrations](#creating-new-migrations)
+  - [Multi-head situations](#multi-head-situations)
 
 ## Basic operations
 ### Initialize
@@ -43,9 +44,9 @@ against your db so it has all the required tables. `make init` does this, but if
 needing to work with the migrations directly, some common commands:
 
 ```sh
-make db-upgrade       # Apply pending migrations to db
-make db-downgrade     # Rollback last migration to db
-make db-downgrade-all # Rollback all migrations
+make db-migrate       # Apply pending migrations to db
+make db-migrate-down     # Rollback last migration to db
+make db-migrate-down-all # Rollback all migrations
 ```
 
 ## Creating new migrations
@@ -54,7 +55,7 @@ If you've changed a python object model, auto-generate a migration file for the 
 
 ```sh
 $ make db-migrate-create MIGRATE_MSG="<brief description of change>"
-$ make db-upgrade
+$ make db-migrate
 ```
 
 <details>
