@@ -17,11 +17,11 @@ defaults:
     working-directory: ./app
 
 jobs:
-  lint-test:
-    # We could run these steps in parallel
-    # if we built the docker image and shared
-    # it across jobs as described in:
-    # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
+  # As an enhancement, it is possible to share the built docker image and share
+  # it across jobs as described in:
+  # https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts#passing-data-between-jobs-in-a-workflow
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -31,9 +31,19 @@ jobs:
 
       - name: Run linting
         run: make lint
+  security-scan:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
       - name: Run security linting
         run: make lint-security
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
       - name: Start tests
         run: |

@@ -8,6 +8,10 @@ services:
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     environment:
       POSTGRES_PASSWORD: secret123
+      # Set user to app to match user from template-infra (https://github.com/navapbc/template-infra)
+      # This is also needed for the initial migration that alters defaut privileges to grant
+      # table privileges to the app user (see /app/src/db/migrations/versions/2023_08_10_default_table_privileges.py)
+      POSTGRES_USER: app
     ports:
       - "5432:5432"
     volumes:

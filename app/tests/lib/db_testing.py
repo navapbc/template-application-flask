@@ -18,10 +18,6 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
     """
     schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
-    monkeypatch.setenv("DB_NAME", "postgres")
-    monkeypatch.setenv("DB_USER", "postgres")
-    monkeypatch.setenv("DB_PASSWORD", "secret123")
-    monkeypatch.setenv("ENVIRONMENT", "local")
     monkeypatch.setenv("DB_CHECK_CONNECTION_ON_INIT", "False")
 
     # To improve test performance, don't check the database connection
