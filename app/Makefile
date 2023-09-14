@@ -122,7 +122,7 @@ start-db:
 
 # Calls pg_isready to check if the DB is ready to accept connections
 wait-for-db:
-	./wait-for-local-db.sh
+	./bin/wait-for-local-db.sh
 
 ## Destroy current DB, setup new one
 db-recreate: clean-volumes init-db
