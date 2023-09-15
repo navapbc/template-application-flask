@@ -115,13 +115,10 @@ check: format-check lint test
 
 # Docker starts the image for the DB but it's not quite
 # ready to accept connections so we add a brief wait script
-init-db: start-db wait-for-db db-migrate
+init-db: start-db db-migrate
 
 start-db:
 	docker-compose up --detach main-db
-
-# Calls pg_isready to check if the DB is ready to accept connections
-wait-for-db:
 	./bin/wait-for-local-db.sh
 
 ## Destroy current DB, setup new one
