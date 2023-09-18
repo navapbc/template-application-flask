@@ -17,21 +17,21 @@ The template application is intended to work with the infrastructure from [templ
 
 ## Installation
 
-To get started using the template infrastructure on your project, install the template by cloning the template repository and copying the following folders/files to your repository:
+To get started using the template application on your project:
 
-```bash
-# fetch latest version of the template
-git clone --single-branch --branch main --depth 1 git@github.com:navapbc/template-application-flask.git
+1. Run the [download and install script](./template-only-bin/download-and-install-template.sh) in your project's root directory.
 
-cp -r \
-  template-application-flask/.github \
-  template-application-flask/docs \
-  template-application-flask/app \
-  template-application-flask/docker-compose.yml \
-  .
+    ```bash
+    curl https://raw.githubusercontent.com/navapbc/template-application-flask/main/template-only-bin/download-and-install-template.sh | bash -s
+    ```
 
-# clean up the template folder
-rm -fr template-application-flask
-```
+    This script will:
+
+    1. Clone the template repository
+    2. Copy the template files into your project directory
+    3. Remove any files specific to the template repository.
+2. Optional, if using the Platform infra template: [Follow the steps in the `template-infra` README](https://github.com/navapbc/template-infra#installation) to set up the various pieces of your infrastructure.
+
+## Getting started
 
 Now you're ready to [get started](/docs/app/getting-started.md).
