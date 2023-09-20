@@ -42,10 +42,10 @@ class Base(DeclarativeBase):
     # See: https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-mapped-column-type-map
     #      for details on setting up this configuration.
     type_annotation_map = {
-        # Explicitly use the Text column type for strings
-        str: Text,
         # Always include a timezone for datetimes
         datetime: TIMESTAMP(timezone=True),
+        # Explicitly use the Text column type for strings
+        str: Text,
         # Always use the Postgres UUID column type
         uuid.UUID: postgresql.UUID(as_uuid=True),
     }
