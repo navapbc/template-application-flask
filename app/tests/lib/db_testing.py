@@ -29,7 +29,7 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
         _create_schema(conn, schema_name)
 
     try:
-        yield db.PostgresDBClient()
+        yield db_client
 
     finally:
         with db_client.get_connection() as conn:
