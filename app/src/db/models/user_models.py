@@ -5,7 +5,6 @@ from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import Enum, ForeignKey
-from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.models.base import Base, IdMixin, TimestampMixin
@@ -36,7 +35,7 @@ class User(Base, IdMixin, TimestampMixin):
 class Role(Base, TimestampMixin):
     __tablename__ = "role"
     user_id: Mapped[UUID] = mapped_column(
-        postgresql.UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
+        ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
     )
 
     # Set native_enum=False to use store enum values as VARCHAR/TEXT

@@ -46,6 +46,8 @@ class Base(DeclarativeBase):
         str: Text,
         # Always include a timezone for datetimes
         datetime: TIMESTAMP(timezone=True),
+        # Always use the Postgres UUID column type
+        uuid.UUID: postgresql.UUID(as_uuid=True),
     }
 
     def _dict(self) -> dict:
@@ -82,9 +84,7 @@ class IdMixin:
     https://docs.sqlalchemy.org/en/20/orm/declarative_mixins.html
     """
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
 
 
 def same_as_created_at(context: Any) -> Any:
@@ -98,14 +98,12 @@ class TimestampMixin:
     """
 
     created_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
         nullable=False,
         default=datetime_util.utcnow,
         server_default=sqlnow(),
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        TIMESTAMP(timezone=True),
         nullable=False,
         default=same_as_created_at,
         onupdate=datetime_util.utcnow,
