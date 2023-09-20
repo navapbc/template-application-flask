@@ -46,9 +46,6 @@ class PostgresDBClient(DBClient):
         return sqlalchemy.create_engine(
             "postgresql://",
             pool=conn_pool,
-            # FYI, execute many mode handles how SQLAlchemy handles doing a bunch of inserts/updates/deletes at once
-            # https://docs.sqlalchemy.org/en/14/dialects/postgresql.html#psycopg2-fast-execution-helpers
-            executemany_mode="batch",
             hide_parameters=db_config.hide_sql_parameter_logs,
             # TODO: Don't think we need this as we aren't using JSON columns, but keeping for reference
             # json_serializer=lambda o: json.dumps(o, default=pydantic.json.pydantic_encoder),
