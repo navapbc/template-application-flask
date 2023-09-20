@@ -28,11 +28,10 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
     with db_client.get_connection() as conn:
         _create_schema(conn, schema_name)
 
-    try:
-        yield db_client
+        try:
+            yield db_client
 
-    finally:
-        with db_client.get_connection() as conn:
+        finally:
             _drop_schema(conn, schema_name)
 
 
