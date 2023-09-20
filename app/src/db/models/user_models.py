@@ -4,9 +4,9 @@ from datetime import date
 from typing import Optional
 from uuid import UUID
 
-from sqlalchemy import Boolean, Column, Date, Enum, ForeignKey, Text
+from sqlalchemy import Enum, ForeignKey
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.orm import Mapped, relationship, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.db.models.base import Base, IdMixin, TimestampMixin
 
@@ -21,12 +21,12 @@ class RoleType(str, enum.Enum):
 class User(Base, IdMixin, TimestampMixin):
     __tablename__ = "user"
 
-    first_name: Mapped[str] = mapped_column(Text, nullable=False)
-    middle_name: Mapped[Optional[str]] = mapped_column(Text)
-    last_name: Mapped[str] = mapped_column(Text, nullable=False)
-    phone_number: Mapped[str] = mapped_column(Text, nullable=False)
-    date_of_birth: Mapped[date] = mapped_column(Date, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    first_name: Mapped[str]
+    middle_name: Mapped[Optional[str]]
+    last_name: Mapped[str]
+    phone_number: Mapped[str]
+    date_of_birth: Mapped[date]
+    is_active: Mapped[bool]
 
     roles: Mapped[list["Role"]] = relationship(
         "Role", back_populates="user", cascade="all, delete", order_by="Role.type"
@@ -48,6 +48,6 @@ class Role(Base, TimestampMixin):
     # not yet functional
     # (See https://github.com/sqlalchemy/alembic/issues/363)
     #
-    # https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
+    # https://docs.sqlalchemy.org/en/20/core/type_basics.html#sqlalchemy.types.Enum.params.native_enum
     type: Mapped[RoleType] = mapped_column(Enum(RoleType, native_enum=False), primary_key=True)
     user: Mapped[User] = relationship(User, back_populates="roles")

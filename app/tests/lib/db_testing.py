@@ -3,9 +3,10 @@ import contextlib
 import logging
 import uuid
 
+from sqlalchemy import text
+
 import src.adapters.db as db
 from src.adapters.db.clients.postgres_config import get_db_config
-from sqlalchemy import text
 
 logger = logging.getLogger(__name__)
 
@@ -19,10 +20,6 @@ def create_isolated_db(monkeypatch) -> db.DBClient:
     """
     schema_name = f"test_schema_{uuid.uuid4().int}"
     monkeypatch.setenv("DB_SCHEMA", schema_name)
-    #monkeypatch.setenv("DB_NAME", "postgres")
-    #monkeypatch.setenv("DB_USER", "local_db_user")
-    #monkeypatch.setenv("DB_PASSWORD", "secret123")
-    #monkeypatch.setenv("ENVIRONMENT", "local")
     monkeypatch.setenv("DB_CHECK_CONNECTION_ON_INIT", "False")
 
     # To improve test performance, don't check the database connection
@@ -44,7 +41,9 @@ def _create_schema(conn: db.Connection, schema_name: str):
     db_test_user = get_db_config().username
 
     with conn.begin():
-        conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};"))
+        conn.execute(
+            text(f"CREATE SCHEMA IF NOT EXISTS {schema_name} AUTHORIZATION {db_test_user};")
+        )
     logger.info("create schema %s", schema_name)
 
 

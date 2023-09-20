@@ -4,10 +4,9 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import TIMESTAMP, Column, MetaData, inspect
+from sqlalchemy import TIMESTAMP, MetaData, Text, inspect
 from sqlalchemy.dialects import postgresql
-from sqlalchemy.ext.declarative import as_declarative
-from sqlalchemy.orm import declarative_mixin, DeclarativeBase, mapped_column, Mapped
+from sqlalchemy.orm import DeclarativeBase, Mapped, declarative_mixin, mapped_column
 from sqlalchemy.sql.functions import now as sqlnow
 
 from src.util import datetime_util
@@ -27,8 +26,30 @@ metadata = MetaData(
 
 
 class Base(DeclarativeBase):
+    # Attach the metadata to the Base class so all tables automatically get added to the metadata
+    metadata = metadata
+
+    # Override the default type that SQLAlchemy will map python types to.
+    # This is used if you simply define a column like:
+    #
+    #   my_column: Mapped[str]
+    #
+    # If you provide a mapped_column attribute you can override these values
+    #
+    # See: https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#mapped-column-derives-the-datatype-and-nullability-from-the-mapped-annotation
+    #      for the default mappings
+    #
+    # See: https://docs.sqlalchemy.org/en/20/orm/declarative_tables.html#orm-declarative-mapped-column-type-map
+    #      for details on setting up this configuration.
+    type_annotation_map = {
+        # Explicitly use the Text column type for strings
+        str: Text,
+        # Always include a timezone for datetimes
+        datetime: TIMESTAMP(timezone=True),
+    }
+
     def _dict(self) -> dict:
-        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}  # type: ignore
 
     def for_json(self) -> dict:
         json_valid_dict = {}
@@ -45,9 +66,9 @@ class Base(DeclarativeBase):
 
     def copy(self, **kwargs: dict[str, Any]) -> "Base":
         # TODO - Python 3.11 will let us make the return Self instead
-        table = self.__table__  # type: ignore
+        table = self.__table__
         non_pk_columns = [
-            k for k in table.columns.keys() if k not in table.primary_key.columns.keys()
+            k for k in table.columns.keys() if k not in table.primary_key.columns.keys()  # type: ignore
         ]
         data = {c: getattr(self, c) for c in non_pk_columns}
         data.update(kwargs)
@@ -58,10 +79,12 @@ class Base(DeclarativeBase):
 @declarative_mixin
 class IdMixin:
     """Mixin to add a UUID id primary key column to a model
-    https://docs.sqlalchemy.org/en/14/orm/declarative_mixins.html
+    https://docs.sqlalchemy.org/en/20/orm/declarative_mixins.html
     """
 
-    id: Mapped[uuid.UUID] = mapped_column(postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id: Mapped[uuid.UUID] = mapped_column(
+        postgresql.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
 
 
 def same_as_created_at(context: Any) -> Any:
@@ -71,7 +94,7 @@ def same_as_created_at(context: Any) -> Any:
 @declarative_mixin
 class TimestampMixin:
     """Mixin to add created_at and updated_at columns to a model
-    https://docs.sqlalchemy.org/en/14/orm/declarative_mixins.html#mixing-in-columns
+    https://docs.sqlalchemy.org/en/20/orm/declarative_mixins.html#mixing-in-columns
     """
 
     created_at: Mapped[datetime] = mapped_column(

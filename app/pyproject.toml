@@ -7,7 +7,7 @@ authors = ["Nava Engineering <engineering@navapbc.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-SQLAlchemy = "2.0"
+SQLAlchemy = {extras = ["mypy"], version = "2.0"}
 alembic = "^1.8.1"
 psycopg2-binary = "^2.9.3"
 python-dotenv = "^0.20.0"
@@ -79,8 +79,6 @@ warn_no_return = true
 warn_redundant_casts = true
 warn_unreachable = true
 warn_unused_ignores = true
-
-plugins = ["sqlalchemy.ext.mypy.plugin"]
 
 [tool.bandit]
 # Ignore audit logging test file since test audit logging requires a lot of operations that trigger bandit warnings

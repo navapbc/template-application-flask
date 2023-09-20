@@ -1539,6 +1539,7 @@ files = [
 
 [package.dependencies]
 greenlet = {version = "!=0.4.17", markers = "platform_machine == \"win32\" or platform_machine == \"WIN32\" or platform_machine == \"AMD64\" or platform_machine == \"amd64\" or platform_machine == \"x86_64\" or platform_machine == \"ppc64le\" or platform_machine == \"aarch64\""}
+mypy = {version = ">=0.910", optional = true, markers = "extra == \"mypy\""}
 typing-extensions = ">=4.2.0"
 
 [package.extras]
@@ -1563,7 +1564,6 @@ postgresql-psycopg2binary = ["psycopg2-binary"]
 postgresql-psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql"]
 sqlcipher = ["sqlcipher3-binary"]
-
 
 [[package]]
 name = "stevedore"
@@ -1762,4 +1762,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7a82f9dfb49c38336eb629bc271335aeac9047365b35834f696bc283700fe6fd"
+content-hash = "1f9cd49cc5f72e8aa08711524527104dabba7be6d427bf19eeb90e438d241eb7"
