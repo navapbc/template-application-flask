@@ -33,7 +33,7 @@ def patch_user(
 
     with db_session.begin():
         # TODO: move this to service and/or persistence layer
-        user = db_session.query(User).options(orm.selectinload(User.roles)).get(user_id)
+        user = db_session.get(User, user_id, options=[orm.selectinload(User.roles)])
 
         if user is None:
             # TODO move HTTP related logic out of service layer to controller layer and just return None from here
