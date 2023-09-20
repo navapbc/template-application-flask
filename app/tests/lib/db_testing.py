@@ -49,5 +49,6 @@ def _create_schema(conn: db.Connection, schema_name: str):
 
 def _drop_schema(conn: db.Connection, schema_name: str):
     """Drop a database schema."""
-    conn.execute(text(f"DROP SCHEMA {schema_name} CASCADE;"))
+    with conn.begin():
+        conn.execute(text(f"DROP SCHEMA {schema_name} CASCADE;"))
     logger.info("drop schema %s", schema_name)
