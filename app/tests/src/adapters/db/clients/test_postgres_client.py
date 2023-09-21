@@ -1,4 +1,5 @@
 import logging
+from dataclasses import dataclass
 
 import pytest
 
@@ -6,11 +7,16 @@ from src.adapters.db.clients.postgres_client import get_connection_parameters, v
 from src.adapters.db.clients.postgres_config import get_db_config
 
 
+@dataclass
+class DummyPgConn:
+    ssl_in_use: bool
+
+
 class DummyConnectionInfo:
     def __init__(self, ssl_in_use, attributes):
-        self.ssl_in_use = ssl_in_use
         self.attributes = attributes
         self.ssl_attribute_names = tuple(attributes.keys())
+        self.pgconn = DummyPgConn(ssl_in_use)
 
     def ssl_attribute(self, name):
         return self.attributes[name]

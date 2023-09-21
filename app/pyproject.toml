@@ -9,7 +9,6 @@ authors = ["Nava Engineering <engineering@navapbc.com>"]
 python = "^3.10"
 SQLAlchemy = {extras = ["mypy"], version = "2.0"}
 alembic = "^1.8.1"
-psycopg2-binary = "^2.9.3"
 python-dotenv = "^0.20.0"
 pydantic = "^1.10.0"
 botocore = "^1.27.67"
@@ -20,6 +19,7 @@ APIFlask = "^1.1.3"
 marshmallow-dataclass = {extras = ["enum", "union"], version = "^8.5.8"}
 marshmallow = "^3.18.0"
 gunicorn = "^21.2.0"
+psycopg = {extras = ["binary"], version = "^3.1.10"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.6.0"

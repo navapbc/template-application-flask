@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 import boto3
-import psycopg2
+import psycopg
 import sqlalchemy
 import sqlalchemy.pool as pool
 
@@ -35,7 +35,7 @@ class PostgresDBClient(DBClient):
         # For more details on building connection pools, see the docs:
         # https://docs.sqlalchemy.org/en/13/core/pooling.html#constructing-a-pool
         def get_conn() -> Any:
-            return psycopg2.connect(**get_connection_parameters(db_config))
+            return psycopg.connect(**get_connection_parameters(db_config))
 
         conn_pool = pool.QueuePool(get_conn, max_overflow=10, pool_size=20)
 
@@ -44,7 +44,7 @@ class PostgresDBClient(DBClient):
         #
         # (a SQLAlchemy Engine represents a Dialect+Pool)
         return sqlalchemy.create_engine(
-            "postgresql://",
+            "postgresql+psycopg://",
             pool=conn_pool,
             hide_parameters=db_config.hide_sql_parameter_logs,
             # TODO: Don't think we need this as we aren't using JSON columns, but keeping for reference
@@ -63,8 +63,8 @@ class PostgresDBClient(DBClient):
                     "host": conn_info.host,
                     "port": conn_info.port,
                     "options": conn_info.options,
-                    "dsn_parameters": conn_info.dsn_parameters,
-                    "protocol_version": conn_info.protocol_version,
+                    "dsn_parameters": conn_info.dsn,
+                    "protocol_version": conn_info.pgconn.protocol_version,
                     "server_version": conn_info.server_version,
                 },
             )
@@ -120,7 +120,7 @@ def generate_iam_auth_token(aws_region: str, host: str, port: int, user: str) ->
 
 def verify_ssl(connection_info: Any) -> None:
     """Verify that the database connection is encrypted and log a warning if not."""
-    if connection_info.ssl_in_use:
+    if connection_info.pgconn.ssl_in_use:
         logger.info(
             "database connection is using SSL: %s",
             ", ".join(
