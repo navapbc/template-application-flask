@@ -121,12 +121,6 @@ def generate_iam_auth_token(aws_region: str, host: str, port: int, user: str) ->
 def verify_ssl(connection_info: Any) -> None:
     """Verify that the database connection is encrypted and log a warning if not."""
     if connection_info.pgconn.ssl_in_use:
-        logger.info(
-            "database connection is using SSL: %s",
-            ", ".join(
-                name + " " + connection_info.ssl_attribute(name)
-                for name in connection_info.ssl_attribute_names
-            ),
-        )
+        logger.info("database connection is using SSL")
     else:
         logger.warning("database connection is not using SSL")
