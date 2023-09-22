@@ -8,8 +8,8 @@ from werkzeug.exceptions import Unauthorized
 
 import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
-import src.logging
-import src.logging.flask_logger as flask_logger
+import src.logger
+import src.logger.flask_logger as flask_logger
 from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
@@ -21,7 +21,11 @@ logger = logging.getLogger(__name__)
 def create_app() -> APIFlask:
     app = APIFlask(__name__)
 
+<<<<<<< Updated upstream
     src.logging.init(__package__)
+=======
+    root_logger = src.logging.init(__package__)
+>>>>>>> Stashed changes
     flask_logger.init_app(logging.root, app)
 
     db_client = db.PostgresDBClient()

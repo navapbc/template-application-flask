@@ -3,8 +3,8 @@ import re
 
 import pytest
 
-import src.logging
-import src.logging.formatters as formatters
+import src.logger
+import src.logger.formatters as formatters
 from tests.lib.assertions import assert_dict_contains
 
 

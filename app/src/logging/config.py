@@ -1,9 +1,7 @@
+from contextlib import contextmanager
 import logging
-import os
-import platform
-import pwd
 import sys
-from typing import Any, ContextManager, cast
+from typing import Generator, Tuple
 
 import src.logging.audit
 import src.logging.formatters as formatters
@@ -12,7 +10,7 @@ from src.util.env_config import PydanticBaseEnvConfig
 
 logger = logging.getLogger(__name__)
 
-_original_argv = tuple(sys.argv)
+is_initialized = False
 
 
 class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
@@ -22,88 +20,50 @@ class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
 class LoggingConfig(PydanticBaseEnvConfig):
     format = "json"
     level = "INFO"
-    enable_audit = False
+    enable_audit = True
     human_readable_formatter = HumanReadableFormatterConfig()
 
     class Config:
         env_prefix = "log_"
         env_nested_delimiter = "__"
 
+@contextmanager
+def configure_logging() -> logging.Handler:
+    """Configure logging for the application.
 
-class LoggingContext(ContextManager[None]):
+    Configures the root module logger to log to stdout.
+    Adds a PII mask filter to the root logger.
+    Also configures log levels third party packages.
     """
-    A context manager for handling setting up the logging stream.
+    config = LoggingConfig()
 
-    To help facillitate being able to test logging, we need to be able
-    to easily create temporary output streams and then tear them down.
+    # Loggers can be configured using config functions defined
+    # in logging.config or by directly making calls to the main API
+    # of the logging module (see https://docs.python.org/3/library/logging.config.html)
+    # We opt to use the main API using functions like `addHandler` which is
+    # non-destructive, i.e. it does not overwrite any existing handlers.
+    # In contrast, logging.config.dictConfig() would overwrite any existing loggers.
+    # This is important during testing, since fixtures like `caplog` add handlers that would
+    # get overwritten if we call logging.config.dictConfig() during the scope of the test.
+    console_handler = logging.StreamHandler(sys.stdout)
+    formatter = get_formatter(config)
+    console_handler.setFormatter(formatter)
+    console_handler.addFilter(pii.mask_pii)
+    logging.root.removeHandler(console_handler)
+    logging.root.addHandler(console_handler)
+    logging.root.setLevel(config.level)
 
-    When this context manager is torn down, the stream handler created
-    with it will be removed.
+    if config.enable_audit:
+        src.logging.audit.init()
 
-    For example:
-    ```py
-    import logging
+    # Configure loggers for third party packages
+    logging.getLogger("alembic").setLevel(logging.INFO)
+    logging.getLogger("werkzeug").setLevel(logging.WARN)
+    logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
+    logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
 
-    logger = logging.getLogger(__name__)
+    return console_handler
 
-    with LoggingContext("example_program_name"):
-        # This log message will go to stdout
-        logger.info("example log message")
-
-    # This log message won't go to stdout as the
-    # handler will have been removed
-    logger.info("example log message")
-    ```
-    Note that any other handlers added to the root logger won't be affected
-    and calling this multiple times before exit would result in duplicate logs.
-    """
-
-    def __init__(self, program_name: str) -> None:
-        self._configure_logging()
-        log_program_info(program_name)
-
-    def __enter__(self) -> None:
-        pass
-
-    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
-        # Remove the console handler to stop logs from being sent to stdout
-        # This is useful in the test suite, since multiple tests may initialize
-        # separate duplicate handlers. This allows for easier cleanup for each
-        # of those tests.
-        logging.root.removeHandler(self.console_handler)
-
-    def _configure_logging(self) -> None:
-        """Configure logging for the application.
-
-        Configures the root module logger to log to stdout.
-        Adds a PII mask filter to the root logger.
-        Also configures log levels third party packages.
-        """
-        config = LoggingConfig()
-
-        # Loggers can be configured using config functions defined
-        # in logging.config or by directly making calls to the main API
-        # of the logging module (see https://docs.python.org/3/library/logging.config.html)
-        # We opt to use the main API using functions like `addHandler` which is
-        # non-destructive, i.e. it does not overwrite any existing handlers.
-        # In contrast, logging.config.dictConfig() would overwrite any existing loggers.
-        # This is important during testing, since fixtures like `caplog` add handlers that would
-        # get overwritten if we call logging.config.dictConfig() during the scope of the test.
-        self.console_handler = logging.StreamHandler(sys.stdout)
-        formatter = get_formatter(config)
-        self.console_handler.setFormatter(formatter)
-        self.console_handler.addFilter(pii.mask_pii)
-        logging.root.addHandler(self.console_handler)
-        logging.root.setLevel(config.level)
-
-        if config.enable_audit:
-            src.logging.audit.init()
-
-        # Configure loggers for third party packages
-        logging.getLogger("alembic").setLevel(logging.INFO)
-        logging.getLogger("werkzeug").setLevel(logging.WARN)
-        logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
-        logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
 
 
 def get_formatter(config: LoggingConfig) -> logging.Formatter:
@@ -115,36 +75,6 @@ def get_formatter(config: LoggingConfig) -> logging.Formatter:
     if config.format == "human-readable":
         return get_human_readable_formatter(config.human_readable_formatter)
     return formatters.JsonFormatter()
-
-
-def log_program_info(program_name: str) -> None:
-    logger.info(
-        "start %s: %s %s %s, hostname %s, pid %i, user %i(%s)",
-        program_name,
-        platform.python_implementation(),
-        platform.python_version(),
-        platform.system(),
-        platform.node(),
-        os.getpid(),
-        os.getuid(),
-        pwd.getpwuid(os.getuid()).pw_name,
-        extra={
-            "hostname": platform.node(),
-            "cpu_count": os.cpu_count(),
-            # If mypy is run on a mac, it will throw a module has no attribute error, even though
-            # we never actually access it with the conditional.
-            #
-            # However, we can't just silence this error, because on linux (e.g. CI/CD) that will
-            # throw an unused “type: ignore” comment error. Casting to Any instead ensures this
-            # passes regardless of where mypy is being run
-            "cpu_usable": (
-                len(cast(Any, os).sched_getaffinity(0))
-                if "sched_getaffinity" in dir(os)
-                else "unknown"
-            ),
-        },
-    )
-    logger.info("invoked as: %s", " ".join(_original_argv))
 
 
 def get_human_readable_formatter(

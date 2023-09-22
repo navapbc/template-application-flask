@@ -5,7 +5,7 @@ import time
 import pytest
 from flask import Flask
 
-import src.logging.flask_logger as flask_logger
+import src.logger.flask_logger as flask_logger
 from tests.lib.assertions import assert_dict_contains
 
 

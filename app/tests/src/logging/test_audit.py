@@ -16,7 +16,7 @@ from typing import Any, Callable
 
 import pytest
 
-import src.logging.audit as audit
+import src.logger.audit as audit
 
 # Do not run these tests alongside the rest of the test suite since
 # this tests adds an audit hook that interfere with other tests,

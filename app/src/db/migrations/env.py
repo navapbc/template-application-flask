@@ -5,7 +5,7 @@ import alembic.context as context
 import sqlalchemy
 
 import src.adapters.db as db
-import src.logging
+import src.logger
 from src.db.models import metadata
 
 # this is the Alembic Config object, which provides
@@ -16,6 +16,16 @@ logger = logging.getLogger("migrations")
 
 # Initialize logging
 with src.logging.init("migrations"):
+<<<<<<< Updated upstream
+=======
+
+    if not config.get_main_option("sqlalchemy.url"):
+        uri = make_connection_uri(get_db_config())
+
+        # Escape percentage signs in the URI.
+        # https://alembic.sqlalchemy.org/en/latest/api/config.html#alembic.config.Config.set_main_option
+        config.set_main_option("sqlalchemy.url", uri.replace("%", "%%"))
+>>>>>>> Stashed changes
 
     # add your model's MetaData object here
     # for 'autogenerate' support

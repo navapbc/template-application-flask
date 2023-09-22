@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 
-import src.logging.formatters as formatters
+import src.logger.formatters as formatters
 from tests.lib.assertions import assert_dict_contains
 
 

@@ -23,10 +23,64 @@ Example:
     logger = logging.getLogger(__name__)
     logger.info("message")
 """
-
+from contextlib import contextmanager
+import logging
+import os
+import platform
+import pwd
+import sys
+from typing import Any, ContextManager, cast
 
 import src.logging.config as config
 
+logger = logging.getLogger(__name__)
+_original_argv = tuple(sys.argv)
 
-def init(program_name: str) -> config.LoggingContext:
-    return config.LoggingContext(program_name)
+
+class Log:
+    def __init__(self, program_name: str) -> None:
+        self.program_name = program_name
+        self.root_logger, self.stream_handler = config.configure_logging()
+        log_program_info(self.program_name)
+
+    def __enter__(self) -> logging.Logger:
+        return self.root_logger
+
+    def __exit__(self, exc_type: Any, exc_val: Any, exc_tb: Any) -> None:
+        self.root_logger.removeHandler(self.stream_handler)
+
+@contextmanager
+def init(program_name: str):
+    stream_handler = config.configure_logging()
+    log_program_info(program_name)
+    yield
+    logging.root.removeHandler(stream_handler)
+
+def log_program_info(program_name: str) -> None:
+    logger.info(
+        "start %s: %s %s %s, hostname %s, pid %i, user %i(%s)",
+        program_name,
+        platform.python_implementation(),
+        platform.python_version(),
+        platform.system(),
+        platform.node(),
+        os.getpid(),
+        os.getuid(),
+        pwd.getpwuid(os.getuid()).pw_name,
+        extra={
+            "hostname": platform.node(),
+            "cpu_count": os.cpu_count(),
+            # If mypy is run on a mac, it will throw a module has no attribute error, even though
+            # we never actually access it with the conditional.
+            #
+            # However, we can't just silence this error, because on linux (e.g. CI/CD) that will
+            # throw an unused “type: ignore” comment error. Casting to Any instead ensures this
+            # passes regardless of where mypy is being run
+            "cpu_usable": (
+                len(cast(Any, os).sched_getaffinity(0))
+                if "sched_getaffinity" in dir(os)
+                else "unknown"
+            ),
+        },
+    )
+    logger.info("invoked as: %s", " ".join(_original_argv))
