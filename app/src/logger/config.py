@@ -5,9 +5,11 @@ import pwd
 import sys
 from typing import Any, ContextManager, cast
 
-import src.logging.audit
-import src.logging.formatters as formatters
-import src.logging.pii as pii
+from pydantic_settings import SettingsConfigDict
+
+import src.logger.audit
+import src.logger.formatters as formatters
+import src.logger.pii as pii
 from src.util.env_config import PydanticBaseEnvConfig
 
 logger = logging.getLogger(__name__)
@@ -20,14 +22,12 @@ class HumanReadableFormatterConfig(PydanticBaseEnvConfig):
 
 
 class LoggingConfig(PydanticBaseEnvConfig):
-    format = "json"
-    level = "INFO"
-    enable_audit = False
-    human_readable_formatter = HumanReadableFormatterConfig()
+    format: str = "json"
+    level: str = "INFO"
+    enable_audit: bool = False
+    human_readable_formatter: HumanReadableFormatterConfig = HumanReadableFormatterConfig()
 
-    class Config:
-        env_prefix = "log_"
-        env_nested_delimiter = "__"
+    model_config = SettingsConfigDict(env_prefix="log_", env_nested_delimiter="__")
 
 
 class LoggingContext(ContextManager[None]):
@@ -97,13 +97,19 @@ class LoggingContext(ContextManager[None]):
         logging.root.setLevel(config.level)
 
         if config.enable_audit:
-            src.logging.audit.init()
+            src.logger.audit.init()
 
         # Configure loggers for third party packages
         logging.getLogger("alembic").setLevel(logging.INFO)
         logging.getLogger("werkzeug").setLevel(logging.WARN)
         logging.getLogger("sqlalchemy.pool").setLevel(logging.INFO)
         logging.getLogger("sqlalchemy.dialects.postgresql").setLevel(logging.INFO)
+
+        # Uvicorn sets up its own handlers with different formatting
+        # To keep things consistent, we override their handler to be ours
+        # Alternatively we could configure all of this directly, but that is significantly more configuration.
+        logging.getLogger("uvicorn").handlers = [self.console_handler]
+        logging.getLogger("uvicorn.access").handlers = [self.console_handler]
 
 
 def get_formatter(config: LoggingConfig) -> logging.Formatter:

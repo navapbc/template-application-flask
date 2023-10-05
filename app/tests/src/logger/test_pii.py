@@ -1,6 +1,6 @@
 import pytest
 
-import src.logging.pii as pii
+import src.logger.pii as pii
 
 
 @pytest.mark.parametrize(

@@ -14,7 +14,7 @@ from enum import Enum
 from typing import Any, Callable, Type, TypeVar
 from uuid import UUID
 
-import src.logging.decodelog as decodelog
+import src.logger.decodelog as decodelog
 
 T = TypeVar("T")
 

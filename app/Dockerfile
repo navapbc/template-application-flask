@@ -4,7 +4,7 @@
 # The build stage that will be used to deploy to the various environments
 # needs to be called `release` in order to integrate with the repo's
 # top-level Makefile
-FROM python:3-slim AS base
+FROM python:3.11-slim AS base
 
 # Install poetry, the package manager.
 # https://python-poetry.org
@@ -57,7 +57,7 @@ COPY . /app
 ENV HOST=0.0.0.0
 
 # Run the application.
-CMD ["poetry", "run", "python", "-m", "src"]
+CMD ["poetry", "run", "python", "src/app.py"]
 
 #---------
 # Release
@@ -109,4 +109,4 @@ ENV HOST=0.0.0.0
 USER ${RUN_USER}
 
 # Run the application.
-CMD ["poetry", "run", "gunicorn", "src.app:create_app()"]
+CMD ["poetry", "run", "python", "src/app.py"]

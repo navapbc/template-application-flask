@@ -5,7 +5,7 @@ import alembic.context as context
 import sqlalchemy
 
 import src.adapters.db as db
-import src.logging
+import src.logger
 from src.db.models import metadata
 
 # this is the Alembic Config object, which provides
@@ -15,7 +15,7 @@ config = context.config
 logger = logging.getLogger("migrations")
 
 # Initialize logging
-with src.logging.init("migrations"):
+with src.logger.init("migrations"):
 
     # add your model's MetaData object here
     # for 'autogenerate' support
