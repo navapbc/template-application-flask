@@ -1,44 +1,57 @@
-from apiflask import fields
-from marshmallow import fields as marshmallow_fields
+from datetime import date, datetime
+from typing import Any
+from uuid import UUID
 
-from src.api.schemas import request_schema
+from pydantic import BaseModel, Field
+
 from src.db.models import user_models
 
 
-class RoleSchema(request_schema.OrderedSchema):
-    type = marshmallow_fields.Enum(
-        user_models.RoleType,
-        by_value=True,
-        metadata={"description": "The name of the role"},
-    )
-
-    # Note that user_id is not included in the API schema since the role
-    # will always be a nested fields of the API user
+class RoleModel(BaseModel):
+    type: user_models.RoleType
 
 
-class UserSchema(request_schema.OrderedSchema):
-    id = fields.UUID(dump_only=True)
-    first_name = fields.String(metadata={"description": "The user's first name"}, required=True)
-    middle_name = fields.String(metadata={"description": "The user's middle name"})
-    last_name = fields.String(metadata={"description": "The user's last name"}, required=True)
-    phone_number = fields.String(
-        required=True,
-        metadata={
-            "description": "The user's phone number",
-            "example": "123-456-7890",
-            "pattern": r"^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$",
-        },
-    )
-    date_of_birth = fields.Date(
-        metadata={"description": "The users date of birth"},
-        required=True,
-    )
-    is_active = fields.Boolean(
-        metadata={"description": "Whether the user is active"},
-        required=True,
-    )
-    roles = fields.List(fields.Nested(RoleSchema), required=True)
+class UserModel(BaseModel):
 
-    # Output only fields in addition to id field
-    created_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
+    first_name: str
+    middle_name: str | None = None
+    last_name: str
+    phone_number: str = Field(
+        pattern=r"^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$", examples=["123-456-7890"]
+    )
+    date_of_birth: date
+    is_active: bool
+    roles: list[RoleModel]
+
+
+UNSET: Any = None
+
+
+class UserModelPatch(UserModel):
+    # TODO - this is unfortunately what we need to do for PATCH to work
+    #        and is making me think PATCH should just not be used in favor of PUT endpoints
+    #        which may also be simpler for front-ends as well.
+    #
+    #        Ideas:
+    #           - Just go with a PUT endpoint
+    #           - Make this how the main model works, merge the two
+    #           - Be fine with duplication?
+    #
+    first_name: str = UNSET
+    # middle_initial does not need to be redefined
+    last_name: str = UNSET
+    phone_number: str = Field(
+        pattern=r"^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$",
+        examples=["123-456-7890"],
+        default=UNSET,
+    )
+    date_of_birth: date = UNSET
+    is_active: bool = UNSET
+    roles: list[RoleModel] = UNSET
+
+
+class UserModelOut(UserModel):
+    id: UUID
+
+    created_at: datetime
+    updated_at: datetime

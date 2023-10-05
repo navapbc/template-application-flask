@@ -28,7 +28,7 @@ def base_request():
 @pytest.fixture
 def created_user(client, api_auth_token, base_request):
     response = client.post("/v1/users", json=base_request, headers={"X-Auth": api_auth_token})
-    return response.get_json()["data"]
+    return response.json()
 
 
 test_create_and_get_user_data = [
@@ -45,7 +45,7 @@ def test_create_and_get_user(client, base_request, api_auth_token, roles):
         "roles": roles,
     }
     post_response = client.post("/v1/users", json=request, headers={"X-Auth": api_auth_token})
-    post_response_data = post_response.get_json()["data"]
+    post_response_data = post_response.json()
     expected_response = {
         **request,
         "id": post_response_data["id"],
@@ -59,26 +59,41 @@ def test_create_and_get_user(client, base_request, api_auth_token, roles):
     assert post_response_data["updated_at"] is not None
 
     # Get the user
-    user_id = post_response.get_json()["data"]["id"]
+    user_id = post_response.json()["id"]
     get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
 
     assert get_response.status_code == 200
 
-    get_response_data = get_response.get_json()["data"]
+    get_response_data = get_response.json()
     assert get_response_data == expected_response
 
 
 test_create_user_bad_request_data = [
     pytest.param(
         {},
-        {
-            "first_name": ["Missing data for required field."],
-            "last_name": ["Missing data for required field."],
-            "phone_number": ["Missing data for required field."],
-            "date_of_birth": ["Missing data for required field."],
-            "is_active": ["Missing data for required field."],
-            "roles": ["Missing data for required field."],
-        },
+        [
+            {
+                "input": {},
+                "loc": ["body", "first_name"],
+                "msg": "Field required",
+                "type": "missing",
+            },
+            {"input": {}, "loc": ["body", "last_name"], "msg": "Field required", "type": "missing"},
+            {
+                "input": {},
+                "loc": ["body", "phone_number"],
+                "msg": "Field required",
+                "type": "missing",
+            },
+            {
+                "input": {},
+                "loc": ["body", "date_of_birth"],
+                "msg": "Field required",
+                "type": "missing",
+            },
+            {"input": {}, "loc": ["body", "is_active"], "msg": "Field required", "type": "missing"},
+            {"input": {}, "loc": ["body", "roles"], "msg": "Field required", "type": "missing"},
+        ],
         id="missing all required fields",
     ),
     pytest.param(
@@ -91,25 +106,70 @@ test_create_user_bad_request_data = [
             "is_active": 6,
             "roles": 7,
         },
-        {
-            "first_name": ["Not a valid string."],
-            "middle_name": ["Not a valid string."],
-            "last_name": ["Not a valid string."],
-            "phone_number": ["Not a valid string."],
-            "date_of_birth": ["Not a valid date."],
-            "is_active": ["Not a valid boolean."],
-            "roles": ["Not a valid list."],
-        },
+        [
+            {
+                "input": 1,
+                "loc": ["body", "first_name"],
+                "msg": "Input should be a valid string",
+                "type": "string_type",
+            },
+            {
+                "input": 2,
+                "loc": ["body", "middle_name"],
+                "msg": "Input should be a valid string",
+                "type": "string_type",
+            },
+            {
+                "input": 3,
+                "loc": ["body", "last_name"],
+                "msg": "Input should be a valid string",
+                "type": "string_type",
+            },
+            {
+                "input": 5,
+                "loc": ["body", "phone_number"],
+                "msg": "Input should be a valid string",
+                "type": "string_type",
+            },
+            {
+                "input": 4,
+                "loc": ["body", "date_of_birth"],
+                "msg": "Datetimes provided to dates should have zero time - e.g. be exact " "dates",
+                "type": "date_from_datetime_inexact",
+            },
+            {
+                "input": 6,
+                "loc": ["body", "is_active"],
+                "msg": "Input should be a valid boolean, unable to interpret input",
+                "type": "bool_parsing",
+            },
+            {
+                "input": 7,
+                "loc": ["body", "roles"],
+                "msg": "Input should be a valid list",
+                "type": "list_type",
+            },
+        ],
         id="invalid types",
     ),
     pytest.param(
         get_base_request() | {"roles": [{"type": "Mime"}, {"type": "Clown"}]},
-        {
-            "roles": {
-                "0": {"type": ["Must be one of: USER, ADMIN."]},
-                "1": {"type": ["Must be one of: USER, ADMIN."]},
-            }
-        },
+        [
+            {
+                "ctx": {"expected": "'USER' or 'ADMIN'"},
+                "input": "Mime",
+                "loc": ["body", "roles", 0, "type"],
+                "msg": "Input should be 'USER' or 'ADMIN'",
+                "type": "enum",
+            },
+            {
+                "ctx": {"expected": "'USER' or 'ADMIN'"},
+                "input": "Clown",
+                "loc": ["body", "roles", 1, "type"],
+                "msg": "Input should be 'USER' or 'ADMIN'",
+                "type": "enum",
+            },
+        ],
         id="invalid role type",
     ),
 ]
@@ -120,7 +180,7 @@ def test_create_user_bad_request(client, api_auth_token, request_data, expected_
     response = client.post("/v1/users", json=request_data, headers={"X-Auth": api_auth_token})
     assert response.status_code == 422
 
-    response_data = response.get_json()["detail"]["json"]
+    response_data = response.json()["detail"]
     assert response_data == expected_response_data
 
 
@@ -130,7 +190,7 @@ def test_patch_user(client, api_auth_token, created_user):
     patch_response = client.patch(
         f"/v1/users/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
-    patch_response_data = patch_response.get_json()["data"]
+    patch_response_data = patch_response.json()
     expected_response_data = {
         **created_user,
         **patch_request,
@@ -141,7 +201,7 @@ def test_patch_user(client, api_auth_token, created_user):
     assert patch_response_data == expected_response_data
 
     get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
-    get_response_data = get_response.get_json()["data"]
+    get_response_data = get_response.json()
 
     assert get_response_data == expected_response_data
 
@@ -155,14 +215,14 @@ def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, u
     }
     created_user = client.post(
         "/v1/users", json=post_request, headers={"X-Auth": api_auth_token}
-    ).get_json()["data"]
+    ).json()
     user_id = created_user["id"]
 
     patch_request = {"roles": updated_roles}
     patch_response = client.patch(
         f"/v1/users/{user_id}", json=patch_request, headers={"X-Auth": api_auth_token}
     )
-    patch_response_data = patch_response.get_json()["data"]
+    patch_response_data = patch_response.json()
     expected_response_data = {
         **created_user,
         **patch_request,
@@ -173,7 +233,7 @@ def test_patch_user_roles(client, base_request, api_auth_token, initial_roles, u
     assert patch_response_data == expected_response_data
 
     get_response = client.get(f"/v1/users/{user_id}", headers={"X-Auth": api_auth_token})
-    get_response_data = get_response.get_json()["data"]
+    get_response_data = get_response.json()
 
     assert get_response_data == expected_response_data
 
@@ -190,10 +250,12 @@ def test_unauthorized(client, method, url, body, api_auth_token):
     expected_message = (
         "The server could not verify that you are authorized to access the URL requested"
     )
-    response = getattr(client, method)(url, json=body, headers={"X-Auth": "incorrect token"})
+    response = client.request(
+        method=method, url=url, json=body, headers={"X-Auth": "incorrect token"}
+    )
 
     assert response.status_code == 401
-    assert response.get_json()["message"] == expected_message
+    assert response.json()["detail"] == expected_message
 
 
 test_not_found_data = [
@@ -206,7 +268,7 @@ test_not_found_data = [
 def test_not_found(client, api_auth_token, method, body):
     user_id = uuid.uuid4()
     url = f"/v1/users/{user_id}"
-    response = getattr(client, method)(url, json=body, headers={"X-Auth": api_auth_token})
+    response = client.request(method=method, url=url, json=body, headers={"X-Auth": api_auth_token})
 
     assert response.status_code == 404
-    assert response.get_json()["message"] == f"Could not find user with ID {user_id}"
+    assert response.json()["detail"] == f"Could not find user with ID {user_id}"

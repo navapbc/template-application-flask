@@ -1,33 +1,28 @@
 import logging
-from typing import Tuple
 
-from apiflask import APIBlueprint
-from flask import current_app
+from fastapi import APIRouter, HTTPException, Request, status
+from pydantic import BaseModel, Field
 from sqlalchemy import text
-from werkzeug.exceptions import ServiceUnavailable
 
-import src.adapters.db.flask_db as flask_db
-from src.api import response
-from src.api.schemas import request_schema
+import src.adapters.db.fastapi_db as fastapi_db
 
 logger = logging.getLogger(__name__)
 
-
-class HealthcheckSchema(request_schema.OrderedSchema):
-    message: str
+healthcheck_router = APIRouter(tags=["healthcheck"])
 
 
-healthcheck_blueprint = APIBlueprint("healthcheck", __name__, tag="Health")
+class HealthcheckModel(BaseModel):
+    message: str = Field(examples=["Service healthy"])
 
 
-@healthcheck_blueprint.get("/health")
-@healthcheck_blueprint.output(HealthcheckSchema)
-@healthcheck_blueprint.doc(responses=[200, ServiceUnavailable.code])
-def health() -> Tuple[dict, int]:
+@healthcheck_router.get("/health")
+def health(request: Request) -> HealthcheckModel:
     try:
-        with flask_db.get_db(current_app).get_connection() as conn:
+        with fastapi_db.get_db_client(request.app).get_connection() as conn:
             assert conn.scalar(text("SELECT 1 AS healthy")) == 1
-        return response.ApiResponse(message="Service healthy").asdict(), 200
-    except Exception:
+        return HealthcheckModel(message="Service healthy")
+    except Exception as err:
         logger.exception("Connection to DB failure")
-        return response.ApiResponse(message="Service unavailable").asdict(), ServiceUnavailable.code
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Service unavailable"
+        ) from err

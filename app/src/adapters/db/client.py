@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class DBClient(abc.ABC, metaclass=abc.ABCMeta):
     """Database connection manager.
 
-    This class is used to manage database connections for the Flask app.
+    This class is used to manage database connections for the app.
     It has methods for getting a new connection or session object.
 
     A derived class must initialize _engine in the __init__ function

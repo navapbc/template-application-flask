@@ -12,7 +12,7 @@ from tests.lib.assertions import assert_dict_contains
 def init_test_logger(caplog: pytest.LogCaptureFixture, monkeypatch: pytest.MonkeyPatch):
     caplog.set_level(logging.DEBUG)
     monkeypatch.setenv("LOG_FORMAT", "human-readable")
-    with src.logging.init("test_logging"):
+    with src.logger.init("test_logging"):
         yield
 
 
@@ -27,7 +27,7 @@ def test_init(caplog: pytest.LogCaptureFixture, monkeypatch, log_format, expecte
     caplog.set_level(logging.DEBUG)
     monkeypatch.setenv("LOG_FORMAT", log_format)
 
-    with src.logging.init("test_logging"):
+    with src.logger.init("test_logging"):
 
         records = caplog.records
         assert len(records) == 2
