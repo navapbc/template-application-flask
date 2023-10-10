@@ -8,7 +8,7 @@ See https://docs.python.org/3/library/logging.html#formatter-objects
 """
 import json
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, UTC
 from decimal import Decimal
 from enum import Enum
 from typing import Any, Callable, Type, TypeVar
@@ -101,7 +101,7 @@ class HumanReadableFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         message = super().format(record)
         return decodelog.format_line(
-            datetime.utcfromtimestamp(record.created),
+            datetime.fromtimestamp(record.created),
             record.name,
             record.funcName,
             record.levelname,
