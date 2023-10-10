@@ -5,4 +5,4 @@
 # DOCKLE_ACCEPT_FILES="file1,path/to/file2,file3/path,etc"
 
 # The apiflask/settings file is a stub file that apiflask creates, and has no sensitive data in. We are ignoring it since it is unused
-DOCKLE_ACCEPT_FILES=app/.venv/lib/python3.11/site-packages/apiflask/settings.py
+DOCKLE_ACCEPT_FILES=app/.venv/lib/python3.12/site-packages/apiflask/settings.py
