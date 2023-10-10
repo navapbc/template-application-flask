@@ -8,7 +8,7 @@ See https://docs.python.org/3/library/logging.html#formatter-objects
 """
 import json
 import logging
-from datetime import date, datetime, UTC
+from datetime import date, datetime
 from decimal import Decimal
 from enum import Enum
 from typing import Any, Callable, Type, TypeVar

@@ -11,10 +11,10 @@ SQLAlchemy = "^2.0.21"
 alembic = "^1.12.0"
 python-dotenv = "^0.20.0"
 pydantic = "^1.10.0"
-botocore = "^1.27.67"
-boto3 = "~1.24.67"
+botocore = "^1.31.62"
+boto3 = "^1.28.62"
 smart-open = "^6.1.0"
-pytz = "^2022.2.1"
+pytz = "^2023.3.post1"
 APIFlask = "^2.0.2"
 marshmallow-dataclass = {extras = ["enum", "union"], version = "^8.5.8"}
 marshmallow = "^3.20.1"
@@ -38,6 +38,7 @@ pytest = "^7.4.2"
 pytest-watch = "^4.2.0"
 pytest-lazy-fixture = "^0.6.3"
 types-pyyaml = "^6.0.12.11"
+setuptools = "^68.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -100,7 +101,6 @@ disallow_untyped_defs = false
 # When a library has addressed its deprecation issues and we've updated the
 # library, we can remove the ignore filter for that library.
 filterwarnings = [
-  "ignore::DeprecationWarning:apiflask.*",
   "ignore::DeprecationWarning:botocore.*"] # pytest-watch errors if the closing bracket is on it's own line
 
 markers = [

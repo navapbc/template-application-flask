@@ -51,7 +51,7 @@ class Base(DeclarativeBase):
     }
 
     def _dict(self) -> dict:
-        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}  # type: ignore
+        return {c.key: getattr(self, c.key) for c in inspect(self).mapper.column_attrs}
 
     def for_json(self) -> dict:
         json_valid_dict = {}
