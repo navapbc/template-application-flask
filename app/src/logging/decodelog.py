@@ -1,7 +1,7 @@
 #
 # Make JSON logs easier to read when developing or troubleshooting.
 #
-# Expects JSON log lines or `docker-compose log` output on stdin and outputs plain text lines on
+# Expects JSON log lines or `docker compose log` output on stdin and outputs plain text lines on
 # stdout.
 #
 # This module intentionally has no dependencies outside the standard library so that it can be run
@@ -42,7 +42,7 @@ def process_line(line: str) -> Optional[str]:
         # JSON format
         return decode_json_line(line)
     elif "| {" in line:
-        # `docker-compose logs ...` format
+        # `docker compose logs ...` format
         return decode_json_line(line[line.find("| {") + 2 :])
     # Anything else is left alone
     return line
