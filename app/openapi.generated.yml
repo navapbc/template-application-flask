@@ -1,0 +1,490 @@
+info:
+  title: Template Application Flask
+  description: Template API for a Flask Application
+  contact:
+    name: Nava PBC Engineering
+    url: https://www.navapbc.com
+    email: engineering@navapbc.com
+  version: 0.1.0
+tags:
+- name: Health
+- name: User
+paths:
+  /health:
+    get:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The message to return
+                  data:
+                    $ref: '#/components/schemas/Healthcheck'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  pagination_info:
+                    description: The pagination information for paginated endpoints
+                    allOf:
+                    - $ref: '#/components/schemas/PaginationInfo'
+          description: Successful response
+        '503':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Service Unavailable
+      tags:
+      - Health
+      summary: Health
+  /v1/users:
+    post:
+      parameters: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The message to return
+                  data:
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  pagination_info:
+                    description: The pagination information for paginated endpoints
+                    allOf:
+                    - $ref: '#/components/schemas/PaginationInfo'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+      tags:
+      - User
+      summary: POST /v1/users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      security:
+      - ApiKeyAuth: []
+  /v1/users/search:
+    post:
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The message to return
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  pagination_info:
+                    description: The pagination information for paginated endpoints
+                    allOf:
+                    - $ref: '#/components/schemas/PaginationInfo'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+      tags:
+      - User
+      summary: User Search
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSearch'
+      security:
+      - ApiKeyAuth: []
+  /v1/users/{user_id}:
+    get:
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The message to return
+                  data:
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  pagination_info:
+                    description: The pagination information for paginated endpoints
+                    allOf:
+                    - $ref: '#/components/schemas/PaginationInfo'
+          description: Successful response
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      tags:
+      - User
+      summary: User Get
+      security:
+      - ApiKeyAuth: []
+    patch:
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: The message to return
+                  data:
+                    $ref: '#/components/schemas/User'
+                  status_code:
+                    type: integer
+                    description: The HTTP status code
+                  warnings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  errors:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ValidationError'
+                  pagination_info:
+                    description: The pagination information for paginated endpoints
+                    allOf:
+                    - $ref: '#/components/schemas/PaginationInfo'
+          description: Successful response
+        '422':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: Validation error
+        '401':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Authentication error
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+          description: Not found
+      tags:
+      - User
+      summary: User Patch
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      security:
+      - ApiKeyAuth: []
+openapi: 3.0.3
+components:
+  schemas:
+    ValidationError:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of error
+        message:
+          type: string
+          description: The message to return
+        rule:
+          type: string
+          description: The rule that failed
+        field:
+          type: string
+          description: The field that failed
+        value:
+          type: string
+          description: The value that failed
+    PaginationInfo:
+      type: object
+      properties:
+        page_offset:
+          type: integer
+          description: The page number that was fetched
+          example: 1
+        page_size:
+          type: integer
+          description: The size of the page fetched
+          example: 25
+        total_records:
+          type: integer
+          description: The total number of records fetchable
+          example: 42
+        total_pages:
+          type: integer
+          description: The total number of pages that can be fetched
+          example: 2
+        order_by:
+          type: string
+          description: The field that the records were sorted by
+          example: id
+        sort_direction:
+          description: The direction the records are sorted
+          enum:
+          - ascending
+          - descending
+    HTTPError:
+      properties:
+        detail:
+          type: object
+        message:
+          type: string
+      type: object
+    Healthcheck:
+      type: object
+      properties: {}
+    Role:
+      type: object
+      properties:
+        type:
+          description: The name of the role
+          enum:
+          - USER
+          - ADMIN
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
+        phone_number:
+          type: string
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          description: The user's phone number
+          example: 123-456-7890
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - date_of_birth
+      - first_name
+      - is_active
+      - last_name
+      - phone_number
+      - roles
+    UserSorting:
+      type: object
+      properties:
+        order_by:
+          type: string
+          enum:
+          - id
+          - created_at
+          - updated_at
+          description: The field to sort the response by
+        sort_direction:
+          description: Whether to sort the response ascending or descending
+          enum:
+          - ascending
+          - descending
+      required:
+      - order_by
+      - sort_direction
+    Pagination:
+      type: object
+      properties:
+        page_size:
+          type: integer
+          minimum: 1
+          description: The size of the page to fetch
+          example: 25
+        page_offset:
+          type: integer
+          minimum: 1
+          description: The page number to fetch, starts counting from 1
+          example: 1
+      required:
+      - page_offset
+      - page_size
+    UserSearch:
+      type: object
+      properties:
+        phone_number:
+          type: string
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          description: The user's phone number
+          example: 123-456-7890
+        is_active:
+          type: boolean
+        role_type:
+          enum:
+          - USER
+          - ADMIN
+        sorting:
+          $ref: '#/components/schemas/UserSorting'
+        paging:
+          $ref: '#/components/schemas/Pagination'
+      required:
+      - paging
+    UserUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        first_name:
+          type: string
+          description: The user's first name
+        middle_name:
+          type: string
+          description: The user's middle name
+        last_name:
+          type: string
+          description: The user's last name
+        phone_number:
+          type: string
+          pattern: ^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$
+          description: The user's phone number
+          example: 123-456-7890
+        date_of_birth:
+          type: string
+          format: date
+          description: The users date of birth
+        is_active:
+          type: boolean
+          description: Whether the user is active
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/Role'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-Auth
+

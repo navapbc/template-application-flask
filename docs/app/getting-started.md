@@ -1,14 +1,14 @@
 # Getting started
 
-This application is dockerized. Take a look at [Dockerfile](./app/Dockerfile) to see how it works.
+This application is dockerized. Take a look at [Dockerfile](/app/Dockerfile) to see how it works.
 
-A very simple [docker-compose.yml](./docker-compose.yml) has been included to support local development and deployment. Take a look at [docker-compose.yml](./docker-compose.yml) for more information.
+A very simple [docker-compose.yml](/docker-compose.yml) has been included to support local development and deployment. Take a look at [docker-compose.yml](/docker-compose.yml) for more information.
 
 ## Prerequisites
 
 **Note:** Run everything from within the `/app` folder:
 
-1. Install the version of Python specified in [.python-version](../../app/.python-version)
+1. Install the version of Python specified in [.python-version](/app/.python-version)
    [pyenv](https://github.com/pyenv/pyenv#installation) is one popular option for installing Python,
    or [asdf](https://asdf-vm.com/).
 
@@ -23,20 +23,15 @@ A very simple [docker-compose.yml](./docker-compose.yml) has been included to su
 
 4. You'll also need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
 
-## Setup
-
-```bash
-make setup-local
-```
-
 ## Run the application
 
-1. In your terminal, `cd` to the app directory of this repo.
+1. In your terminal, `cd` to the `app` directory of this repo.
 2. Make sure you have [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed & running.
-3. Run `make init start` to build the image and start the container.
-4. Navigate to `localhost:8080/v1/docs` to access the Swagger UI.
-5. Run `make run-logs` to see the logs of the running API container
-6. Run `make stop` when you are done to delete the container.
+3. Run `make setup-local` to install dependencies
+4. Run `make init start` to build the image and start the container.
+5. Navigate to `localhost:8080/docs` to access the Swagger UI.
+6. Run `make run-logs` to see the logs of the running API container
+7. Run `make stop` when you are done to delete the container.
 
 ## Next steps
 

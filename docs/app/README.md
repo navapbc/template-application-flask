@@ -12,7 +12,7 @@ This is the API layer. It includes a few separate components:
 ```text
 root
 ├── app
-│   └── api
+│   └── src
 │       └── auth                Authentication code for API
 │       └── db
 │           └── models          DB model definitions            
@@ -22,6 +22,7 @@ root
 │       └── route               API route definitions
 │           └── handler         API route implementations
 │       └── scripts             Backend scripts that run separate from the application
+|       └── services            Methods for service layer
 │       └── util                Utility methods and classes useful to most areas of the code
 │
 │   └── tests
@@ -31,13 +32,13 @@ root
 │   └── setup.cfg           Python config for tools that don't support pyproject.toml yet
 │   └── Dockerfile          Docker build file for project
 │
-└── docker-compose.yml  Config file for Docker Compose (V2) tool, used for local development
+└── docker-compose.yml  Config file for docker-compose tool, used for local development
 ```
 
 ## Information
 
 * [API Technical Overview](./technical-overview.md)
-* [Database Migrations](./database-migrations.md)
+* [Database Management](./database/database-management.md)
 * [Formatting and Linting](./formatting-and-linting.md)
 * [Writing Tests](./writing-tests.md)
 
@@ -47,11 +48,9 @@ root
 
 `make clean-volumes` will spin down the docker containers + delete the volumes. This can be useful to reset your DB, or fix any bad states your local environment may have gotten into.
 
-See the [Makefile](./app/Makefile) for a full list of commands you can run.
+See the [Makefile](/app/Makefile) for a full list of commands you can run.
 
 ## Docker and Native Development
-
-***NB.*** This template uses [Docker Compose V2](https://www.docker.com/blog/announcing-compose-v2-general-availability/) (viz. `docker compose` instead of `docker-compose`).
 
 Several components like tests, linting, and scripts can be run either inside of the Docker container, or outside on your native machine.
 Running in Docker is the default, but on some machines like the M1 Mac, running natively may be desirable for performance reasons.
@@ -65,13 +64,43 @@ Note that even with the native mode, many components like the DB and API will on
 
 Running in the native/local approach may require additional packages to be installed on your machine to get working.
 
+### Running Natively
+
+* Run `export PY_RUN_APPROACH=local`
+* Run `make setup-local`
+* Run `poetry install --all-extras --with dev` to keep your Poetry packages up to date
+* Load environment variables from the local.env file, see below for one option.
+
+One option for loading all of your local.env variables is to install direnv: https://direnv.net/
+You can configure direnv to then load the local.env file by creating an `.envrc` file in the /app directory that looks like:
+
+```sh
+#!/bin/bash
+set -o allexport
+source local.env
+set +o allexport
+
+# Set any environment variable overrides you want here
+#
+# If you are running outside of the Docker container, the DB can
+# be found on localhost:5432. Inside the container it's referenced via
+# the name of the docker container.
+export DB_HOST=localhost
+```
+And then running `direnv allow .` in the /app folder. You should see something like:
+```shell
+➜  template-application-flask git:(main) ✗ cd app
+direnv: loading ~/workspace/template-application-flask/app/.envrc
+direnv: export +API_AUTH_TOKEN +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_SECRET_ACCESS_KEY +DB_HOST +DB_NAME +DB_PASSWORD +DB_SCHEMA +DB_SSL_MODE +DB_USER +ENVIRONMENT +FLASK_APP +HIDE_SQL_PARAMETER_LOGS +LOG_ENABLE_AUDIT +LOG_FORMAT +PORT +PYTHONPATH
+```
+
 ## Environment Variables
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](./app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose.yml](./docker-compose.yml) file, and loaded [by a script](./app/api/util/local.py) automatically when running most other components outside the container.
+Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
 
-Any environment variables specified directly in the [docker-compose.yml](./docker-compose.yml) file will take precedent over those specified in the [local.env](./app/local.env) file.
+Any environment variables specified directly in the [docker-compose](/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
 
 ## Authentication
 
