@@ -87,21 +87,21 @@ setup-local:
 ##################################################
 
 build:
-	docker-compose build
+	docker compose build
 
 start:
-	docker-compose up --detach
+	docker compose up --detach
 
 run-logs: start
-	docker-compose logs --follow --no-color $(APP_NAME)
+	docker compose logs --follow --no-color $(APP_NAME)
 
 init: build init-db
 
 clean-volumes: ## Remove project docker volumes (which includes the DB state)
-	docker-compose down --volumes
+	docker compose down --volumes
 
 stop:
-	docker-compose down
+	docker compose down
 
 check: format-check lint test
 
@@ -118,7 +118,7 @@ check: format-check lint test
 init-db: start-db db-migrate
 
 start-db:
-	docker-compose up --detach main-db
+	docker compose up --detach main-db
 	./bin/wait-for-local-db.sh
 
 ## Destroy current DB, setup new one
