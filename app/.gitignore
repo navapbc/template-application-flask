@@ -26,3 +26,6 @@ coverage.*
 # VSCode Workspace
 *.code-workspace
 .vscode
+
+# Poetry installer local error logs
+poetry-installer-error-*.log
