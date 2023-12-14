@@ -61,8 +61,10 @@ $ make db-migrate
 <details>
     <summary>Example: Adding a new column to an existing table:</summary>
 
-1. Manually update the database models with the changes ([example_models.py](/app/src/db/models/example_models.py) in this example)
+1. Manually update the database models with the changes
 ```python
+# src/db/models/example_models.py
+
 class ExampleTable(Base):
     ...
     my_new_timestamp = Column(TIMESTAMP(timezone=True)) # Newly added line

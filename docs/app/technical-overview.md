@@ -4,8 +4,6 @@
 - [Request operations](#request-operations)
 - [Authentication](#authentication)
 - [Authorization](#authorization)
-- [Running In Hosted Environments](#running-in-hosted-environments)
-  - [ECS](#ecs)
 
 ## Key Technologies
 
@@ -38,6 +36,7 @@ generally preferred.
 [sqlalchemy-src]: https://github.com/sqlalchemy/sqlalchemy
 
 [alembic-home]: https://alembic.sqlalchemy.org/en/latest/
+[alembic-src]: https://github.com/sqlalchemy/alembic
 
 ## Request operations
 
