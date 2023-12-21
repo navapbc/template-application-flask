@@ -161,6 +161,9 @@ db-migrate-history: ## Show migration history
 db-migrate-heads: ## Show migrations marked as a head
 	$(alembic_cmd) heads $(args)
 
+db-check-model-parity: ## Verify the DB schema matches the DB migrations generated
+	$(alembic_cmd) check
+
 ##################################################
 # Testing
 ##################################################
@@ -194,7 +197,7 @@ format-check: ## Check file formatting
 	$(PY_RUN_CMD) isort --atomic --check-only src tests
 	$(PY_RUN_CMD) black --check src tests
 
-lint: lint-py ## Lint
+lint: lint-py db-check-model-parity
 
 lint-py: lint-flake lint-mypy
 
