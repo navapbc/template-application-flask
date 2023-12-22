@@ -9,7 +9,7 @@ If running outside of Docker, you must install `graphviz` (`brew install graphvi
 # Caveats
 The diagrams generated are based on our SQLAlchemy models, and not the database itself, so there are a few differences.
 
-* The 
+* The script that generates the models needs to import each model file in order to add it to the diagram
 * Fields that we name different in-code will have a different name
 * The table names use the class name
 * Property fields are SQLAlchemy only and generally represent relationships (ie. values fetched via a foreign key `join`)
