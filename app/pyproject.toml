@@ -40,6 +40,8 @@ pytest-watch = "^4.2.0"
 pytest-lazy-fixture = "^0.6.3"
 types-pyyaml = "^6.0.12.11"
 setuptools = "^68.2.2"
+sadisplay = "0.4.9"
+pydot = "1.4.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -49,6 +51,7 @@ build-backend = "poetry.core.masonry.api"
 db-migrate = "src.db.migrations.run:up"
 db-migrate-down = "src.db.migrations.run:down"
 db-migrate-down-all = "src.db.migrations.run:downall"
+create-schema-diagrams = "bin.create_schema_diagrams:main"
 
 [tool.black]
 line-length = 100
