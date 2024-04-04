@@ -40,6 +40,7 @@ pytest-watch = "^4.2.0"
 pytest-lazy-fixture = "^0.6.3"
 types-pyyaml = "^6.0.12.11"
 setuptools = "^68.2.2"
+debugpy = "^1.8.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
