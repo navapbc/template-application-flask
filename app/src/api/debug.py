@@ -8,7 +8,7 @@ class DebugAdapterProtocolConfig(PydanticBaseEnvConfig):
         default=False,
         description="Enable debug mode. Overwritten to True when running a debug make target",
     )
-    host: str = Field(default="0.0.0.0", description="The host for the debugger to listen on")
+    host: str = Field(default="localhost", description="The host for the debugger to listen on")
     port: int = Field(default=5678, description="The port for the debugger to listen on")
 
     wait_for_client: bool = Field(
