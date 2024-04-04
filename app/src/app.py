@@ -2,18 +2,19 @@ import logging
 import os
 from typing import Optional
 
+from apiflask import APIFlask
+from flask import g
+from werkzeug.exceptions import Unauthorized
+
 import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
 import src.logging
 import src.logging.flask_logger as flask_logger
-from apiflask import APIFlask
-from flask import g
 from src.api.debug import DebugAdapterProtocolConfig
 from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
 from src.auth.api_key_auth import User, get_app_security_scheme
-from werkzeug.exceptions import Unauthorized
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ logger = logging.getLogger(__name__)
 def create_app() -> APIFlask:
     app = APIFlask(__name__)
 
-    print('app => ', app)
+    print("app => ", app)
 
     if is_running_in_local():
         setup_debug_adapter()
@@ -40,7 +41,7 @@ def create_app() -> APIFlask:
 
 
 def is_running_in_local() -> bool:
-    print( 's.getenv("FLASK_ENV") => ', os.getenv("FLASK_ENV"))
+    print('s.getenv("FLASK_ENV") => ', os.getenv("FLASK_ENV"))
     return os.getenv("FLASK_ENV") in ("local", "dev")
 
 
