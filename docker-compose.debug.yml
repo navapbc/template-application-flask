@@ -1,0 +1,21 @@
+version: "3.8"
+
+# run with `docker compose -f`
+# combines ports and env vars with main docker-compose.yml mass-pfml-api service
+services:
+  main-app:
+    build:
+      context: ./app
+      target: dev
+      args:
+        - RUN_UID=${RUN_UID:-4000}
+        - RUN_USER=${RUN_USER:-app}
+    command: ["poetry", "run", "flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    container_name: main-app
+    env_file: ./app/local.env
+    ports:
+      - 5678:5678
+    environment:
+      - DEBUG_ADAPTER_PROTOCOL_ENABLE=true
+    volumes:
+      - ./app:/app
