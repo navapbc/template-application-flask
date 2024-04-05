@@ -10,23 +10,16 @@ import src.adapters.db as db
 import src.adapters.db.flask_db as flask_db
 import src.logging
 import src.logging.flask_logger as flask_logger
-from src.api.debug import DebugAdapterProtocolConfig
 from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
 from src.auth.api_key_auth import User, get_app_security_scheme
-from src.util.local import is_running_in_local
 
 logger = logging.getLogger(__name__)
 
 
 def create_app() -> APIFlask:
     app = APIFlask(__name__)
-
-    print("app => ", app)
-
-    if is_running_in_local():
-        setup_debug_adapter()
 
     src.logging.init(__package__)
     flask_logger.init_app(logging.root, app)
@@ -39,24 +32,6 @@ def create_app() -> APIFlask:
     register_index(app)
 
     return app
-
-
-def setup_debug_adapter() -> None:
-    debug_adapter_protocol_config = DebugAdapterProtocolConfig()
-
-    if debug_adapter_protocol_config.enable and os.environ.get("WERKZEUG_RUN_MAIN"):
-        # flask can initialize multiple times - only debugpy.listen() once
-        import debugpy
-
-        debugpy.listen(
-            (
-                debug_adapter_protocol_config.host,
-                debug_adapter_protocol_config.port,
-            )
-        )
-        if debug_adapter_protocol_config.wait_for_client:
-            logger.info(debug_adapter_protocol_config.wait_for_client_message)
-            debugpy.wait_for_client()  # blocks execution until debugger is attached
 
 
 def current_user(is_user_expected: bool = True) -> Optional[User]:
