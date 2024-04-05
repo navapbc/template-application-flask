@@ -22,7 +22,5 @@ services:
     ]
     ports:
       - 5678:5678
-    environment:
-      - DEBUG_ADAPTER_PROTOCOL_ENABLE=true
     volumes:
       - ./app:/app
