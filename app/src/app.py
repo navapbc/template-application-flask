@@ -15,6 +15,7 @@ from src.api.healthcheck import healthcheck_blueprint
 from src.api.schemas import response_schema
 from src.api.users import user_blueprint
 from src.auth.api_key_auth import User, get_app_security_scheme
+from src.util.local import is_running_in_local
 
 logger = logging.getLogger(__name__)
 
@@ -38,11 +39,6 @@ def create_app() -> APIFlask:
     register_index(app)
 
     return app
-
-
-def is_running_in_local() -> bool:
-    print('s.getenv("FLASK_ENV") => ', os.getenv("FLASK_ENV"))
-    return os.getenv("FLASK_ENV") in ("local", "dev")
 
 
 def setup_debug_adapter() -> None:
