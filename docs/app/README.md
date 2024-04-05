@@ -108,7 +108,7 @@ This API uses a very simple [ApiKey authentication approach](https://apiflask.co
 
 ## VSCode Remote Attach Container Debugging
 
-The API can be run in debug mode that allows for remote attach debugging (currently only supporting VSCode) to the container.
+The API can be run in debug mode that allows for remote attach debugging (currently only supported from VSCode) to the container.
 
 - Requirements:
 
@@ -118,14 +118,13 @@ The API can be run in debug mode that allows for remote attach debugging (curren
 - First create a file `./vscode/launch.json` - as shown below. (Default name of `Python: Remote Attach`)
 
 - Start the server in debug mode via `make start-debug` or `make start-debug run-logs`.
-    - This will start the `main-app` service on port 5678.
+    - This will start the `main-app` service with port 5678 exposed.
 
-- The server will start waiting for you to attach the debugger (see `/src/app.py`) before continuing to run
+- The server will start in waiting mode, waiting for you to attach the debugger (see `/src/app.py`) before continuing to run.
 
 - Go to your VSCode debugger window and run the `Python: Remote Attach` option
 
 - You should now be able to hit set breakpoints throughout the API
-- Note that because there's a mapping between your code and the code in the container, if you start adding/removing code, the new breakpoints may not be on the same line in the container - in this case, you can simply rebuild or restart the server
 
 `./vscode/launch.json`:
 
@@ -138,7 +137,7 @@ The API can be run in debug mode that allows for remote attach debugging (curren
     "configurations": [
         {
             "name": "Python: Remote Attach",
-            "type": "python",
+            "type": "debugpy",
             "request": "attach",
             "connect": {
                 "host": "localhost",
@@ -147,10 +146,10 @@ The API can be run in debug mode that allows for remote attach debugging (curren
             "pathMappings": [
                 {
                     "localRoot": "${workspaceFolder}/app",
-                    "remoteRoot": "/app/src"
+                    "remoteRoot": "."
                 }
             ],
-            "justMyCode": false
+            "justMyCode": false,
         }
     ]
 }
