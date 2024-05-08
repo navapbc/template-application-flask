@@ -11,6 +11,8 @@ Connection = psycopg.Connection
 Cursor = psycopg.Cursor
 kwargs_row = rows.kwargs_row
 
+EMPTY_SQL = sql.SQL("")
+
 
 def bulk_upsert(
     cur: psycopg.Cursor,
@@ -18,8 +20,8 @@ def bulk_upsert(
     attributes: Sequence[str],
     objects: Sequence[Any],
     constraint: str,
-    update_condition: sql.SQL = sql.SQL(""),
-):
+    update_condition: sql.SQL = EMPTY_SQL,
+) -> None:
     """Bulk insert or update a sequence of objects.
 
     Insert a sequence of objects, or update on conflict.
@@ -48,7 +50,7 @@ def bulk_upsert(
     )
 
 
-def create_temp_table(cur: psycopg.Cursor, temp_table: str, src_table: str):
+def create_temp_table(cur: psycopg.Cursor, temp_table: str, src_table: str) -> None:
     """
     Create table that lives only for the current transaction.
     Use an existing table to determine the table structure.
@@ -74,7 +76,7 @@ def bulk_insert(
     table: str,
     columns: Sequence[str],
     objects: Sequence[Any],
-):
+) -> None:
     """
     Write data from a sequence of objects to a temp table.
     This function uses the PostgreSQL COPY command which is highly performant.
@@ -101,8 +103,8 @@ def write_from_table_to_table(
     dest_table: str,
     columns: Sequence[str],
     constraint: str,
-    update_condition: sql.SQL = sql.SQL(""),
-):
+    update_condition: sql.SQL = EMPTY_SQL,
+) -> None:
     """
     Write data from one table to another.
     If there are conflicts due to unique constraints, overwrite existing data.
@@ -122,6 +124,7 @@ def write_from_table_to_table(
                 column=sql.Identifier(column),
             )
             for column in columns
+            if column not in ["id", "number"]
         ]
     )
     query = sql.SQL(
