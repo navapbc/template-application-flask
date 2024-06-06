@@ -74,6 +74,11 @@ class PostgresDBClient(DBClient):
             # if check_migrations_current:
             #     have_all_migrations_run(engine)
 
+    def get_raw_connection(self) -> sqlalchemy.PoolProxiedConnection:
+        # For low-level operations not supported by SQLAlchemy.
+        # Unless you specifically need this, you should use get_connection().
+        return self._engine.raw_connection()
+
 
 def get_connection_parameters(db_config: PostgresDBConfig) -> dict[str, Any]:
     connect_args: dict[str, Any] = {}

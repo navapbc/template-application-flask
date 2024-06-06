@@ -1,8 +1,9 @@
 """Bulk database operations for performance.
 
-Provides a bulk_upsert function
+Provides a bulk_upsert function for use with
+Postgres and the psycopg library.
 """
-from typing import Any, Optional, Sequence
+from typing import Any, Sequence
 
 import psycopg
 from psycopg import rows, sql
@@ -18,7 +19,7 @@ def bulk_upsert(
     attributes: Sequence[str],
     objects: Sequence[Any],
     constraint: str,
-    update_condition: Optional[sql.SQL] = None,
+    update_condition: sql.SQL | None = None,
 ) -> None:
     """Bulk insert or update a sequence of objects.
 
@@ -39,9 +40,9 @@ def bulk_upsert(
         update_condition = sql.SQL("")
 
     temp_table = f"temp_{table}"
-    create_temp_table(cur, temp_table=temp_table, src_table=table)
-    bulk_insert(cur, table=temp_table, columns=attributes, objects=objects)
-    write_from_table_to_table(
+    _create_temp_table(cur, temp_table=temp_table, src_table=table)
+    _bulk_insert(cur, table=temp_table, columns=attributes, objects=objects)
+    _write_from_table_to_table(
         cur,
         src_table=temp_table,
         dest_table=table,
@@ -51,7 +52,7 @@ def bulk_upsert(
     )
 
 
-def create_temp_table(cur: psycopg.Cursor, temp_table: str, src_table: str) -> None:
+def _create_temp_table(cur: psycopg.Cursor, temp_table: str, src_table: str) -> None:
     """
     Create table that lives only for the current transaction.
     Use an existing table to determine the table structure.
@@ -72,7 +73,7 @@ def create_temp_table(cur: psycopg.Cursor, temp_table: str, src_table: str) -> N
     )
 
 
-def bulk_insert(
+def _bulk_insert(
     cur: psycopg.Cursor,
     table: str,
     columns: Sequence[str],
@@ -98,13 +99,13 @@ def bulk_insert(
             copy.write_row(values)
 
 
-def write_from_table_to_table(
+def _write_from_table_to_table(
     cur: psycopg.Cursor,
     src_table: str,
     dest_table: str,
     columns: Sequence[str],
     constraint: str,
-    update_condition: Optional[sql.SQL] = None,
+    update_condition: sql.SQL | None = None,
 ) -> None:
     """
     Write data from one table to another.
