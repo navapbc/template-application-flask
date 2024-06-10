@@ -8,7 +8,7 @@ This document describes how logging is configured in the application. The loggin
 
 We have two separate ways of formatting the logs which are controlled by the `LOG_FORMAT` environment variable.
 
-`json` (default) -> Produces JSON formatted logs which are machine-readable.
+`json` (default) -> Produces JSON formatted logs, which are machine-readable.
 
 ```json
 {
@@ -27,7 +27,7 @@ We have two separate ways of formatting the logs which are controlled by the `LO
 }
 ```
 
-`human-readable` (set by default in `local.env`) -> Produces color coded logs for local development or for troubleshooting.
+`human-readable` (set by default in `local.env`) -> Produces color-coded logs for local development or troubleshooting.
 
 ![Human readable logs](human-readable-logs.png)
 
@@ -37,11 +37,11 @@ The [src.logging.flask_logger](../../../app/src/logging/flask_logger.py) module 
 
 ## PII Masking
 
-The [src.logging.pii](../../../app/src/logging/pii.py) module defines a filter that applies to all logs that automatically masks data fields that look like social security numbers.
+The [src.logging.pii](../../../app/src/logging/pii.py) module defines a filter that applies to all logs and automatically masks data fields that look like social security numbers.
 
 ## Audit Logging
 
-* The [src.logging.audit](../../../app/src/logging/audit.py) module defines a low level audit hook that logs events that may be of interest from a security point of view, such as dynamic code execution and network requests.
+* The [src.logging.audit](../../../app/src/logging/audit.py) module defines a low-level audit hook that logs events that may be of interest from a security point of view, such as dynamic code execution and network requests.
 
 ## Additional Reading
 

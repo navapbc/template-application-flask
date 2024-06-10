@@ -60,7 +60,7 @@ You can switch which way many of these components are run by setting the `PY_RUN
 * `export PY_RUN_APPROACH=local` will run these components natively
 * `export PY_RUN_APPROACH=docker` will run these within Docker
 
-Note that even with the native mode, many components like the DB and API will only ever run in Docker, and you should always make sure that any implementations work within docker.
+Note that even with the native mode, many components like the DB and API will only ever run in Docker, and you should always make sure that any implementations work within Docker.
 
 Running in the native/local approach may require additional packages to be installed on your machine to get working.
 
@@ -71,8 +71,8 @@ Running in the native/local approach may require additional packages to be insta
 * Run `poetry install --all-extras --with dev` to keep your Poetry packages up to date
 * Load environment variables from the local.env file, see below for one option.
 
-One option for loading all of your local.env variables is to install direnv: https://direnv.net/
-You can configure direnv to then load the local.env file by creating an `.envrc` file in the /app directory that looks like:
+One option for loading all of your local.env variables is to install `direnv`: https://direnv.net/
+You can configure `direnv` to then load the local.env file by creating an `.envrc` file in the /app directory that looks like:
 
 ```sh
 #!/bin/bash

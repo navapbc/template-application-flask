@@ -8,14 +8,14 @@ Technical Story: https://github.com/navapbc/template-application-flask/issues/12
 
 ## Context and Problem Statement
 
-This template library was built out using Flask + Connexion as the API technology. We are investigating if we want to keep using Connexion, or potentially move to another Flask-wrapper API approach. Any approach we consider must make it possible to easily setup an OpenAPI/Swagger endpoint.
+This template library was built using Flask + Connexion as the API technology. We are investigating if we want to keep using Connexion, or potentially move to another Flask-wrapper API approach. Any approach we consider must make it possible to easily set up an OpenAPI/Swagger endpoint.
 
 We aren't looking to move off of Flask at the moment as we feel that would be a much larger refactor.
 
 ## Decision Drivers
 
-* Connexion requires you to specify an OpenAPI spec, but passes the request objects as an the raw JSON. We currently use Pydantic to convert this into a python object for additional validations & for ease-of-use, but this effectively means we need to define any models twice.
-* Defining the OpenAPI specs first instead of defining the data models in code has often been more frustrating. While one goal of doing it this way was the ability to create mock-endpoints while development is ongoing, this can also be easily handled by just making the endpoint return a static response in-code.
+* Connexion requires you to specify an OpenAPI spec but passes the request objects as the raw JSON. We currently use Pydantic to convert this into a Python object for additional validations & for ease of use, but this effectively means we need to define any models twice.
+* Defining the OpenAPI specs first instead of defining the data models in code has often been more frustrating. While one goal of doing it this way was the ability to create mock endpoints while development is ongoing, this can also be easily handled by just making the endpoint return a static response in-code.
 * Connexion's defaults for validation leave a lot to be desired. While we currently override these, it adds a lot of boilerplate to this template library, and isn't immediately obvious.
 * Code first is recommended by Swagger when building internal APIs that need to be built quickly: https://swagger.io/blog/api-design/design-first-or-code-first-api-development/ which is often the case for our endpoints that aren't directly exposed to users.
 
@@ -31,11 +31,11 @@ We aren't looking to move off of Flask at the moment as we feel that would be a 
 
 ## Decision Outcome
 
-Chosen option: "APIFlask", because it appears to be a library that has taken several lessons from the other libraries. It aims to simplify a lot of the headache with setting up and vending an OpenAPI schema, while being incredibly well documented, and very easy to configure. The documentation does a great job of explaining each component, the rationality of the default behavior, and how to adjust that behavior if needed.
+Chosen option: "APIFlask", because it appears to be a library that has taken several lessons from the other libraries. It aims to simplify a lot of the headache with setting up and vending an OpenAPI schema while being incredibly well-documented, and very easy to configure. The documentation does a great job of explaining each component, the rationality of the default behavior, and how to adjust that behavior if needed.
 
 ### Positive Consequences <!-- optional -->
 
-* No more writing OpenAPI specs, instead writing models once in-code.
+* No more writing OpenAPI specs, instead writing models once in code.
 ### Negative Consequences <!-- optional -->
 
 * If we use Marshmallow-dataclass, it's a bit cumbersome to define the validation rules as they all get passed via a metadata map. A utility for generating this so you can instead do `phone_number: str = field(metadata=get_metadata(required=True, regex="...", example="..."))` would go a long way in mitigating this annoyance.
@@ -44,7 +44,7 @@ Chosen option: "APIFlask", because it appears to be a library that has taken sev
 
 ### APIFlask
 
-[APIFlask](https://apiflask.com/openapi/) is a framework wrapped around Flask (much like Connexion) that also leverages [marshmallow](https://github.com/marshmallow-code/marshmallow) for data models, and [Flask-HTTPAuth](https://github.com/miguelgrinberg/flask-httpauth) for authentication. See [Comparison and Motivations](https://apiflask.com/comparison/) for further details on its creation and purpose.
+[APIFlask](https://apiflask.com/openapi/) is a framework wrapped around Flask (much like Connexion) that also leverages [marshmallow](https://github.com/marshmallow-code/marshmallow) for data models and [Flask-HTTPAuth](https://github.com/miguelgrinberg/flask-httpauth) for authentication. See [Comparison and Motivations](https://apiflask.com/comparison/) for further details on its creation and purpose.
 
 <details>
 <summary>Example implementation</summary>
@@ -130,10 +130,10 @@ def create_user(user: User):
 ```
 </details>
 
-* Good, because the documentation is immensely thorough, and does a great job of explaining all the customization options, while providing sane defaults.
+* Good, because the documentation is immensely thorough, and does a great job of explaining all the customization options while providing sane defaults.
 * Good, because you can [register custom error processors](https://apiflask.com/error-handling/#custom-error-response-processor) which would allow us to reuse and adapt our existing error processors - although it looks like the defaults are more sane - as all errors, not just the first get added to the error response.
-* Good, because [authentication looks to be flexible](https://apiflask.com/authentication/), and allow you to define it as if you were writing the openAPI.
-* Good, because the [API uses Marshmallow](https://apiflask.com/schema/) for its data schema, which is a [well maintained library](https://github.com/marshmallow-code/marshmallow) - and additionally supports [Marshmallow Dataclass](https://apiflask.com/schema/#use-dataclass-as-data-schema) which is a wrapper that allows you to interact directly with dataclass objects which further improves runtime typing.
+* Good, because [authentication looks to be flexible](https://apiflask.com/authentication/), and allows you to define it as if you were writing the OpenAPI.
+* Good, because the [API uses Marshmallow](https://apiflask.com/schema/) for its data schema, which is a [well-maintained library](https://github.com/marshmallow-code/marshmallow) - and additionally supports [Marshmallow Dataclass](https://apiflask.com/schema/#use-dataclass-as-data-schema) which is a wrapper that allows you to interact directly with dataclass objects which further improves runtime typing.
 * Meh, because methods end up with several decorators, although you can [group route methods into classes](https://apiflask.com/usage/#use-class-based-views) and make them share decorators (eg. set the authentication decorator on the class).
 * Bad, because APIFlask 1.0 only released in May 2022, with the first beta release about a year earlier, so the project is still somewhat young.
 
@@ -208,21 +208,21 @@ if __name__ == "__main__":
 * Good, because the API model definitions use Pydantic, which is a well-supported library we are already familiar with.
 * Good, because the API definitions are minimal and pretty intuitive to read.
 * Bad, because the documentation isn't fully detailed, and the errors that occur when trying to get the API running aren't very clear. In ~30 minutes of debugging, I hadn't figured out how to get the API to fully run.
-* Bad, while it generates swagger docs, and can display example responses, it doesn't appear that you can specify example requests or parameters. This effectively makes swagger unusable.
+* Bad, while it generates swagger docs, and can display example responses, it doesn't appear that you can specify example requests or parameters. This effectively makes Swagger unusable.
 * Bad, because it appears that the library is primarily [maintained by one person](https://github.com/luolingchun/flask-openapi3/commits/master), and appears to still be going through early implementation fixes.
 
 ### Flasgger
 
-[Flasgger](https://github.com/flasgger/flasgger) is a library that runs adjacent to your Flask app to vend a swagger endpoint. 
+[Flasgger](https://github.com/flasgger/flasgger) is a library that runs adjacent to your Flask app to vend a swagger endpoint.
 
 Note that Flasgger has several different ways to define the schema. This specifically looked at only the approaches that defined the OpenAPI models in code, as the other approaches amount to defining your own OpenAPI schema (either as a yaml file, or as a comment on the function), which is virtually the same as how connexion works, so would provide no benefit to do.
 
 [A tool](https://github.com/flasgger/flasgger/blob/master/examples/apispec_example.py) exists for generating the docs for Flasgger from the APISpec definitions (see that section for APISpec details), so we could combine the two if desired.
 
-No example implementation as the ones presented in the docs didn't actually function out-of-the-box.
+No example implementation as the ones presented in the docs didn't actually function out of the box.
 
-* Good, because there is a lot of variety in how you setup your schema, although most require defining the JSON/YAML yourself.
-* Bad, because the non-JSON/YAML approaches don't appear to be the main purpose of this API, and little documentation/examples exists regarding their usage.
+* Good, because there is a lot of variety in how you set up your schema, although most require defining the JSON/YAML yourself.
+* Bad, because the non-JSON/YAML approaches don't appear to be the main purpose of this API, and little documentation/examples exist regarding their usage.
 * Bad, because it seems the approach for running using [Marshmallow for the schema](https://github.com/flasgger/flasgger#using-marshmallow-schemas) isn't valid anymore as the parameters that Flask takes in don't match the example. From reading various other docs, Flask seems to have had a major version update that changed it a bit in recent years, so that is likely the cause.
 
 ### Flask Smorest
@@ -304,9 +304,9 @@ if __name__ == "__main__":
 
 </details>
 
-* Good, because the API uses Marshmallow for its data schema, which is a [well maintained library](https://github.com/marshmallow-code/marshmallow) - it's in the same project.
+* Good, because the API uses Marshmallow for its data schema, which is a [well-maintained library](https://github.com/marshmallow-code/marshmallow) - it's in the same project.
 * Good, because it is fairly straightforward and just seems to work as expected.
-* Bad, because the documentation is pretty minimal beyond getting openapi running. Seems like this is just an openapi wrapper with no other additional features.
+* Bad, because the documentation is pretty minimal beyond getting OpenAPI running. Seems like this is just an OpenAPI wrapper with no other additional features.
 * Bad, because it is pretty barebones. It just sets up a swagger endpoint and does the object validation, but doesn't handle anything beyond that regarding authentication.
 * Bad, because even the maintainers recognize it needs a [bit more work](https://github.com/apiflask/apiflask/discussions/14#discussioncomment-571898)
 
@@ -422,14 +422,14 @@ if __name__ == "__main__":
 ```
 </details>
 
-* Good, because the API uses Marshmallow for its data schema, which is a [well maintained library](https://github.com/marshmallow-code/marshmallow) - it's in the same project.
+* Good, because the API uses Marshmallow for its data schema, which is a [well-maintained library](https://github.com/marshmallow-code/marshmallow) - it's in the same project.
 * Good, because it gives a lot of flexibility for defining the OpenAPI docs, [including security](https://apispec.readthedocs.io/en/latest/special_topics.html#documenting-security-schemes).
 * Bad, because you still have to specify some of the OpenAPI docs as a comment on the function. The primary gain is being able to use Marshmallow to define the schema models, but the routes are still largely yaml.
 * Bad, because apispec doesn't actually run the swagger docs, it just generates them. You would need to use one of the other approaches here in tandem.
 
 ### Flask RESTX
 
-[Flask RESTX](https://github.com/python-restx/flask-restx) (a fork of Flask-RESTPlus) is a library that runs adjacent to Flask that helps standup a swagger endpoint for your app.
+[Flask RESTX](https://github.com/python-restx/flask-restx) (a fork of Flask-RESTPlus) is a library that runs adjacent to Flask and helps standup a swagger endpoint for your app.
 
 <details>
 <summary>Example implementation</summary>
@@ -502,8 +502,8 @@ if __name__ == "__main__":
 * Good, because the way it organizes namespaces (ie. tags), and parameters is intuitive and fairly readable.
 * Good, because it provides implicit [masking logic](https://flask-restx.readthedocs.io/en/latest/mask.html) that makes masking responses easy which is helpful when working with PII.
 * Bad, because while you define a model, you define it as a dictionary, not a class, and thus end up working with just dictionaries. If we wanted any well-structured classes, we'd need to define that separately.
-* Bad, because they have an entire section of documention about [request parsing](https://flask-restx.readthedocs.io/en/latest/parsing.html) that is deprecated - and seems to have been replaced quite some time ago (not well maintained?).
-* Bad, because the last release was a over a year ago, and there have only been a very small number of commits this year.
+* Bad, because they have an entire section of documentation about [request parsing](https://flask-restx.readthedocs.io/en/latest/parsing.html) that is deprecated - and seems to have been replaced quite some time ago (not well maintained?).
+* Bad, because the last release was over a year ago, and there have only been a very small number of commits this year.
 
 
 ### APIFairy
@@ -594,7 +594,7 @@ if __name__ == "__main__":
 ```
 </details>
 
-* Good, because the API uses Marshmallow for its data schema, which is a [well maintained library](https://github.com/marshmallow-code/marshmallow).
+* Good, because the API uses Marshmallow for its data schema, which is a [well-maintained library](https://github.com/marshmallow-code/marshmallow).
 * Good, because the decorators are named fairly intuitively and help make the methods clearer.
 * Bad, because it insists Marshmallow "just works" but.. doesn't (see the hacky `jsonify` I had to do in the example). The very unhelpful error messages it gave about `jsonify` not existing were very frustrating.
 * Bad, because the documentation doesn't have any fully working examples making it difficult to figure out a minimal viable implementation. It is written as if you're adjusting a fully-formed Marshmallow-based Flask app, and not starting from scratch.

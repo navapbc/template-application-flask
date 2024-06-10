@@ -6,9 +6,9 @@
 
 ## Context and Problem Statement
 
-We want to design a pattern of writing API code that provides appropriately levels of static and runtime type safety when dealing with API request bodies and parameters to service methods while minimizing code duplication if possible.
+We want to design a pattern of writing API code that provides appropriate levels of static and runtime type safety when dealing with API request bodies and parameters to service methods while minimizing code duplication if possible.
 
-In apiflask, [Marshmallow](https://marshmallow.readthedocs.io/en/stable/) schemas are used to perform runtime validation of the JSON request body of incoming requests. However, the resulting object that is loaded from the JSON is still a plain `dict`, which loses all its type information.
+In `apiflask`, [Marshmallow](https://marshmallow.readthedocs.io/en/stable/) schemas are used to perform runtime validation of the JSON request body of incoming requests. However, the resulting object that is loaded from the JSON is still a plain `dict`, which loses all its type information.
 
 Consider the following example:
 
@@ -104,7 +104,7 @@ We considered the following data type options for representing parameters to ser
     @dataclass
     class Foo:
         bar: str
-    
+
     d = {"typo": "baz"}
     Foo(**d) # raises a TypeError
     ```
@@ -131,7 +131,7 @@ In attempting to minimize code duplication between defining parameters for "crea
         fields_to_patch: list[str]
     ```
 
-    The problem with this is that it's not possible to tell from looking at the `CreateUserParams` class which fields are required or not, as they all need to be able to be able to be `None` for the `PATCH` request to work. Also, developers would be forced to add `assert create_user_params.first_name is not None` in method calls to pass type checking. An alternative would be to define a `missing` sentinal value that is separate from `None`, that can be used to distinguish between `None`, [as suggested by @zelgadis in this PR comment](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053891320).
+    The problem with this is that it's not possible to tell from looking at the `CreateUserParams` class which fields are required or not, as they all need to be able to be able to be `None` for the `PATCH` request to work. Also, developers would be forced to add `assert create_user_params.first_name is not None` in method calls to pass type checking. An alternative would be to define a `missing` sentinal value that is separate from `None`, which can be used to distinguish between `None`, [as suggested by @zelgadis in this PR comment](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053891320).
 
 * **Use separate dataclasses for create and patch params, where all fields can have the type `Missing`, indicating that the field was unset.**
 

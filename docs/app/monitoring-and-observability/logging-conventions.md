@@ -8,7 +8,7 @@ Logging is a valuable tool for engineering teams to support products in producti
 
 ### Make code observability a primary tool for debugging and reasoning about production code
 
-When a user runs into an issue in production, logs offer one of the primary ways of understanding what happened. This is especially important for situations where we can’t or don’t know how to reproduce the issue. In general it is not feasible to attach a debugger to production systems, or to set breakpoints and inspect the state of the application in production, so logs offer a way to debug through “print statements”.
+When a user runs into an issue in production, logs offer one of the primary ways of understanding what happened. This is especially important for situations where we can’t or don’t know how to reproduce the issue. In general, it is not feasible to attach a debugger to production systems, or to set breakpoints and inspect the state of the application in production, so logs offer a way to debug through “print statements”.
 
 ### Make it easy for on-call engineers to search for logs in the codebase
 
@@ -30,13 +30,13 @@ Log querying systems are often limited in their querying abilities. Most log dat
 
 ### Log event type
 
-- **INFO** – Use INFO events to log something informational. This can be information that's useful for investigations, debugging, or tracking metrics. Note that events such as a user or client error (such as validation errors or 4XX bad request errors) should use INFO, since those are expected to occur as part of normal operation and do not necessarily indicate anything wrong with the system. Do not use ERROR or WARNING for user or client errors to avoid cluttering error logs.
-- **ERROR** – Use ERROR events if the the system is failed to complete some business operation. This can happen if there is an unexpected exception or failed assertion. Error logs can be used to trigger an alert to on-call engineers to look into a potential issue.
-- **WARNING** – Use WARNING to indicate that there *may* be something wrong with the system but that we have not yet detected any immediate impact on the system's ability to successfully complete the business operation. For example, you can warn on failed soft assumptions and soft constraints. Warning logs can be used to trigger notifications that engineers need to look into during business hours.
+- **INFO** – Use `INFO` events to log something informational. This can be information that's useful for investigations, debugging, or tracking metrics. Note that events such as a user or client error (such as validation errors or 4XX bad request errors) should use `INFO`, since those are expected to occur as part of normal operation and do not necessarily indicate anything wrong with the system. Do not use `ERROR` or `WARNING` for user or client errors to avoid cluttering error logs.
+- **ERROR** – Use `ERROR` events if the system fails to complete some business operation. This can happen if there is an unexpected exception or failed assertion. Error logs can be used to trigger an alert to on-call engineers to look into a potential issue.
+- **WARNING** – Use `WARNING` to indicate that there *may* be something wrong with the system but that we have not yet detected any immediate impact on the system's ability to successfully complete the business operation. For example, you can warn on failed soft assumptions and soft constraints. Warning logs can be used to trigger notifications that engineers need to look into during business hours.
 
 ### Log messages
 
-- **Standardized log messages** – Consistently formatted and worded log messages easier to read when viewing many logs at a time, which reduces the chance for human error when interpreting logs. It also makes it easier to write queries by enabling engineers to guess queries and allow New Relic autocomplete to show available log message options to filter by.
+- **Standardized log messages** – Consistently formatted and worded log messages are easier to read when viewing many logs at a time, which reduces the chance of human error when interpreting logs. It also makes it easier to write queries by enabling engineers to guess queries and allowing New Relic autocomplete to show available log message options to filter by.
 - **Statically defined log messages** – Avoid putting dynamic data in log messages. Static messages are easier to search for in the codebase. Static messages are also easier to query for those specific log events without needing to resort to RLIKE queries with regular expressions or LIKE queries.
 
 ### Attributes
@@ -44,7 +44,7 @@ Log querying systems are often limited in their querying abilities. Most log dat
 - **Log primitives not objects** – Explicitly list which attributes you are logging to avoid unintentionally logging PII. This also makes it easier for engineers to know what attributes are available for querying, or for engineers to search for parts of the codebase that logs these attributes.
 - **Structured metadata in custom attributes** – Put metadata in custom attributes (not in the log message) so that it can be used in queries more easily. This is especially helpful when the attributes are used in "group by" clauses to avoid needing to use more complicated queries.
   - **system identifiers** – Log all relevant system identifiers (uuids, foreign keys)
-  - **correlation ids** – Log ids that can be shared between frontend events, backend logs, and ideally even sent to external services
+  - **correlation ids** – Log ids that can be shared between front-end events, backend logs, and ideally even sent to external services
   - **discrete or discretized attributes** – Log all useful non-PII discrete attributes (enums, flags) and discretized versions of continuous attributes (e.g. comment → has_comment, household → is_married, has_dependents)
 - **Denormalized data** – Include relevant metadata from related entities. Including denormalized (i.e. redundant) data makes queries easier and faster, and removes the need to join or self-join between datasets, which is not always feasible.
 - **Fully-qualified globally consistent attribute names** – Using consistent attribute names everywhere. Use fully qualified attribute names (e.g. application.application_id instead of application_id) to avoid naming conflicts.
