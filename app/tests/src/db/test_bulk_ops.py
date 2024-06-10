@@ -25,7 +25,7 @@ def get_random_number_object() -> Number:
 def test_bulk_upsert(db_session: db.Session):
     db_client = db.PostgresDBClient()
     conn = db_client.get_raw_connection()
-    # conn = db_session.connection().connection
+
     # Override mypy, because SQLAlchemy's DBAPICursor type doesn't specify the row_factory attribute, or that it functions as a context manager
     with conn.cursor(row_factory=rows.class_row(Number)) as cur:  # type: ignore
         table = "temp_table"
@@ -68,17 +68,23 @@ def test_bulk_upsert(db_session: db.Session):
         assert records == objects
 
         # Now modify half of the objects
-        for obj in objects[: int(len(objects) / 2)]:
+        updated_indexes = random.sample(range(100), 50)
+        original_objects = [objects[i] for i in range(100) if i not in updated_indexes]
+        updated_objects = [objects[i] for i in updated_indexes]
+        for obj in updated_objects:
             obj.num = random.randint(1, 10000)
 
         # And insert additional objects
-        objects.extend([get_random_number_object() for i in range(50)])
+        inserted_objects = [get_random_number_object() for i in range(50)]
+
+        updated_and_inserted_objects = updated_objects + inserted_objects
+        random.shuffle(updated_objects + inserted_objects)
 
         bulk_ops.bulk_upsert(
             cur,
             table,
             attributes,
-            objects,
+            updated_and_inserted_objects,
             constraint,
         )
         conn.commit()
@@ -90,5 +96,6 @@ def test_bulk_upsert(db_session: db.Session):
             )
         )
         records = cur.fetchall()
-        objects.sort(key=operator.attrgetter("id"))
-        assert records == objects
+        expected_objects = original_objects + updated_and_inserted_objects
+        expected_objects.sort(key=operator.attrgetter("id"))
+        assert records == expected_objects
