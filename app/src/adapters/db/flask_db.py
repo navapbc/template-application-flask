@@ -121,7 +121,4 @@ def with_db_session(
 
         return wrapper
 
-    # mypy says the type should be something slightly different
-    # Callable[[Arg(Callable[[Session, **P], T], 'f')], Callable[P, T]]
-    # but also mentions that "Arg" is deprecated, so not sure how to make it happy
-    return decorator  # type: ignore
+    return decorator
