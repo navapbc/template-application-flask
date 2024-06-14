@@ -33,6 +33,15 @@ A very simple [docker-compose.yml](/docker-compose.yml) has been included to sup
 6. Run `make run-logs` to see the logs of the running API container
 7. Run `make stop` when you are done to delete the container.
 
+## (Optional) Configure local secrets
+
+If you need to pass secrets to the application via environment variables, copy the provided [/docker-compose.override.yml.example](/docker-compose.override.yml.example) to /docker-compose.override.yml. Then create an `/app/.env` file with your secrets. The override will pass this file to the Docker container with your application.
+
+```bash
+cp docker-compose.override.yml.example docker-compose.override.yml
+touch app/.env
+```
+
 ## Next steps
 
 Now that you're up and running, read the [application docs](README.md) to familiarize yourself with the application.
