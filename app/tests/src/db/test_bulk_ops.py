@@ -15,9 +15,14 @@ class Number:
     num: int
 
 
+_next_id = 0
+
+
 def get_random_number_object() -> Number:
+    global _next_id
+    _next_id += 1
     return Number(
-        id=str(random.randint(1000000, 9999999)),
+        id=str(_next_id),
         num=random.randint(1, 10000),
     )
 
