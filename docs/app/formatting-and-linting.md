@@ -17,7 +17,7 @@ When we run migrations via alembic, we autorun the formatters on the generated f
 Run `make lint` to run all of the linters. It's recommended you run the formatters first as they fix several linting issues automatically.
 
 ### Flake
-[flake](https://flake8.pycqa.org/en/latest/) is used to validate the format of our Python code. Configuration options can be found in [setup.cfg](/app/setup.cfg).
+[ruff](https://flake8.pycqa.org/en/latest/) is used to enforce a set of best practices for our Python code. Configuration options can be found in [pyproject.toml - tool.ruff](/app/pyproject.toml).
 
 We use two flake extensions:
 * [bugbear](https://pypi.org/project/flake8-bugbear/) for finding likely bugs and design problems.
