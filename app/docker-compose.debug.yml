@@ -3,13 +3,13 @@
 services:
   main-app:
     build:
-      context: ./app
+      context: ./
       target: dev
       args:
         - RUN_UID=${RUN_UID:-4000}
         - RUN_USER=${RUN_USER:-app}
     container_name: main-app
-    env_file: ./app/local.env
+    env_file: local.env
     command: [
       "poetry", "run", "python", "-m", "debugpy",
       "--listen", "0.0.0.0:5678",
@@ -20,4 +20,4 @@ services:
     ports:
       - 5678:5678
     volumes:
-      - ./app:/app
+      - ./:/
