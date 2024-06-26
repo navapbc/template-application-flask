@@ -29,7 +29,6 @@ root
 │   └── local.env           Environment variable configuration for local files
 │   └── Makefile            Frequently used CLI commands for docker and utilities
 │   └── pyproject.toml      Python project configuration file
-│   └── setup.cfg           Python config for tools that don't support pyproject.toml yet
 │   └── Dockerfile          Docker build file for project
 │
 └── docker-compose.yml  Config file for docker-compose tool, used for local development
