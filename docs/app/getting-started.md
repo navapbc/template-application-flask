@@ -28,7 +28,7 @@ A very simple [docker-compose.yml](/docker-compose.yml) has been included to sup
 1. Run `make init start` to build the image and start the container.
 2. Navigate to `localhost:8080/docs` to access the Swagger UI.
 3. Run `make run-logs` to see the logs of the running API container
-4. Run `make stop` when you are done to delete the container.
+4. Run `make stop` when you are done to stop the container.
 
 ## (Optional) Configure local secrets
 
