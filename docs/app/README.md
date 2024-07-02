@@ -30,8 +30,7 @@ root
 │   └── Makefile            Frequently used CLI commands for docker and utilities
 │   └── pyproject.toml      Python project configuration file
 │   └── Dockerfile          Docker build file for project
-│
-└── docker-compose.yml  Config file for docker-compose tool, used for local development
+└── └── docker-compose.yml  Config file for docker-compose tool, used for local development
 ```
 
 ## Information
