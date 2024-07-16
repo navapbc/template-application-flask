@@ -81,7 +81,7 @@ factories](https://factoryboy.readthedocs.io/en/stable/#using-factories), termed
 The build strategy is useful if the code under test just needs the data on the
 model and doesn't actually perform any database interactions.
 
-In order to use the create strategy, pull in the `initialize_factories_session`
+In order to use the create strategy, pull in the `enable_factory_create`
 fixture.
 
 Regardless of the strategy, you can override the values for attributes on the
