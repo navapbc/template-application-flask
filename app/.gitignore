@@ -29,3 +29,8 @@ coverage.*
 
 # Poetry installer local error logs
 poetry-installer-error-*.log
+
+# This file is used in local development to pass an /app/.env
+# file to the container, for secrets. It should not be committed
+# to the repo because tests and CI/CD will not have an .env file.
+docker-compose.override.yml

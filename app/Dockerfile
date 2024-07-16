@@ -99,7 +99,7 @@ RUN poetry install --no-root --only main
 RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
 # Add project's virtual env to the PATH so we can directly run poetry scripts
-# defiend in pyproject.toml
+# defined in pyproject.toml
 ENV PATH="/app/.venv/bin:$PATH"
 
 # Set the host to 0.0.0.0 to make the server available external

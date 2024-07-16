@@ -29,10 +29,8 @@ root
 │   └── local.env           Environment variable configuration for local files
 │   └── Makefile            Frequently used CLI commands for docker and utilities
 │   └── pyproject.toml      Python project configuration file
-│   └── setup.cfg           Python config for tools that don't support pyproject.toml yet
 │   └── Dockerfile          Docker build file for project
-│
-└── docker-compose.yml  Config file for docker-compose tool, used for local development
+└── └── docker-compose.yml  Config file for docker-compose tool, used for local development
 ```
 
 ## Information
@@ -98,9 +96,9 @@ direnv: export +API_AUTH_TOKEN +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_SECRE
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
+Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/app/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
 
-Any environment variables specified directly in the [docker-compose](/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
+Any environment variables specified directly in the [docker-compose](/app/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
 
 ## Authentication
 
