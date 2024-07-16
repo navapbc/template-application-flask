@@ -33,8 +33,8 @@ To clean the database, use the following command:
 make db-recreate
 ```
 
-This will remove _all_ docker project volumes, rebuild the database volume, and 
-run all pending migrations. Once completed, only the database container will be 
+This will remove _all_ docker project volumes, rebuild the database volume, and
+run all pending migrations. Once completed, only the database container will be
 running. Simply run `make start` to bring up all other project containers.
 
 ## Running migrations
@@ -100,7 +100,7 @@ make db-migrate-history
 
 When multiple migrations are created that point to the same `down_revision` a
 branch is created, with the tip of each branch being a "head". The above history
-command will show this, but a list of just the heads can been retrieved with:
+command will show this, but a list of just the heads can be retrieved with:
 
 ```sh
 make db-migrate-heads
