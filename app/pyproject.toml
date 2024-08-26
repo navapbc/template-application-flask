@@ -6,7 +6,9 @@ packages = [{ include = "src" }]
 authors = ["Nava Engineering <engineering@navapbc.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+# See /docs/app/README.md#Upgrading Python
+# for details on upgrading your Python version
+python = "~3.12"
 SQLAlchemy = {version = "^2.0.21", extras = ["mypy"]}
 alembic = "^1.12.0"
 python-dotenv = "^1.0.0"

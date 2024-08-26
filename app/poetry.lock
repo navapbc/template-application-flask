@@ -949,7 +949,7 @@ files = [
 
 [package.dependencies]
 marshmallow = [
-    {version = ">=3.13.0,<4.0", optional = true, markers = "python_version < \"3.7\" or extra != \"enum\""},
+    {version = ">=3.13.0,<4.0"},
     {version = ">=3.18.0,<4.0", optional = true, markers = "python_version >= \"3.7\" and extra == \"enum\""},
 ]
 typeguard = {version = ">=2.4.1,<4.0.0", optional = true, markers = "extra == \"union\""}
@@ -1981,5 +1981,5 @@ files = [
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.12"
-content-hash = "259e2bd37870236ef86dc5893950acf19912b7468e906dc61f78436ea5f34796"
+python-versions = "~3.12"
+content-hash = "885d91299426a19ef533e20f8d85a652c639eb031091bbb9501da467c374e873"
