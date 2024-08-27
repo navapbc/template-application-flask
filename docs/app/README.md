@@ -153,59 +153,29 @@ The API can be run in debug mode that allows for remote attach debugging (curren
 }
 ```
 
-# Upgrading Python
+## Upgrading Python
 Python does [yearly releases](https://devguide.python.org/versions/) for their minor versions (eg. 3.12 -> 3.13). They do not
 use semvar versioning, and their [minor releases](https://devguide.python.org/developer-workflow/development-cycle/#devcycle) contain
 breaking changes.
 
-We have this environment configured to use a specific minor version of python just in case anything would break when the yearly release does occur.
+Pin to a specific minor version of python just in case anything would break when the yearly release does occur.
+Only pin the minor versions of Python (eg. 3.12), and not the patch versions (eg. 3.12.1) as those contain bug and security fixes.
 
-We recommend as a starting point, only pin the minor versions of Python (eg. 3.12), and not the patch versions (eg. 3.12.1) as those contain bug and security fixes.
-However, your project may have dependencies, or tools that rely on very specific patch versions of Python, so adjust your approach as necessary.
+Along with any version upgrades, remember to:
+- Test the system functionality before deploying to production
+- Review the [changelog](https://docs.python.org/3/whatsnew/changelog.html)
+for any breaking changes of features you may use
 
-Along with any version upgrades, you should follow all best practices for upgrading software and test the functionality
-of your system before deploying to production. It is also recommended to review the [changelog](https://docs.python.org/3/whatsnew/changelog.html)
-for any breaking changes of features you may use.
-
-## Local Development
-If you run any of the python code outside of the Docker container, first upgrade your version
-of Python locally. The exact way you upgrade will depend on how you originally installed Python,
-but one strongly recommended approach is to use [pyenv](https://github.com/pyenv/pyenv) which allows
-you to install and swap between different python versions locally.
-
-If you run commands with Poetry, you'll also need to [configure](https://python-poetry.org/docs/managing-environments/#switching-between-environments)
-it to use the approach python version.
-
-## Dockerfile
-The dockerfile that our API is built from specifies the Python version as the first step.
-To upgrade this, simply change the version to the version you would like to use.
-
-For example, to upgrade from 3.12 to 3.13, change the following line:
-```dockerfile
-FROM python:3.12-slim AS base
-```
-to
-```dockerfile
-FROM python:3.13-slim AS base
-```
-
-## Poetry
-Adjust the pyproject.toml file line that specifies the version of Python used
-to your new version. For example, to upgrade from 3.12 to 3.13, change it from:
-
-```toml
-[tool.poetry.dependencies]
-python = "~3.12"
-```
-
-to
-```toml
-[tool.poetry.dependencies]
-python = "~3.13"
-```
-
-You will then need to run `poetry lock --no-update` to make the lock file reflect this change.
-
-## Misc
-Some tools, include pyenv, reference the [.python-version](/app/.python-version) file in order to determine which
-version of python should be used. Update this to the approach version as well.
+### Upgrade Steps
+To upgrade the Python version, make changes in the following places:
+1. Local Python version (see more about managing local Python versions in [getting started](/docs/app/getting-started.md))
+2. [Dockerfile](/app/Dockerfile)
+    search for the line `FROM python:3.12-slim as base` - supported versions can be found on [Dockerhub](https://hub.docker.com/_/python)
+3. [pyproject.toml](/app/pyproject.toml)
+    search for the line
+    ```toml
+    [tool.poetry.dependencies]
+    python = "~3.12"
+    ```
+   Then run `poetry lock --no-update` to update the [poetry.lock](/app/poetry.lock) file.
+4. [.python-version](/app/.python-version) which is used by tools like pyenv
