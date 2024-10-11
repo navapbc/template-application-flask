@@ -16,7 +16,6 @@ cp -r \
   .dockleconfig \
   .hadolint.yaml \
   app \
-  docker-compose.yml \
   docs \
   $CUR_DIR
 cd -
