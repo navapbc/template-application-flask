@@ -24,7 +24,11 @@ services:
         - RUN_USER=${RUN_USER:-app}
     command: ["poetry", "run", "flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "8080", "--reload"]
     container_name: main-app
-    env_file: local.env
+    env_file:
+      - path: ./local.env
+        required: true
+      - path: ./override.env
+        required: false
     ports:
       - 8080:8080
     volumes:
