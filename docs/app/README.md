@@ -97,6 +97,7 @@ direnv: export +API_AUTH_TOKEN +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_SECRE
 Most configuration options are managed by environment variables.
 
 Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/app/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
+To override environment variables for locally, create an `override.env` file in the same directory as local.env. The docker-compose file [optionally checks this file](https://docs.docker.com/reference/compose-file/services/#required) as well.
 
 Any environment variables specified directly in the [docker-compose](/app/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
 
