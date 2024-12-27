@@ -4,9 +4,9 @@ name: Update OpenAPI Docs
 on:
   pull_request:
     paths:
-      - app/**
+      - {{app_name}}/**
       - Makefile
-      - .github/workflows/ci-openapi.yml
+      - .github/workflows/ci-{{app_name}}-openapi.yml
 
 defaults:
   run:
@@ -16,7 +16,7 @@ defaults:
 # If new commits are pushed to the branch, cancel in progress runs and start
 # a new one.
 concurrency:
-  group: ${{ github.head_ref }}
+  group: ${{'{{'}} github.head_ref {{'}}'}}
   cancel-in-progress: true
 
 
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           # Checkout the feature branch associated with the pull request
-          ref: ${{ github.head_ref }}
+          ref: ${{'{{'}} github.head_ref {{'}}'}}
 
       - name: Update OpenAPI spec
         run: make openapi-spec

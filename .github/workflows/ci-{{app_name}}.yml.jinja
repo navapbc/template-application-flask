@@ -1,20 +1,20 @@
-name: CI - App
+name: CI - {{app_name}}
 
 on:
   push:
     branches:
       - main
     paths:
-      - app/**
-      - .github/workflows/ci-app.yml
+      - {{app_name}}/**
+      - .github/workflows/ci-{{app_name}}.yml
   pull_request:
     paths:
-      - app/**
-      - .github/workflows/ci-app.yml
+      - {{app_name}}/**
+      - .github/workflows/ci-{{app_name}}.yml
 
 defaults:
   run:
-    working-directory: ./app
+    working-directory: ./{{app_name}}
 
 jobs:
   # As an enhancement, it is possible to share the built docker image and share
