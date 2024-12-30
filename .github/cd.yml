@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 # Only allow one workflow at a time to prevent race conditions when pushing changes to the project repo
-concurrency: template-only-cd
+concurrency: cd
 
 jobs:
   deploy:
