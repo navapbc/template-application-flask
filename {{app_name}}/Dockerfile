@@ -5,8 +5,7 @@
 # needs to be called `release` in order to integrate with the repo's
 # top-level Makefile
 FROM python:3.13-slim AS base
-# See /docs/app/README.md#Upgrading Python
-# for details on upgrading your Python version
+# See docs for details on upgrading your Python version
 
 # Install poetry, the package manager.
 # https://python-poetry.org
