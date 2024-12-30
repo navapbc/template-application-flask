@@ -46,7 +46,7 @@ root
 
 `make clean-volumes` will spin down the docker containers + delete the volumes. This can be useful to reset your DB, or fix any bad states your local environment may have gotten into.
 
-See the [Makefile](/app/Makefile) for a full list of commands you can run.
+See the [Makefile](/{{ app_name }}/Makefile) for a full list of commands you can run.
 
 ## Docker and Native Development
 
@@ -88,7 +88,7 @@ export DB_HOST=localhost
 And then running `direnv allow .` in the /app folder. You should see something like:
 ```shell
 ➜  template-application-flask git:(main) ✗ cd app
-direnv: loading ~/workspace/template-application-flask/app/.envrc
+direnv: loading ~/workspace/template-application-flask/{{ app_name }}/.envrc
 direnv: export +API_AUTH_TOKEN +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_SECRET_ACCESS_KEY +DB_HOST +DB_NAME +DB_PASSWORD +DB_SCHEMA +DB_SSL_MODE +DB_USER +ENVIRONMENT +FLASK_APP +HIDE_SQL_PARAMETER_LOGS +LOG_ENABLE_AUDIT +LOG_FORMAT +PORT +PYTHONPATH
 ```
 
@@ -96,10 +96,10 @@ direnv: export +API_AUTH_TOKEN +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_SECRE
 
 Most configuration options are managed by environment variables.
 
-Environment variables for local development are stored in the [local.env](/app/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/app/docker-compose.yml) file, and loaded [by a script](/app/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
+Environment variables for local development are stored in the [local.env](/{{ app_name }}/local.env) file. This file is automatically loaded when running. If running within Docker, this file is specified as an `env_file` in the [docker-compose](/{{ app_name }}/docker-compose.yml) file, and loaded [by a script](/{{ app_name }}/src/util/local.py) automatically when running unit tests (see running natively above for other cases).
 To override environment variables for locally, create an `override.env` file in the same directory as local.env. The docker-compose file [optionally checks this file](https://docs.docker.com/reference/compose-file/services/#required) as well.
 
-Any environment variables specified directly in the [docker-compose](/app/docker-compose.yml) file will take precedent over those specified in the [local.env](/app/local.env) file.
+Any environment variables specified directly in the [docker-compose](/{{ app_name }}/docker-compose.yml) file will take precedent over those specified in the [local.env](/{{ app_name }}/local.env) file.
 
 ## Authentication
 
@@ -169,14 +169,14 @@ for any breaking changes of features you may use
 
 ### Upgrade Steps
 To upgrade the Python version, make changes in the following places:
-1. Local Python version (see more about managing local Python versions in [getting started](/docs/app/getting-started.md))
-2. [Dockerfile](/app/Dockerfile)
+1. Local Python version (see more about managing local Python versions in [getting started](/docs/{{ app_name }}/getting-started.md))
+2. [Dockerfile](/{{ app_name }}/Dockerfile)
     search for the line `FROM python:3.12-slim as base` - supported versions can be found on [Dockerhub](https://hub.docker.com/_/python)
-3. [pyproject.toml](/app/pyproject.toml)
+3. [pyproject.toml](/{{ app_name }}/pyproject.toml)
     search for the line
     ```toml
     [tool.poetry.dependencies]
     python = "~3.12"
     ```
-   Then run `poetry lock --no-update` to update the [poetry.lock](/app/poetry.lock) file.
-4. [.python-version](/app/.python-version) which is used by tools like pyenv
+   Then run `poetry lock --no-update` to update the [poetry.lock](/{{ app_name }}/poetry.lock) file.
+4. [.python-version](/{{ app_name }}/.python-version) which is used by tools like pyenv
