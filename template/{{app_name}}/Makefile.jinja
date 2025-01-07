@@ -2,7 +2,7 @@
 # Constants
 ##################################################
 
-APP_NAME := main-app
+APP_NAME := {{ app_name }}
 
 # Adding this to the end of a script that outputs JSON will convert
 # it to a readable format with timestamps and color-coding.
@@ -118,8 +118,8 @@ check: format-check lint test
 init-db: start-db db-migrate
 
 start-db:
-	docker compose up --detach main-db
-	./bin/wait-for-local-db.sh
+	docker compose up --detach $(APP_NAME)-db
+	DB_NAME=$(APP_NAME)-db ./bin/wait-for-local-db.sh
 
 ## Destroy current DB, setup new one
 db-recreate: clean-volumes init-db

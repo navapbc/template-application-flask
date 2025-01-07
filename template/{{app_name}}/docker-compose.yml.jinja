@@ -1,7 +1,6 @@
 services:
-  main-db:
+  {{ app_name }}-db:
     image: postgres:16-alpine
-    container_name: main-db
     command: postgres -c "log_lock_waits=on" -N 1000 -c "fsync=off"
     environment:
       POSTGRES_PASSWORD: secret123
@@ -12,9 +11,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - dbdata:/var/lib/postgresql/data
+      - {{app_name}}-dbdata:/var/lib/postgresql/data
 
-  main-app:
+  {{ app_name }}:
     build:
       context: ./
       target: dev
@@ -22,7 +21,6 @@ services:
         - RUN_UID=${RUN_UID:-4000}
         - RUN_USER=${RUN_USER:-app}
     command: ["poetry", "run", "flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "8080", "--reload"]
-    container_name: main-app
     env_file:
       - path: ./local.env
         required: true
@@ -33,9 +31,7 @@ services:
     volumes:
       - ./:/app
     depends_on:
-      - main-db
+      - {{ app_name}}-db
 
 volumes:
-  dbdata:
-
-
+  {{app_name}}-dbdata:
