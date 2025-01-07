@@ -1,5 +1,4 @@
 services:
-
   main-db:
     image: postgres:16-alpine
     container_name: main-db
@@ -30,7 +29,7 @@ services:
       - path: ./override.env
         required: false
     ports:
-      - 8080:8080
+      - 8080:{{ app_local_port }}
     volumes:
       - ./:/app
     depends_on:

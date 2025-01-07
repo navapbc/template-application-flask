@@ -26,7 +26,7 @@ A very simple [docker-compose.yml](/{{ app_name }}/docker-compose.yml) has been 
 **Note:** Run everything from within the `/app` folder:
 
 1. Run `make init start` to build the image and start the container.
-2. Navigate to `localhost:8080/docs` to access the Swagger UI.
+2. Navigate to `localhost:{{ app_local_port }}/docs` to access the Swagger UI.
 3. Run `make run-logs` to see the logs of the running API container
 4. Run `make stop` when you are done to stop the container.
 
