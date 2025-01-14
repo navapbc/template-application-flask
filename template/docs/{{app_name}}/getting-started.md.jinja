@@ -32,7 +32,7 @@ A very simple [docker-compose.yml](/{{ app_name }}/docker-compose.yml) has been 
 
 ## (Optional) Configure local secrets
 
-If you need to pass secrets to the application via environment variables, copy the provided [/{{ app_name }}/docker-compose.override.yml.example](/docker-compose.override.yml.example) to `/{{ app_name }}/docker-compose.override.yml`. Then create an `/{{ app_name }}/.env` file with your secrets. The override will pass this file to the Docker container with your application.
+If you need to pass secrets to the application via environment variables, copy the provided [docker-compose.override.yml.example](/{{ app_name }}/docker-compose.override.yml.example) to `/{{ app_name }}/docker-compose.override.yml`. Then create an `/{{ app_name }}/.env` file with your secrets. The override will pass this file to the Docker container with your application.
 
 ```bash
 cp docker-compose.override.yml.example docker-compose.override.yml

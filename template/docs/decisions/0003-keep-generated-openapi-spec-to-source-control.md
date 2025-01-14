@@ -18,6 +18,6 @@ With the switch from Connexion to APIFlask (see [Connection replacement ADR](./0
 
 We chose to keep the openapi.yml file in source control because we want changes to the API to be called out explicitly so that developers do not accidentally make backwards-incompatible changes to the API as part of a code change. This is particularly important since the API spec is now implicit as the OpenAPI specification is automatically generated from the code.
 
-We chose to keep the openapi.yml file in sync with the API application automatically using a [CI workflow that generates the OpenAPI and pushes and changes to the PR branch](../../.github/workflows/ci-openapi.yml). This reduces the amount of manual work required by the engineer compared to a CI check that only checks for diffs but does not make the change. That said, we don't feel strongly about this decision so are open to changes in the future.
+We chose to keep the openapi.yml file in sync with the API application automatically using a CI workflow that generates the OpenAPI and pushes and changes to the PR branch (`.github/workflows/ci-<APP_NAME>-openapi.yml`). This reduces the amount of manual work required by the engineer compared to a CI check that only checks for diffs but does not make the change. That said, we don't feel strongly about this decision so are open to changes in the future.
 
 To minimize developer confusion, we chose to rename the `openapi.yml` file to `openapi.generated.yml` to clearly indicate that it is a generated file and not something that the developer should manually adjust.
