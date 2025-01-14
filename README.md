@@ -19,23 +19,20 @@ The template application is intended to work with the infrastructure from [templ
 
 To get started using the template application on your project:
 
-1. Run the [download and install script](./template-only-bin/download-and-install-template.sh) in your project's root directory.
-
-    ```bash
-    curl https://raw.githubusercontent.com/navapbc/template-application-flask/main/template-only-bin/download-and-install-template.sh | bash -s
+1. [Install the nava-platform tool](https://github.com/navapbc/platform-cli).
+2. Install template by running in your project's root:
+    ```sh
+    nava-platform app install --template-uri https://github.com/navapbc/template-application-flask . <APP_NAME>
     ```
-
-    This script will:
-
-    1. Clone the template repository
-    2. Copy the template files into your project directory
-    3. Remove any files specific to the template repository.
-2. Optional, if using the Platform infra template: [Follow the steps in the `template-infra` README](https://github.com/navapbc/template-infra#installation) to set up the various pieces of your infrastructure.
+3. Follow the steps in `/docs/<APP_NAME>/getting-started.md` to set up the application locally.
+4. Optional, if using the Platform infrastructure template: [Follow the steps in the `template-infra` README](https://github.com/navapbc/template-infra#installation) to set up the various pieces of your infrastructure.
 
 ## Note on memory usage
 
-If you are using [template-infra](https://github.com/navapbc/template-infra), you may want to increase the [default memory](https://github.com/navapbc/template-infra/blob/main/infra/modules/service/variables.tf#L33) allocated to the ECS service to 2048 Mb (2 Gb) to avoid the gunicorn workers running out of memory. This is because the application is currently [configured to create multiple workers](https://github.com/navapbc/template-application-flask/blob/main/app/gunicorn.conf.py#L24) based on the number of virtual CPUs available, which can take up more memory.
-
-## Getting started
-
-Now you're ready to [get started](/docs/app/getting-started.md).
+If you are using [template-infra](https://github.com/navapbc/template-infra),
+you may want to increase the [default
+memory](https://github.com/navapbc/template-infra/blob/main/infra/modules/service/variables.tf#L33)
+allocated to the ECS service to 2048 Mb (2 Gb) to avoid the gunicorn workers
+running out of memory. This is because the application is currently configured
+to create multiple workers based on the number of virtual CPUs available, which
+can take up more memory (see `/<APP_NAME>/gunicorn.conf.py`).
