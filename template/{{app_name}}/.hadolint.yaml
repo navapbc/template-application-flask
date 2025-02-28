@@ -4,7 +4,7 @@
 failure-threshold: warning
 ignored: []
 override:
-  info: 
+  info:
     # Casts the apt-get install <package>=<version> finding as info
     # We have this set since there is no way to specify version for
     #  build-essentials in the Dockerfile
