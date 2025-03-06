@@ -1,8 +1,8 @@
 # Keep generated OpenAPI YAML specification file in source control
 
-* Status: accepted
-* Deciders: @chouinar @sawyerh
-* Date: 2023-02-22
+- Status: accepted
+- Deciders: @chouinar @sawyerh
+- Date: 2023-02-22
 
 ## Context and Problem Statement
 
@@ -10,9 +10,9 @@ With the switch from Connexion to APIFlask (see [Connection replacement ADR](./0
 
 ## Considered Options
 
-* Remove openapi.yml from source control since the `/docs` endpoint is generated from schemas defined in code and no longer relies on the openapi.yml file
-* Keep openapi.yml in source control, and automatically keep it in sync with the code
-* Keep openapi.yml in source control, and have a CI check that ensures that it is kept in sync with the code
+- Remove openapi.yml from source control since the `/docs` endpoint is generated from schemas defined in code and no longer relies on the openapi.yml file
+- Keep openapi.yml in source control, and automatically keep it in sync with the code
+- Keep openapi.yml in source control, and have a CI check that ensures that it is kept in sync with the code
 
 ## Decision Outcome
 

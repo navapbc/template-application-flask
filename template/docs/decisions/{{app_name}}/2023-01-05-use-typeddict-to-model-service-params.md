@@ -1,8 +1,8 @@
 # Use TypedDict to model parameters to service methods
 
-* Status: accepted
-* Deciders: @chouinar @zelgadis
-* Date: 2023-01-05
+- Status: accepted
+- Deciders: @chouinar @zelgadis
+- Date: 2023-01-05
 
 ## Context and Problem Statement
 
@@ -97,8 +97,8 @@ Chosen option: "[option 1]", because [justification. e.g., only option, which me
 
 We considered the following data type options for representing parameters to service methods.
 
-* **Plain dict** – With plain dictionaries, the only type safety that is provided is what is provided at runtime by Marshmallow. In order to get type safety in both API and background job contexts, we'd want to re-run Marshmallow validation within service methods, [as suggested in this PR comment](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1054846653). The problem is that this still doesn't support static type checking, so IDE autocomplete won't be available and activities like writing tests may also become more challenging.
-* **[Python dataclass](https://docs.python.org/3/library/dataclasses.html)** – This provides static type safety and additionally provides some basic runtime type safety. For example, when constructing an instance of a dataclass by unpacking a dictionary, the dataclass will throw a `TypeError` if unknown keys are passed into the constructor:
+- **Plain dict** – With plain dictionaries, the only type safety that is provided is what is provided at runtime by Marshmallow. In order to get type safety in both API and background job contexts, we'd want to re-run Marshmallow validation within service methods, [as suggested in this PR comment](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1054846653). The problem is that this still doesn't support static type checking, so IDE autocomplete won't be available and activities like writing tests may also become more challenging.
+- **[Python dataclass](https://docs.python.org/3/library/dataclasses.html)** – This provides static type safety and additionally provides some basic runtime type safety. For example, when constructing an instance of a dataclass by unpacking a dictionary, the dataclass will throw a `TypeError` if unknown keys are passed into the constructor:
 
     ```python
     @dataclass
@@ -109,14 +109,14 @@ We considered the following data type options for representing parameters to ser
     Foo(**d) # raises a TypeError
     ```
 
-* **[Pydantic class](https://docs.pydantic.dev/)** – Pydantic is a competing framework to Marshmallow that provides static and runtime type safety similar to Marshmallow but stores the results of deserialization into objects rather than leaving them as dictionaries. Additionally, Pydantic helps keep track of which object attributes were explicitly set, which helps distinguish between attributes that were set as `None` and attributes that weren't set at all. This is useful for implementing `PATCH` endpoints. The problem is that we don't want to have two frameworks that do effectively the same thing. If we wanted to use Pydantic, we should consider switching to the [fastapi framework](https://fastapi.tiangolo.com/) which uses Pydantic natively.
-* **[TypedDict](https://docs.python.org/3/library/typing.html#typing.TypedDict)** – This keeps the code structurally as simple as a plain dict, but adds static type safety by defining the structure of the dict.
+- **[Pydantic class](https://docs.pydantic.dev/)** – Pydantic is a competing framework to Marshmallow that provides static and runtime type safety similar to Marshmallow but stores the results of deserialization into objects rather than leaving them as dictionaries. Additionally, Pydantic helps keep track of which object attributes were explicitly set, which helps distinguish between attributes that were set as `None` and attributes that weren't set at all. This is useful for implementing `PATCH` endpoints. The problem is that we don't want to have two frameworks that do effectively the same thing. If we wanted to use Pydantic, we should consider switching to the [fastapi framework](https://fastapi.tiangolo.com/) which uses Pydantic natively.
+- **[TypedDict](https://docs.python.org/3/library/typing.html#typing.TypedDict)** – This keeps the code structurally as simple as a plain dict, but adds static type safety by defining the structure of the dict.
 
 ### Reusing definitions for patch requests
 
 In attempting to minimize code duplication between defining parameters for "create" service methods and "patch" service methods, we considered the following options:
 
-* **Use a single dataclass for create params, where all fields can be `None`, and define a generic `PatchParams` class that is generic on the create params type and has an extra `fields_to_patch` attribute to keep track of which fields were actually set.**
+- **Use a single dataclass for create params, where all fields can be `None`, and define a generic `PatchParams` class that is generic on the create params type and has an extra `fields_to_patch` attribute to keep track of which fields were actually set.**
 
     ```python
     @dataclass
@@ -133,7 +133,7 @@ In attempting to minimize code duplication between defining parameters for "crea
 
     The problem with this is that it's not possible to tell from looking at the `CreateUserParams` class which fields are required or not, as they all need to be able to be able to be `None` for the `PATCH` request to work. Also, developers would be forced to add `assert create_user_params.first_name is not None` in method calls to pass type checking. An alternative would be to define a `missing` sentinal value that is separate from `None`, which can be used to distinguish between `None`, [as suggested by @zelgadis in this PR comment](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053891320).
 
-* **Use separate dataclasses for create and patch params, where all fields can have the type `Missing`, indicating that the field was unset.**
+- **Use separate dataclasses for create and patch params, where all fields can have the type `Missing`, indicating that the field was unset.**
 
     ```python
     class Missing:
@@ -153,7 +153,7 @@ In attempting to minimize code duplication between defining parameters for "crea
 
     Having separate classes is simpler to understand and is more rigorous from a type safety perspective, but there's code duplication.
 
-* **Use separate `TypedDict` types for create and patch params, and use `TypedDict`'s `total=False` feature to support fields not being set at all**
+- **Use separate `TypedDict` types for create and patch params, and use `TypedDict`'s `total=False` feature to support fields not being set at all**
 
     ```python
     class CreateUserParams(TypedDict):
@@ -169,7 +169,7 @@ In attempting to minimize code duplication between defining parameters for "crea
 
 ## Links
 
-* [PR implementing this decision](https://github.com/navapbc/template-application-flask/pull/57)
-* [Discussion exploring options on the PR for switching from `connexion` to `apiflask`](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053724252)
-* [Concurrent PR exploring dataclass option](https://github.com/navapbc/template-application-flask/pull/56)
-* [PR exploring using TypedDict instead of dataclass](https://github.com/navapbc/template-application-flask/pull/62)
+- [PR implementing this decision](https://github.com/navapbc/template-application-flask/pull/57)
+- [Discussion exploring options on the PR for switching from `connexion` to `apiflask`](https://github.com/navapbc/template-application-flask/pull/51#discussion_r1053724252)
+- [Concurrent PR exploring dataclass option](https://github.com/navapbc/template-application-flask/pull/56)
+- [PR exploring using TypedDict instead of dataclass](https://github.com/navapbc/template-application-flask/pull/62)
