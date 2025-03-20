@@ -6,7 +6,7 @@
 
 ## Context and Problem Statement
 
-With the switch from Connexion to APIFlask (see [Connection replacement ADR](./0001-connexion-replacement.md)), the code-first approach to defining the API specification meant that the `openapi.yml` file was no longer needed. This caused multiple engineers to be confused as to why the file still existed in source control. This ADR decides how to eliminate that confusion.
+With the switch from Connexion to APIFlask (see [Connection replacement ADR](./2022-09-27-connexion-replacement.md)), the code-first approach to defining the API specification meant that the `openapi.yml` file was no longer needed. This caused multiple engineers to be confused as to why the file still existed in source control. This ADR decides how to eliminate that confusion.
 
 ## Considered Options
 
