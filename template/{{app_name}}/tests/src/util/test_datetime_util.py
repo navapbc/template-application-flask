@@ -1,9 +1,9 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 import pytest
 import pytz
 
-from src.util.datetime_util import adjust_timezone
+from src.util.datetime_util import adjust_timezone, datetime_str_to_date, utcnow
 
 
 @pytest.mark.parametrize(
@@ -50,3 +50,21 @@ def test_adjust_timezone_from_non_utc(timezone_name, expected_output):
     # in a few places that don't observe DST (the US timezones are all 1 hour closer to UTC)
 
     assert adjust_timezone(input_datetime, timezone_name).isoformat() == expected_output
+
+
+@pytest.mark.parametrize(
+    "datetime_str, expected_output",
+    [
+        ("2022-05-31T23:00:00-06:00", date(2022, 5, 31)),
+        ("2022-06-01T14:00:00+09:00", date(2022, 6, 1)),
+        ("", None),
+        (None, None),
+    ],
+)
+def test_datetime_str_to_date(datetime_str, expected_output):
+    assert datetime_str_to_date(datetime_str) == expected_output
+
+
+def test_utcnow():
+    assert utcnow().tzinfo == timezone.utc
+    assert utcnow().date() == datetime.now().date()
