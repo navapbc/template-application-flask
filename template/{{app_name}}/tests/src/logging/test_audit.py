@@ -148,7 +148,6 @@ def test_audit_hook(
 
 def test_get_addr_info(init_audit_hook, caplog: pytest.LogCaptureFixture):
     socket.getaddrinfo("www.python.org", 80)
-    print(caplog.records)
 
     expected_record = {
         "msg": "socket.getaddrinfo",
