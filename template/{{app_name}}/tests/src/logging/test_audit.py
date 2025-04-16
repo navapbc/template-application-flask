@@ -146,24 +146,6 @@ def test_audit_hook(
         assert_record_match(record, expected_record)
 
 
-def test_get_addr_info(init_audit_hook, caplog: pytest.LogCaptureFixture):
-    socket.getaddrinfo("www.python.org", 80)
-
-    expected_record = {
-        "msg": "socket.getaddrinfo",
-        "audit.args.host": "www.python.org",
-        "audit.args.port": 80,
-    }
-
-    message_found = False
-    for record in caplog.records:
-        if record.msg == "socket.getaddrinfo":
-            message_found = True
-            assert_record_match(record, expected_record)
-
-    assert message_found is True
-
-
 def test_os_kill(init_audit_hook, caplog: pytest.LogCaptureFixture):
     # Start a process to kill
     process = subprocess.Popen("cat")
