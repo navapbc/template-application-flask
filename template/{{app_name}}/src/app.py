@@ -83,11 +83,13 @@ def register_index(app: APIFlask) -> None:
     def index() -> str:
         return """
             <!Doctype html>
-            <html>
+            <html lang="en">
                 <head><title>Home</title></head>
                 <body>
-                    <h1>Home</h1>
-                    <p>Visit <a href="/docs">/docs</a> to view the api documentation for this project.</p>
+                    <main>
+                        <h1>Home</h1>
+                        <p>Visit <a href="/docs">/docs</a> to view the api documentation for this project.</p>
+                    </main>
                 </body>
             </html>
         """
