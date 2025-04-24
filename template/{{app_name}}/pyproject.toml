@@ -19,7 +19,7 @@ pytz = "^2023.3.post1"
 APIFlask = "^2.0.2"
 marshmallow-dataclass = {extras = ["enum", "union"], version = "^8.5.8"}
 marshmallow = "^3.20.1"
-gunicorn = "^21.2.0"
+gunicorn = "^23.0.0"
 psycopg = {extras = ["binary"], version = "^3.1.10"}
 pydantic-settings = "^2.0.3"
 
@@ -37,7 +37,7 @@ pytest = "^7.4.2"
 pytest-watch = "^4.2.0"
 pytest-lazy-fixture = "^0.6.3"
 types-pyyaml = "^6.0.12.11"
-setuptools = "^68.2.2"
+setuptools = ">=70.0.0"
 debugpy = "^1.8.1"
 ruff = "^0.4.9"
 
