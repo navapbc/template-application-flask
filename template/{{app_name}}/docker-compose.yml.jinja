@@ -20,7 +20,7 @@ services:
       args:
         - RUN_UID=${RUN_UID:-4000}
         - RUN_USER=${RUN_USER:-app}
-    command: ["poetry", "run", "flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    command: ["poetry", "run", "flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "{{ app_local_port }}", "--reload"]
     env_file:
       - path: ./local.env
         required: true
@@ -29,7 +29,7 @@ services:
     environment:
       - PYTHONPATH=/app/
     ports:
-      - 8080:{{ app_local_port }}
+      - {{ app_local_port }}:{{ app_local_port }}
     volumes:
       - ./:/app
     depends_on:
