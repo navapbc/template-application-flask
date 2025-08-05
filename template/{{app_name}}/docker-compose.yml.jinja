@@ -27,7 +27,19 @@ services:
       - path: ./override.env
         required: false
     environment:
+      # IMPORTANT NOTE
+      #
+      # Only env vars needing tweaked specifically for the container runtime
+      # environment should be defined here.
+      #
+      # Add general local configuration things to local.env
+
+      # Settings for running make inside the container
+      - PY_RUN_APPROACH=local
       - PYTHONPATH=/app/
+
+      # Point to other containers via the internal network
+      - DB_HOST={{ app_name }}-db
     ports:
       - {{ app_local_port }}:{{ app_local_port }}
     volumes:
