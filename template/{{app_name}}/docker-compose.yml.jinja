@@ -26,6 +26,8 @@ services:
         required: true
       - path: ./override.env
         required: false
+    environment:
+      - PYTHONPATH=/app/
     ports:
       - 8080:{{ app_local_port }}
     volumes:
