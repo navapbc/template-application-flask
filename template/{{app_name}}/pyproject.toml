@@ -22,6 +22,7 @@ marshmallow = "^3.20.1"
 gunicorn = "^23.0.0"
 psycopg = {extras = ["binary"], version = "^3.1.10"}
 pydantic-settings = "^2.0.3"
+click = "^8.1.7"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.9.1"
