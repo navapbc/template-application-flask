@@ -57,3 +57,13 @@ allocated to the ECS service to 2048 Mb (2 Gb) to avoid the gunicorn workers
 running out of memory. This is because the application is currently configured
 to create multiple workers based on the number of virtual CPUs available, which
 can take up more memory (see `/<APP_NAME>/gunicorn.conf.py`).
+
+## License
+
+This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
+
+## Community
+
+- [Code of Conduct](CODE_OF_CONDUCT.md)
+- [Contributing Guidelines](CONTRIBUTING.MD)
+- [Security Policy](SECURITY.md)
