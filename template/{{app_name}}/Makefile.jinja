@@ -1,7 +1,7 @@
 ##################################################
 # Constants
 ##################################################
-# hello!
+
 APP_NAME := {{ app_name }}
 
 # Adding this to the end of a script that outputs JSON will convert
@@ -26,14 +26,14 @@ ifdef CI
  MYPY_POSTPROC := | perl -pe "s/^(.+):(\d+):(\d+): error: (.*)/::warning file=$(APP_DIR)\/\1,line=\2,col=\3::\4/"
 endif
 
-# By default, all python/poetry commands will run inside of the docker container
+# By default, all python/uv commands will run inside of the docker container
 # if you wish to run this natively, add PY_RUN_APPROACH=local to your environment vars
 # You can set this by either running `export PY_RUN_APPROACH=local` in your shell or add
 # it to your ~/.zshrc file (and run `source ~/.zshrc`)
 ifeq "$(PY_RUN_APPROACH)" "local"
-PY_RUN_CMD := poetry run
+PY_RUN_CMD := uv run
 else
-PY_RUN_CMD := docker compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME) poetry run
+PY_RUN_CMD := docker compose run $(DOCKER_EXEC_ARGS) --rm $(APP_NAME)
 endif
 
 FLASK_CMD := $(PY_RUN_CMD) flask --env-file local.env
@@ -73,11 +73,8 @@ release-build:
 ##################################################
 
 setup-local:
-	# Configure poetry to use virtualenvs in the project directory
-	poetry config virtualenvs.in-project true
-
 	# Install dependencies
-	poetry install --no-root
+	uv sync --all-groups --locked
 
 ##################################################
 # API Build & Run

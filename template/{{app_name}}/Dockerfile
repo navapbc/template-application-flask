@@ -4,12 +4,9 @@
 # The build stage that will be used to deploy to the various environments
 # needs to be called `release` in order to integrate with the repo's
 # top-level Makefile
-FROM python:3.13-slim AS base
+FROM python:3.14-slim AS base
 # See docs for details on upgrading your Python version
 
-# Install poetry, the package manager.
-# https://python-poetry.org
-RUN pip install --no-cache-dir poetry==1.5
 
 RUN apt-get update \
     # Install security updates
@@ -28,13 +25,32 @@ RUN apt-get update \
 ARG RUN_UID
 ARG RUN_USER
 
+# Install UV, the package manager.
+# https://docs.astral.sh/uv/guides/integration/docker/#installing-uv
+COPY --from=ghcr.io/astral-sh/uv:0.11.9 /uv /uvx /bin/
+
+# Disable dev dependencies in UV sync
+ENV UV_NO_DEV=1
+# Compile python to *.pyc files for performance
+ENV UV_COMPILE_BYTECODE=1
+
+
 # The following logic creates the RUN_USER home directory and the directory where
 # we will be storing the application in the image. This runs when the user is not root
 RUN : "${RUN_USER:?RUN_USER and RUN_UID need to be set and non-empty.}" && \
     [ "${RUN_USER}" = "root" ] || \
     (useradd --create-home --create --user-group --home "/home/${RUN_USER}" --uid ${RUN_UID} "${RUN_USER}" \
     && mkdir /app \
-    && chown -R ${RUN_UID} "/home/${RUN_USER}" /app)
+    && mkdir -p /opt/venv \
+    && chown -R ${RUN_UID} "/home/${RUN_USER}" /app /opt/venv)
+
+WORKDIR /app
+
+COPY pyproject.toml uv.lock ./
+COPY . /app
+
+RUN uv sync --locked --no-dev && \
+    uv build --wheel  &&
 
 #-----------
 # Dev image
@@ -45,20 +61,28 @@ ARG RUN_USER
 USER ${RUN_USER}
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock ./
-# Explicitly create a new virtualenv to avoid getting overridden by mounted .venv folders
-RUN poetry config virtualenvs.in-project false && poetry env use python
-# Install all dependencies including dev dependencies
-RUN poetry install --no-root --with dev
+# We want dev dependencies in the dev image
+ENV UV_NO_DEV=0
+# In dev, prefer external venv to avoid mutating release venv
+ENV VIRTUAL_ENV=/opt/venv
+ENV UV_PROJECT_ENVIRONMENT=/opt/venv
+# Place entry points in the environment at the front of the path
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY pyproject.toml uv.lock ./
 
 COPY . /app
+
+# Install all dependencies including dev dependencies
+RUN uv venv /opt/venv && uv sync --locked --all-groups
+
 
 # Set the host to 0.0.0.0 to make the server available external
 # to the Docker container that it's running in.
 ENV HOST=0.0.0.0
 
 # Run the application.
-CMD ["poetry", "run", "python", "-m", "src"]
+CMD ["flask", "--app", "src.app", "run", "--host", "0.0.0.0", "--port", "8080", "--reload"]
 
 #---------
 # Release
@@ -83,21 +107,12 @@ COPY . /app
 # that has a virtual environment within the project app folder.
 RUN rm -fr /app/.venv
 
-# Set virtualenv location to be in project to be easy to find
-# This will create a virtualenv in /app/.venv/
-# See https://python-poetry.org/docs/configuration/#virtualenvsin-project
-# See https://python-poetry.org/docs/configuration/#using-environment-variables
-ENV POETRY_VIRTUALENVS_IN_PROJECT=true
-
-# Install production runtime dependencies only
-RUN poetry install --no-root --only main
-
 # Build the application binary (python wheel) defined in pyproject.toml
 # Note that this will only copy over python files, and files stated in the
 # include section in pyproject.toml. Also note that if you change the name or
 # version section in pyproject.toml, you will need to change the dist/... to match
 # or the application will not build
-RUN poetry build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
+RUN uv build --format wheel && poetry run pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
 # Add project's virtual env to the PATH so we can directly run poetry scripts
 # defined in pyproject.toml
@@ -110,4 +125,4 @@ ENV HOST=0.0.0.0
 USER ${RUN_USER}
 
 # Run the application.
-CMD ["poetry", "run", "gunicorn", "src.app:create_app()"]
+CMD ["gunicorn", "src.app:create_app()"]

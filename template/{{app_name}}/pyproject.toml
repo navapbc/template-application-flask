@@ -1,54 +1,65 @@
-[tool.poetry]
+[project]
 name = "template-application-flask"
 version = "0.1.0"
 description = "A template flask API for building ontop of"
-packages = [{ include = "src" }]
-authors = ["Nava Engineering <engineering@navapbc.com>"]
+authors = [{ name = "Nava Engineering", email = "engineering@navapbc.com" }]
+requires-python = ">=3.14,<3.15"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "SQLAlchemy[mypy]>=2.0.21,<3",
+    "alembic>=1.12.0,<2",
+    "python-dotenv>=1.0.0,<2",
+    "pydantic>=2.12.5,<3",
+    "botocore>=1.31.62,<2",
+    "boto3>=1.28.62,<2",
+    "smart-open>=7.0.0,<8",
+    "pytz>=2023.3.post1,<2024",
+    "APIFlask>=3.1.0,<4",
+    "marshmallow-dataclass[enum, union]>=8.5.8,<9",
+    "marshmallow>=3.20.1,<4",
+    "gunicorn>=23.0.0,<24",
+    "psycopg[binary]>=3.1.10,<4",
+    "pydantic-settings>=2.0.3,<3",
+]
 
-[tool.poetry.dependencies]
-# See docs for details on upgrading your Python version
-python = "~3.13"
-SQLAlchemy = {version = "^2.0.21", extras = ["mypy"]}
-alembic = "^1.12.0"
-python-dotenv = "^1.0.0"
-pydantic = "^2.4.2"
-botocore = "^1.31.62"
-boto3 = "^1.28.62"
-smart-open = "^6.1.0"
-pytz = "^2023.3.post1"
-APIFlask = "^2.0.2"
-marshmallow-dataclass = {extras = ["enum", "union"], version = "^8.5.8"}
-marshmallow = "^3.20.1"
-gunicorn = "^23.0.0"
-psycopg = {extras = ["binary"], version = "^3.1.10"}
-pydantic-settings = "^2.0.3"
-
-[tool.poetry.group.dev.dependencies]
-black = "^23.9.1"
-isort = "^5.12.0"
-mypy = "^1.5.1"
-moto = {extras = ["s3"], version = "^4.0.2"}
-types-pytz = "^2023.3.1.1"
-coverage = "^7.3.2"
-Faker = "^19.8.0"
-factory-boy = "^3.3.0"
-bandit = "^1.7.5"
-pytest = "^7.4.2"
-pytest-watch = "^4.2.0"
-pytest-lazy-fixture = "^0.6.3"
-types-pyyaml = "^6.0.12.11"
-setuptools = ">=70.0.0"
-debugpy = "^1.8.1"
-ruff = "^0.4.9"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry.scripts]
+[project.scripts]
 db-migrate = "src.db.migrations.run:up"
 db-migrate-down = "src.db.migrations.run:down"
 db-migrate-down-all = "src.db.migrations.run:downall"
+
+[dependency-groups]
+dev = [
+    "black>=24,<25",
+    "isort>=5.12.0,<6",
+    "mypy>=1.8.0,<2",
+    "moto[s3]>=5.0.0,<6",
+    "types-pytz>=2023.3.1.1,<2024",
+    "coverage>=7.3.2,<8",
+    "Faker>=28.0.0,<29",
+    "factory-boy>=3.3.0,<4",
+    "bandit>=1.7.5,<2",
+    "pytest>=8.0.0,<9",
+    "pytest-watch>=4.2.0,<5",
+    "pytest-lazy-fixture>=0.6.3,<0.7",
+    "types-pyyaml>=6.0.12.11,<7",
+    "setuptools>=75.0.0",
+    "debugpy>=1.8.1,<2",
+    "ruff>=0.15.0,<0.16",
+]
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-name = ["src"]
+module-root = ""
+
+[build-system]
+requires = ["uv_build>=0.11.8,<0.12.0"]
+build-backend = "uv_build"
 
 [tool.black]
 line-length = 100
