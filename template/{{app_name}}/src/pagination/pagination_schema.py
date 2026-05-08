@@ -1,6 +1,6 @@
 from typing import Type
 
-from apiflask import fields, validators, Schema
+from apiflask import Schema, fields, validators
 
 from src.pagination.pagination_models import SortDirection
 

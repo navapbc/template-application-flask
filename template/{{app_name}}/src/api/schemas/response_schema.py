@@ -1,4 +1,4 @@
-from apiflask import fields, Schema
+from apiflask import Schema, fields
 
 from src.pagination.pagination_schema import PaginationInfoSchema
 

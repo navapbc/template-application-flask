@@ -1,4 +1,4 @@
-from apiflask import fields, validators, Schema
+from apiflask import Schema, fields, validators
 from marshmallow import fields as marshmallow_fields
 
 from src.db.models import user_models
