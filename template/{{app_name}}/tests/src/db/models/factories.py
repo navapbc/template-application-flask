@@ -7,11 +7,11 @@ that are persisted to the database.
 The factories are based on the `factory_boy` library. See
 https://factoryboy.readthedocs.io/en/latest/ for more information.
 """
+
 from datetime import datetime
 from typing import Optional
 
 import factory
-import factory.fuzzy
 import faker
 from sqlalchemy.orm import scoped_session
 

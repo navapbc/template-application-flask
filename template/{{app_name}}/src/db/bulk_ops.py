@@ -3,6 +3,7 @@
 Provides a bulk_upsert function for use with
 Postgres and the psycopg library.
 """
+
 from typing import Any, Sequence
 
 import psycopg
