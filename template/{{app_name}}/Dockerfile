@@ -54,7 +54,10 @@ COPY . /app
 # that has a virtual environment within the project app folder.
 RUN rm -fr /app/.venv || true
 
-RUN uv sync --locked --no-dev
+# Install non-dev dependencies and build the wheel
+RUN uv sync --locked --no-dev && \
+    uv build --wheel && \
+    uv pip install --no-cache-dir dist/template_application_flask-0.1.0-py3-none-any.whl
 
 #-----------
 # Dev image
@@ -100,18 +103,10 @@ ARG RUN_USER
 RUN mkdir -p /tmp
 VOLUME ["/tmp"]
 
+# Copy only the virtualenv from base stage
+COPY --from=base /app/.venv /app/.venv
+
 # TODO(https://github.com/navapbc/template-application-flask/issues/23) Productionize the Docker image
-
-WORKDIR /app
-
-COPY . /app
-
-# Build the application binary (python wheel) defined in pyproject.toml
-# Note that this will only copy over python files, and files stated in the
-# include section in pyproject.toml. Also note that if you change the name or
-# version section in pyproject.toml, you will need to change the dist/... to match
-# or the application will not build
-RUN uv build --wheel && uv pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
 # Add project's virtual env to the PATH so we can directly run scripts from the .venv folder
 # defined in pyproject.toml
