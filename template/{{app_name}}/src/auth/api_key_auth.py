@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 # this needs to be attached to your
 # routes as `your_blueprint..auth_required(api_key_auth)`
 # in order to enable authorization
-api_key_auth = APIKeyHeaderAuth("ApiKey", header="X-Auth")
+api_key_auth = APIKeyHeaderAuth("ApiKey", param_name="X-Auth")
 
 
 def get_app_security_scheme() -> dict[str, Any]:
