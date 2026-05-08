@@ -1,10 +1,9 @@
-from apiflask import fields
+from apiflask import fields, Schema
 
-from src.api.schemas import request_schema
 from src.pagination.pagination_schema import PaginationInfoSchema
 
 
-class ValidationErrorSchema(request_schema.OrderedSchema):
+class ValidationErrorSchema(Schema):
     type = fields.String(metadata={"description": "The type of error"})
     message = fields.String(metadata={"description": "The message to return"})
     rule = fields.String(metadata={"description": "The rule that failed"})
@@ -12,7 +11,7 @@ class ValidationErrorSchema(request_schema.OrderedSchema):
     value = fields.String(metadata={"description": "The value that failed"})
 
 
-class ResponseSchema(request_schema.OrderedSchema):
+class ResponseSchema(Schema):
     message = fields.String(metadata={"description": "The message to return"})
     data = fields.Field(metadata={"description": "The REST resource object"}, dump_default={})
     status_code = fields.Integer(metadata={"description": "The HTTP status code"}, dump_default=200)

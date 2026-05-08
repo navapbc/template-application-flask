@@ -1,19 +1,18 @@
 import logging
 from typing import Tuple
 
-from apiflask import APIBlueprint
+from apiflask import APIBlueprint, Schema
 from flask import current_app
 from sqlalchemy import text
 from werkzeug.exceptions import ServiceUnavailable
 
 import src.adapters.db.flask_db as flask_db
 from src.api import response
-from src.api.schemas import request_schema
 
 logger = logging.getLogger(__name__)
 
 
-class HealthcheckSchema(request_schema.OrderedSchema):
+class HealthcheckSchema(Schema):
     message: str
 
 
