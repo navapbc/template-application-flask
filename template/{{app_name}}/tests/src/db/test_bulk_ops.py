@@ -1,4 +1,5 @@
 """Tests for bulk_ops module"""
+
 import operator
 import random
 from dataclasses import dataclass

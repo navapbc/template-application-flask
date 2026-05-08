@@ -1,14 +1,13 @@
-from apiflask import fields, validators
+from apiflask import Schema, fields, validators
 from marshmallow import fields as marshmallow_fields
 
-from src.api.schemas import request_schema
 from src.db.models import user_models
 from src.pagination.pagination_schema import PaginationSchema, generate_sorting_schema
 
 PHONE_NUMBER_VALIDATOR = validators.Regexp(r"^([0-9]|\*){3}\-([0-9]|\*){3}\-[0-9]{4}$")
 
 
-class RoleSchema(request_schema.OrderedSchema):
+class RoleSchema(Schema):
     type = marshmallow_fields.Enum(
         user_models.RoleType,
         by_value=True,
@@ -19,7 +18,7 @@ class RoleSchema(request_schema.OrderedSchema):
     # will always be a nested fields of the API user
 
 
-class UserSchema(request_schema.OrderedSchema):
+class UserSchema(Schema):
     id = fields.UUID(dump_only=True)
     first_name = fields.String(metadata={"description": "The user's first name"}, required=True)
     middle_name = fields.String(metadata={"description": "The user's middle name"})
@@ -47,7 +46,7 @@ class UserSchema(request_schema.OrderedSchema):
     updated_at = fields.DateTime(dump_only=True)
 
 
-class UserSearchSchema(request_schema.OrderedSchema):
+class UserSearchSchema(Schema):
     # Fields that you can search for users by, only includes a subset of user fields
     phone_number = fields.String(
         validate=[PHONE_NUMBER_VALIDATOR],
