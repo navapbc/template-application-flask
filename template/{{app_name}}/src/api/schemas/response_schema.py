@@ -13,7 +13,7 @@ class ValidationErrorSchema(Schema):
 
 class ResponseSchema(Schema):
     message = fields.String(metadata={"description": "The message to return"})
-    data = fields.Field(metadata={"description": "The REST resource object"}, dump_default={})
+    data = fields.Raw(metadata={"description": "The REST resource object"}, dump_default={})
     status_code = fields.Integer(metadata={"description": "The HTTP status code"}, dump_default=200)
     warnings = fields.List(fields.Nested(ValidationErrorSchema()), dump_default=[])
     errors = fields.List(fields.Nested(ValidationErrorSchema()), dump_default=[])
