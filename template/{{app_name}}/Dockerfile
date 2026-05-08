@@ -49,6 +49,11 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY . /app
 
+# Remove any existing virtual environments that might exist. This
+# might happen if testing out building the release image from a local machine
+# that has a virtual environment within the project app folder.
+RUN rm -fr /app/.venv || true
+
 RUN uv sync --locked --no-dev
 
 #-----------
@@ -100,11 +105,6 @@ VOLUME ["/tmp"]
 WORKDIR /app
 
 COPY . /app
-
-# Remove any existing virtual environments that might exist. This
-# might happen if testing out building the release image from a local machine
-# that has a virtual environment within the project app folder.
-RUN rm -fr /app/.venv
 
 # Build the application binary (python wheel) defined in pyproject.toml
 # Note that this will only copy over python files, and files stated in the
