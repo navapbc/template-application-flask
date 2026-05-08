@@ -49,8 +49,7 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 COPY . /app
 
-RUN uv sync --locked --no-dev && \
-    uv build --wheel  &&
+RUN uv sync --locked --no-dev
 
 #-----------
 # Dev image
