@@ -111,7 +111,7 @@ RUN rm -fr /app/.venv
 # include section in pyproject.toml. Also note that if you change the name or
 # version section in pyproject.toml, you will need to change the dist/... to match
 # or the application will not build
-RUN uv build --format wheel && uv pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
+RUN uv build --wheel && uv pip install 'dist/template_application_flask-0.1.0-py3-none-any.whl'
 
 # Add project's virtual env to the PATH so we can directly run scripts from the .venv folder
 # defined in pyproject.toml
